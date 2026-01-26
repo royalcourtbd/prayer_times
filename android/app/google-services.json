@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "358686160551",
+    "project_id": "prayer-times-6163f",
+    "storage_bucket": "prayer-times-6163f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358686160551:android:82a70312b8b8fa98cecd82",
+        "android_client_info": {
+          "package_name": "com.amatullah.prayer_times"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6R9zs7NYq54PY3iKHvwia5dYHbEveRRA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
