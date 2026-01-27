@@ -239,6 +239,8 @@ class PrayerTrackerPresenter extends BasePresenter<PrayerTrackerUiState> {
     final Map<DateTime, List<PrayerTrackerModel>> historyData =
         await getPrayerTrackerHistory();
 
+    if (!context.mounted) return;
+
     if (historyData.isEmpty) {
       addUserMessage('No data to clear');
     } else {

@@ -25,14 +25,14 @@ class ChooseCountryOrCityBottomSheet extends StatelessWidget {
             isCountrySelection: isCountrySelection,
           ),
         );
-    if (context.mounted) {
-      final presenter = locate<SettingsPagePresenter>();
-      if (isCountrySelection) {
-        presenter.clearControllers();
-        await presenter.loadCountries;
-      }
-      await context.showBottomSheet(chooseCountryOrCityBottomSheet, context);
+    if (!context.mounted) return;
+    final presenter = locate<SettingsPagePresenter>();
+    if (isCountrySelection) {
+      presenter.clearControllers();
+      await presenter.loadCountries;
     }
+    if (!context.mounted) return;
+    await context.showBottomSheet(chooseCountryOrCityBottomSheet, context);
   }
 
   @override

@@ -510,6 +510,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
 
     // After the UI is rendered, scroll to the active waqt
     Future.delayed(Duration(milliseconds: 500), () {
+      if (context != null && !context.mounted) return;
       scrollToActiveWaqt(context);
     });
   }

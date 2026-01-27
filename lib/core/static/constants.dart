@@ -18,7 +18,7 @@ const List<Color> availableColors = [
   Color(0xff90A4AE),
 ];
 
-const String packageName = "com.sarahtech.prayer_times";
+const String packageName = "com.amatullah.prayer_times";
 const String appStoreAppId = "1324615850";
 
 const String playStoreUrl =
