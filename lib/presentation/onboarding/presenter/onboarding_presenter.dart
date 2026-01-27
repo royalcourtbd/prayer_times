@@ -93,7 +93,7 @@ class OnboardingPresenter extends BasePresenter<OnboardingUiState> {
     }
   }
 
-  void onLocationAccessTap() async {
+  Future<void> onLocationAccessTap(BuildContext context) async {
     try {
       await toggleLoading(loading: true);
 
@@ -122,13 +122,13 @@ class OnboardingPresenter extends BasePresenter<OnboardingUiState> {
       await addUserMessage('Location access granted');
       await toggleLoading(loading: false);
 
-      Future.microtask(() async {
-        currentUiState.context!.navigatorPushReplacement(MainPage());
-        await doneWithFirstTime();
-      });
+      await doneWithFirstTime();
+      if (context.mounted) {
+        await goToHomePage(context);
+      }
     } catch (error) {
       await toggleLoading(loading: false);
-      if (currentUiState.context != null && currentUiState.context!.mounted) {
+      if (context.mounted) {
         await addUserMessage(error.toString());
 
         if (error.toString().contains('Location permissions are denied')) {
@@ -148,13 +148,34 @@ class OnboardingPresenter extends BasePresenter<OnboardingUiState> {
     }
   }
 
-  void onManualLocationTap(bool isManualLocationSelected) {
-    Future.microtask(() async {
-      settingsPresenter.onManualLocationSelected(
-        isManualLocationSelected: isManualLocationSelected,
-      );
+  Future<void> onManualLocationTap(BuildContext context) async {
+    // Reset the flag before showing bottomsheet
+    settingsPresenter.resetLocationActionFlag();
+
+    // Set manual location selected flag
+    settingsPresenter.onManualLocationSelected(
+      isManualLocationSelected: true,
+    );
+
+    // Show the location selection bottomsheet
+    await settingsPresenter.showSelectLocationBottomSheetAsync(context);
+
+    // After bottomsheet is dismissed, check if user took action (Save or Use Current Location)
+    if (settingsPresenter.wasLocationActionTaken) {
       await doneWithFirstTime();
-    });
+
+      // Use addPostFrameCallback to ensure navigation happens after the current build phase
+      // This prevents "setState() called during build" error
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          goToHomePage(context);
+        }
+        // Load prayer times from cache after navigation completes
+        Future.delayed(const Duration(milliseconds: 500), () {
+          homePresenter.loadLocationAndPrayerTimes();
+        });
+      });
+    }
   }
 
   void updateContext(BuildContext context) {

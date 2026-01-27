@@ -6,7 +6,9 @@ import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/flutter_toast/debouncer.dart';
 import 'package:prayer_times/core/static/constants.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/data/datasources/local/location_local_data_source.dart';
 import 'package:prayer_times/domain/entities/country_entity.dart';
+import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/usecases/get_countries_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_juristic_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/search_countries_usecase.dart';
@@ -21,12 +23,14 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   final UpdateJuristicMethodUseCase _updateJuristicMethodUseCase;
   final GetCountriesUseCase _getCountriesUseCase;
   final SearchCountriesUseCase _searchCountriesUseCase;
+  final LocationLocalDataSource _locationLocalDataSource;
 
   SettingsPagePresenter(
     this._getJuristicMethodUseCase,
     this._updateJuristicMethodUseCase,
     this._getCountriesUseCase,
     this._searchCountriesUseCase,
+    this._locationLocalDataSource,
   );
 
   final Obs<SettingsPageUiState> uiState = Obs(SettingsPageUiState.empty());
@@ -37,6 +41,11 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   final TextEditingController countryController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final _searchDebouncer = Debouncer(milliseconds: 500);
+
+  // Track if location was saved (for onboarding navigation)
+  bool _locationActionTaken = false;
+  bool get wasLocationActionTaken => _locationActionTaken;
+  void resetLocationActionFlag() => _locationActionTaken = false;
 
   @override
   void onInit() {
@@ -89,19 +98,83 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     SelectLocationBottomsheet.show(context: context);
   }
 
+  Future<void> showSelectLocationBottomSheetAsync(BuildContext context) async {
+    await SelectLocationBottomsheet.show(context: context);
+  }
+
   void onManualLocationSelected({required bool isManualLocationSelected}) {
     uiState.value = currentUiState.copyWith(
       isManualLocationSelected: isManualLocationSelected,
     );
   }
 
-  void onUseCurrentLocationSelected() async {
+  Future<void> onUseCurrentLocationSelected(BuildContext context) async {
     onManualLocationSelected(isManualLocationSelected: false);
-    await _homePresenter.loadLocationAndPrayerTimes();
+    _locationActionTaken = true;
+
+    // Close the bottom sheet first
+    if (context.mounted) {
+      context.navigatorPop();
+    }
+    clearControllers();
+
+    // Force refresh from GPS after bottomsheet animation completes
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _homePresenter.refreshLocationAndPrayerTimes();
+    });
   }
 
-  void onSaveLocationSelected(BuildContext context) {
-    context.navigatorPop();
+  Future<void> onSaveLocationSelected(BuildContext context) async {
+    if (currentUiState.isManualLocationSelected) {
+      // Find the selected city from the list
+      final selectedCityName = currentUiState.selectedCity;
+      if (selectedCityName.isEmpty) {
+        showMessage(message: 'Please select a city');
+        return;
+      }
+
+      final selectedCity = currentUiState.selectedCountryCities.firstWhere(
+        (city) => city.name == selectedCityName,
+        orElse: () => CityNameEntity(
+          name: '',
+          timezone: '',
+          latitude: 0,
+          longitude: 0,
+        ),
+      );
+
+      if (selectedCity.name.isEmpty) {
+        showMessage(message: 'City not found');
+        return;
+      }
+
+      // Create LocationEntity from selected city
+      final location = LocationEntity(
+        latitude: selectedCity.latitude,
+        longitude: selectedCity.longitude,
+        placeName: '${selectedCity.name}, ${currentUiState.selectedCountry}',
+      );
+
+      // Cache the location
+      await _locationLocalDataSource.cacheLocation(location);
+      _locationActionTaken = true;
+
+      // Close the bottom sheet first
+      if (context.mounted) {
+        context.navigatorPop();
+      }
+      clearControllers();
+
+      // Load prayer times after bottomsheet animation completes
+      Future.delayed(const Duration(milliseconds: 300), () {
+        _homePresenter.loadLocationAndPrayerTimes();
+      });
+      return;
+    }
+
+    if (context.mounted) {
+      context.navigatorPop();
+    }
     clearControllers();
   }
 

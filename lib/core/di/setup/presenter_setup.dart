@@ -36,7 +36,13 @@ class PresenterSetup implements SetupModule {
       )
       ..registerLazySingleton(
         () => loadPresenter(
-          SettingsPagePresenter(locate(), locate(), locate(), locate()),
+          SettingsPagePresenter(
+            locate(),
+            locate(),
+            locate(),
+            locate(),
+            locate(),
+          ),
         ),
       )
       ..registerLazySingleton(

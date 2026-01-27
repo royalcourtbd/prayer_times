@@ -39,7 +39,7 @@ class SelectLocationBottomsheet extends StatelessWidget {
               title: 'Use Current Location',
               subtitle: presenter.showLocationName(),
               isSelected: !presenter.currentUiState.isManualLocationSelected,
-              onTap: () => presenter.onUseCurrentLocationSelected(),
+              onTap: () => presenter.onUseCurrentLocationSelected(context),
             ),
             gapH25,
             CustomRadioListTile(

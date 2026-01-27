@@ -64,10 +64,7 @@ class OnboardingPage extends StatelessWidget {
                         duration: const Duration(milliseconds: 400),
                         child: CustomButton(
                           title: 'Allow Location Access',
-                          onPressed: () {
-                            _presenter.onManualLocationTap(false);
-                            _presenter.onLocationAccessTap;
-                          },
+                          onPressed: () => _presenter.onLocationAccessTap(context),
                         ),
                       ),
                       gapH20,
@@ -76,7 +73,7 @@ class OnboardingPage extends StatelessWidget {
                         child: CustomButton(
                           title: 'Select Location Manually',
                           isPrimary: false,
-                          onPressed: () => _presenter.onManualLocationTap(true),
+                          onPressed: () => _presenter.onManualLocationTap(context),
                         ),
                       ),
                       gapH20,
