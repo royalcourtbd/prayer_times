@@ -8,7 +8,6 @@ import 'package:prayer_times/core/utility/trial_utility.dart';
 import 'package:prayer_times/data/services/backend_as_a_service.dart';
 import 'package:prayer_times/data/services/database/prayer_database.dart';
 import 'package:prayer_times/data/services/error_message_handler_impl.dart';
-import 'package:prayer_times/data/services/get_server_key.dart';
 import 'package:prayer_times/data/services/local_cache_service.dart';
 import 'package:prayer_times/data/services/location_service.dart';
 import 'package:prayer_times/data/services/notification/notification_service_impl.dart';
@@ -37,9 +36,8 @@ class ServiceSetup implements SetupModule {
       ..registerLazySingleton(() => PrayerDatabase())
       ..registerLazySingleton(() => LocationService())
       ..registerLazySingleton(() => InAppReview.instance)
-      ..registerLazySingleton(() => GetServerKey())
       ..registerLazySingleton(LocalCacheService.new);
-    await GetServerKey().getServerKeyToken();
+
     await LocalCacheService.setUp();
 
     await _setUpAudioService();
