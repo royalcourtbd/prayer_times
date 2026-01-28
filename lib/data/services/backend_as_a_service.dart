@@ -152,16 +152,12 @@ class BackendAsAService {
       }
 
       try {
-        final bool isFirstInstall =
-            await catchAndReturnFuture(() async {
-              final DocumentSnapshot<Map<String, dynamic>> doc =
-                  await _fireStore
-                      .collection(deviceTokensCollection)
-                      .doc(deviceId)
-                      .get();
-              return !doc.exists;
-            }) ??
-            true;
+        final DocumentSnapshot<Map<String, dynamic>> doc =
+            await _fireStore
+                .collection(deviceTokensCollection)
+                .doc(deviceId)
+                .get();
+        final bool isFirstInstall = !doc.exists;
 
         deviceInfo = deviceInfo.copyWith(
           token: token,

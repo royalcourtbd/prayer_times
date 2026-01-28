@@ -68,15 +68,6 @@ class OnboardingPage extends StatelessWidget {
                         ),
                       ),
                       gapH20,
-                      SlideInUp(
-                        duration: const Duration(milliseconds: 200),
-                        child: CustomButton(
-                          title: 'Select Location Manually',
-                          isPrimary: false,
-                          onPressed: () => _presenter.onManualLocationTap(context),
-                        ),
-                      ),
-                      gapH20,
                     ],
                   ],
                 ),
