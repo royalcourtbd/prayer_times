@@ -175,6 +175,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
       await parseDataFromEitherWithUserMessage<LocationEntity>(
         task: () => _getLocationUseCase.execute(forceRemote: forceRemote),
         onDataLoaded: (LocationEntity location) async {
+          // Update TimeService timezone when location changes
+          _timeService.setTimezone(location.timezone);
           await getPrayerTimes(location: location);
         },
       );
@@ -188,12 +190,16 @@ class HomePresenter extends BasePresenter<HomeUiState> {
           latitude: location.latitude,
           longitude: location.longitude,
           date: _timeService.getCurrentTime(),
+          timezone: location.timezone,
         ),
         onDataLoaded: (PrayerTimeEntity data) {
           uiState.value = currentUiState.copyWith(
             prayerTime: data,
             location: location,
           );
+
+          // Update TimeService timezone
+          _timeService.setTimezone(location.timezone);
 
           _updateAllStates();
           initializeTracker();

@@ -148,11 +148,12 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
         return;
       }
 
-      // Create LocationEntity from selected city
+      // Create LocationEntity from selected city - including timezone
       final location = LocationEntity(
         latitude: selectedCity.latitude,
         longitude: selectedCity.longitude,
         placeName: '${selectedCity.name}, ${currentUiState.selectedCountry}',
+        timezone: selectedCity.timezone,
       );
 
       // Cache the location

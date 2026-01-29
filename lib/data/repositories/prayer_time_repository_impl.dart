@@ -15,12 +15,14 @@ class PrayerTimeRepositoryImpl implements PrayerTimeRepository {
     required double latitude,
     required double longitude,
     DateTime? date,
+    String? timezone,
   }) async {
     try {
       final PrayerTimeEntity result = await _dataSource.getPrayerTimes(
         latitude: latitude,
         longitude: longitude,
         date: date,
+        timezone: timezone,
       );
       return right(result);
     } catch (e) {

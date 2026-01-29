@@ -5,6 +5,7 @@ class LocationModel extends LocationEntity {
     required super.latitude,
     required super.longitude,
     super.placeName,
+    super.timezone,
   });
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
@@ -12,6 +13,7 @@ class LocationModel extends LocationEntity {
       latitude: json['latitude'] as double,
       longitude: json['longitude'] as double,
       placeName: json['placeName'] as String?,
+      timezone: json['timezone'] as String?,
     );
   }
 
@@ -20,6 +22,7 @@ class LocationModel extends LocationEntity {
       latitude: entity.latitude,
       longitude: entity.longitude,
       placeName: entity.placeName,
+      timezone: entity.timezone,
     );
   }
 
@@ -28,21 +31,24 @@ class LocationModel extends LocationEntity {
       'latitude': latitude,
       'longitude': longitude,
       'placeName': placeName,
+      'timezone': timezone,
     };
   }
 
   @override
-  List<Object?> get props => [latitude, longitude, placeName];
+  List<Object?> get props => [latitude, longitude, placeName, timezone];
 
   LocationModel copyWith({
     double? latitude,
     double? longitude,
     String? placeName,
+    String? timezone,
   }) {
     return LocationModel(
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       placeName: placeName ?? this.placeName,
+      timezone: timezone ?? this.timezone,
     );
   }
 }

@@ -6,5 +6,6 @@ abstract class PrayerTimeRepository {
     required double latitude,
     required double longitude,
     DateTime? date,
+    String? timezone,
   });
 }

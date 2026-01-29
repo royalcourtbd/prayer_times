@@ -1,5 +1,6 @@
 import 'package:geocoding/geocoding.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
+import 'package:prayer_times/data/services/timezone_lookup_service.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 
 abstract class LocationRemoteDataSource {
@@ -10,11 +11,19 @@ abstract class LocationRemoteDataSource {
 }
 
 class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
+  final TimezoneLookupService _timezoneLookupService;
+
+  LocationRemoteDataSourceImpl(this._timezoneLookupService);
+
   @override
   Future<LocationEntity> getPlaceNameFromCoordinates({
     required double latitude,
     required double longitude,
   }) async {
+    // Lookup timezone from coordinates using nearest city
+    final String? timezone = await _timezoneLookupService
+        .getTimezoneFromCoordinates(latitude, longitude);
+
     final LocationEntity? result = await catchAndReturnFuture(() async {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         latitude,
@@ -46,12 +55,14 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
           placeName: addressParts.isEmpty
               ? 'Unknown Place'
               : addressParts.join(', '),
+          timezone: timezone,
         );
       } else {
         return LocationEntity(
           latitude: latitude,
           longitude: longitude,
           placeName: 'Unknown Place',
+          timezone: timezone,
         );
       }
     });
@@ -62,6 +73,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
           latitude: latitude,
           longitude: longitude,
           placeName: 'Unknown Place',
+          timezone: timezone,
         );
   }
 }
