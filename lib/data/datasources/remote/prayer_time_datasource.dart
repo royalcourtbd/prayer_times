@@ -1,6 +1,6 @@
 // lib/data/datasources/prayer_time_datasource.dart
 
-import 'package:adhan/adhan.dart';
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
 import 'package:prayer_times/domain/repositories/juristic_method_repository.dart';
@@ -24,22 +24,21 @@ class PrayerTimeDataSourceImpl implements PrayerTimeDataSource {
     required double longitude,
     DateTime? date,
   }) async {
-    final Either<String, String> methodResult = await _juristicMethodRepository
-        .getJuristicMethod();
+    final Either<String, String> methodResult =
+        await _juristicMethodRepository.getJuristicMethod();
 
     return methodResult.fold((error) => throw Exception(error), (method) async {
       final Coordinates coordinates = Coordinates(latitude, longitude);
-      final CalculationParameters params = CalculationMethod.karachi
-          .getParameters();
-
-      params.madhab = method == 'Hanafi' ? Madhab.hanafi : Madhab.shafi;
+      final CalculationParameters params = CalculationMethodParameters.karachi()
+        ..madhab = method == 'Hanafi' ? Madhab.hanafi : Madhab.shafi;
 
       // Use the provided date or fallback to current date
       final DateTime prayerDate = date ?? DateTime.now();
       final PrayerTimes prayerTimes = PrayerTimes(
-        coordinates,
-        DateComponents(prayerDate.year, prayerDate.month, prayerDate.day),
-        params,
+        coordinates: coordinates,
+        date: prayerDate,
+        calculationParameters: params,
+        precision: true,
       );
 
       return PrayerTimeEntity(

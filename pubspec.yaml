@@ -68,7 +68,7 @@ dependencies:
   firebase_crashlytics: ^5.0.7
   cloud_firestore: ^6.1.2
   geocoding: ^4.0.0
-  adhan: ^2.0.0+1
+  adhan_dart: ^1.2.0
   geolocator: ^14.0.2
   isolates_helper: ^0.5.2
   hijri_calendar: ^1.0.7+7
