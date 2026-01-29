@@ -1,18 +1,33 @@
 // lib/data/services/database/prayer_database.dart
 
 import 'package:drift/drift.dart';
+import 'package:prayer_times/data/services/database/table/calculation_method_table.dart';
 import 'package:prayer_times/data/services/database/table/juristic_method_table.dart';
 import 'package:prayer_times/data/services/database/database_loader.dart';
 import 'package:prayer_times/data/services/database/table/prayer_tracker_table.dart';
 part 'prayer_database.g.dart';
 
-@DriftDatabase(tables: [JuristicMethodTable, PrayerTrackerTable])
+@DriftDatabase(tables: [JuristicMethodTable, PrayerTrackerTable, CalculationMethodTable])
 class PrayerDatabase extends _$PrayerDatabase {
   PrayerDatabase({QueryExecutor? queryExecutor})
     : super(queryExecutor ?? loadDatabase());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 2) {
+          await m.createTable(calculationMethodTable);
+        }
+      },
+    );
+  }
 
   Future<String> getJuristicMethod() async {
     final result =
@@ -26,6 +41,24 @@ class PrayerDatabase extends _$PrayerDatabase {
   Future<void> updateJuristicMethod(String method) async {
     await into(juristicMethodTable).insert(
       JuristicMethodTableCompanion.insert(
+        method: method,
+        updatedAt: DateTime.now(),
+      ),
+    );
+  }
+
+  Future<String> getCalculationMethod() async {
+    final result =
+        await (select(calculationMethodTable)
+              ..limit(1)
+              ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]))
+            .getSingleOrNull();
+    return result?.method ?? 'karachi';
+  }
+
+  Future<void> updateCalculationMethod(String method) async {
+    await into(calculationMethodTable).insert(
+      CalculationMethodTableCompanion.insert(
         method: method,
         updatedAt: DateTime.now(),
       ),

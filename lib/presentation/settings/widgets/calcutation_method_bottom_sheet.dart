@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
+import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/domain/entities/calculation_method_entity.dart';
 import 'package:prayer_times/presentation/common/custom_modal_sheet.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/settings/presenter/settings_page_presenter.dart';
@@ -30,21 +32,44 @@ class CalculationMethodBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return CustomModalSheet(
-      theme: theme,
-      bottomSheetTitle: 'Calculation Method',
-      children: [
-        CustomRadioListTile(
-          title: 'Muslim World League (MWL)',
-          isSelected: false,
-          onTap: () {},
-        ),
-        CustomRadioListTile(
-          title: 'Islamic Society of North America (ISNA)',
-          isSelected: false,
-          onTap: () {},
-        ),
-      ],
+    final List<CalculationMethodEntity> methods =
+        CalculationMethodEntity.allMethods;
+
+    return PresentableWidgetBuilder(
+      presenter: presenter,
+      builder: () {
+        return CustomModalSheet(
+          theme: theme,
+          bottomSheetTitle: 'Calculation Method',
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.6,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: methods.map((method) {
+                    return CustomRadioListTile(
+                      title: method.displayName,
+                      subtitle: method.subtitle,
+                      isSelected: presenter
+                              .currentUiState
+                              .selectedCalculationMethod ==
+                          method.id,
+                      onTap: () => presenter.onCalculationMethodChanged(
+                        method: method.id,
+                        onPrayerTimeUpdateRequired: () =>
+                            homePresenter.refreshLocationAndPrayerTimes(),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -10,17 +10,22 @@ import 'package:prayer_times/data/datasources/local/location_local_data_source.d
 import 'package:prayer_times/domain/entities/country_entity.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/usecases/get_countries_usecase.dart';
+import 'package:prayer_times/domain/usecases/get_calculation_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_juristic_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/search_countries_usecase.dart';
+import 'package:prayer_times/domain/usecases/update_calculation_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_juristic_method_usecase.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/settings/presenter/settings_page_ui_state.dart';
+import 'package:prayer_times/presentation/settings/widgets/calcutation_method_bottom_sheet.dart';
 import 'package:prayer_times/presentation/settings/widgets/juristic_method_bottom_sheet.dart';
 import 'package:prayer_times/presentation/settings/widgets/select_location_bottomsheet.dart';
 
 class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   final GetJuristicMethodUseCase _getJuristicMethodUseCase;
   final UpdateJuristicMethodUseCase _updateJuristicMethodUseCase;
+  final GetCalculationMethodUseCase _getCalculationMethodUseCase;
+  final UpdateCalculationMethodUseCase _updateCalculationMethodUseCase;
   final GetCountriesUseCase _getCountriesUseCase;
   final SearchCountriesUseCase _searchCountriesUseCase;
   final LocationLocalDataSource _locationLocalDataSource;
@@ -28,6 +33,8 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   SettingsPagePresenter(
     this._getJuristicMethodUseCase,
     this._updateJuristicMethodUseCase,
+    this._getCalculationMethodUseCase,
+    this._updateCalculationMethodUseCase,
     this._getCountriesUseCase,
     this._searchCountriesUseCase,
     this._locationLocalDataSource,
@@ -50,6 +57,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   @override
   void onInit() {
     _loadJuristicMethod();
+    _loadCalculationMethod();
     _loadCountries();
     super.onInit();
   }
@@ -84,6 +92,42 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
         },
       );
     });
+  }
+
+  Future<void> _loadCalculationMethod() async {
+    await executeTaskWithLoading(() async {
+      await parseDataFromEitherWithUserMessage(
+        task: () => _getCalculationMethodUseCase.execute(),
+        onDataLoaded: (String method) {
+          if (method.isNotEmpty) {
+            uiState.value = currentUiState.copyWith(
+              selectedCalculationMethod: method,
+            );
+          }
+        },
+      );
+    });
+  }
+
+  Future<void> onCalculationMethodChanged({
+    required String method,
+    VoidCallback? onPrayerTimeUpdateRequired,
+  }) async {
+    await executeTaskWithLoading(() async {
+      await parseDataFromEitherWithUserMessage(
+        task: () => _updateCalculationMethodUseCase.execute(method: method),
+        onDataLoaded: (_) async {
+          uiState.value = currentUiState.copyWith(
+            selectedCalculationMethod: method,
+          );
+          onPrayerTimeUpdateRequired?.call();
+        },
+      );
+    });
+  }
+
+  void showCalculationMethodBottomSheet(BuildContext context) {
+    CalculationMethodBottomSheet.show(context: context, presenter: this);
   }
 
   String showLocationName() {

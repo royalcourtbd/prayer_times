@@ -479,6 +479,204 @@ class PrayerTrackerTableCompanion
   }
 }
 
+class $CalculationMethodTableTable extends CalculationMethodTable
+    with TableInfo<$CalculationMethodTableTable, CalculationMethodTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CalculationMethodTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _methodMeta = const VerificationMeta('method');
+  @override
+  late final GeneratedColumn<String> method = GeneratedColumn<String>(
+      'method', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [method, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'calculation_method_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<CalculationMethodTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('method')) {
+      context.handle(_methodMeta,
+          method.isAcceptableOrUnknown(data['method']!, _methodMeta));
+    } else if (isInserting) {
+      context.missing(_methodMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  CalculationMethodTableData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CalculationMethodTableData(
+      method: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}method'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $CalculationMethodTableTable createAlias(String alias) {
+    return $CalculationMethodTableTable(attachedDatabase, alias);
+  }
+}
+
+class CalculationMethodTableData extends DataClass
+    implements Insertable<CalculationMethodTableData> {
+  final String method;
+  final DateTime updatedAt;
+  const CalculationMethodTableData(
+      {required this.method, required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['method'] = Variable<String>(method);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CalculationMethodTableCompanion toCompanion(bool nullToAbsent) {
+    return CalculationMethodTableCompanion(
+      method: Value(method),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CalculationMethodTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CalculationMethodTableData(
+      method: serializer.fromJson<String>(json['method']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'method': serializer.toJson<String>(method),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CalculationMethodTableData copyWith({String? method, DateTime? updatedAt}) =>
+      CalculationMethodTableData(
+        method: method ?? this.method,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  CalculationMethodTableData copyWithCompanion(
+      CalculationMethodTableCompanion data) {
+    return CalculationMethodTableData(
+      method: data.method.present ? data.method.value : this.method,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CalculationMethodTableData(')
+          ..write('method: $method, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(method, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CalculationMethodTableData &&
+          other.method == this.method &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CalculationMethodTableCompanion
+    extends UpdateCompanion<CalculationMethodTableData> {
+  final Value<String> method;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CalculationMethodTableCompanion({
+    this.method = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CalculationMethodTableCompanion.insert({
+    required String method,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : method = Value(method),
+        updatedAt = Value(updatedAt);
+  static Insertable<CalculationMethodTableData> custom({
+    Expression<String>? method,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (method != null) 'method': method,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CalculationMethodTableCompanion copyWith(
+      {Value<String>? method, Value<DateTime>? updatedAt, Value<int>? rowid}) {
+    return CalculationMethodTableCompanion(
+      method: method ?? this.method,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (method.present) {
+      map['method'] = Variable<String>(method.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CalculationMethodTableCompanion(')
+          ..write('method: $method, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$PrayerDatabase extends GeneratedDatabase {
   _$PrayerDatabase(QueryExecutor e) : super(e);
   $PrayerDatabaseManager get managers => $PrayerDatabaseManager(this);
@@ -486,12 +684,14 @@ abstract class _$PrayerDatabase extends GeneratedDatabase {
       $JuristicMethodTableTable(this);
   late final $PrayerTrackerTableTable prayerTrackerTable =
       $PrayerTrackerTableTable(this);
+  late final $CalculationMethodTableTable calculationMethodTable =
+      $CalculationMethodTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [juristicMethodTable, prayerTrackerTable];
+      [juristicMethodTable, prayerTrackerTable, calculationMethodTable];
 }
 
 typedef $$JuristicMethodTableTableCreateCompanionBuilder
@@ -789,6 +989,141 @@ typedef $$PrayerTrackerTableTableProcessedTableManager = ProcessedTableManager<
     ),
     PrayerTrackerTableData,
     PrefetchHooks Function()>;
+typedef $$CalculationMethodTableTableCreateCompanionBuilder
+    = CalculationMethodTableCompanion Function({
+  required String method,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$CalculationMethodTableTableUpdateCompanionBuilder
+    = CalculationMethodTableCompanion Function({
+  Value<String> method,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$CalculationMethodTableTableFilterComposer
+    extends Composer<_$PrayerDatabase, $CalculationMethodTableTable> {
+  $$CalculationMethodTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get method => $composableBuilder(
+      column: $table.method, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$CalculationMethodTableTableOrderingComposer
+    extends Composer<_$PrayerDatabase, $CalculationMethodTableTable> {
+  $$CalculationMethodTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get method => $composableBuilder(
+      column: $table.method, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CalculationMethodTableTableAnnotationComposer
+    extends Composer<_$PrayerDatabase, $CalculationMethodTableTable> {
+  $$CalculationMethodTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get method =>
+      $composableBuilder(column: $table.method, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$CalculationMethodTableTableTableManager extends RootTableManager<
+    _$PrayerDatabase,
+    $CalculationMethodTableTable,
+    CalculationMethodTableData,
+    $$CalculationMethodTableTableFilterComposer,
+    $$CalculationMethodTableTableOrderingComposer,
+    $$CalculationMethodTableTableAnnotationComposer,
+    $$CalculationMethodTableTableCreateCompanionBuilder,
+    $$CalculationMethodTableTableUpdateCompanionBuilder,
+    (
+      CalculationMethodTableData,
+      BaseReferences<_$PrayerDatabase, $CalculationMethodTableTable,
+          CalculationMethodTableData>
+    ),
+    CalculationMethodTableData,
+    PrefetchHooks Function()> {
+  $$CalculationMethodTableTableTableManager(
+      _$PrayerDatabase db, $CalculationMethodTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CalculationMethodTableTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CalculationMethodTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CalculationMethodTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> method = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CalculationMethodTableCompanion(
+            method: method,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String method,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CalculationMethodTableCompanion.insert(
+            method: method,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$CalculationMethodTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$PrayerDatabase,
+        $CalculationMethodTableTable,
+        CalculationMethodTableData,
+        $$CalculationMethodTableTableFilterComposer,
+        $$CalculationMethodTableTableOrderingComposer,
+        $$CalculationMethodTableTableAnnotationComposer,
+        $$CalculationMethodTableTableCreateCompanionBuilder,
+        $$CalculationMethodTableTableUpdateCompanionBuilder,
+        (
+          CalculationMethodTableData,
+          BaseReferences<_$PrayerDatabase, $CalculationMethodTableTable,
+              CalculationMethodTableData>
+        ),
+        CalculationMethodTableData,
+        PrefetchHooks Function()>;
 
 class $PrayerDatabaseManager {
   final _$PrayerDatabase _db;
@@ -797,4 +1132,7 @@ class $PrayerDatabaseManager {
       $$JuristicMethodTableTableTableManager(_db, _db.juristicMethodTable);
   $$PrayerTrackerTableTableTableManager get prayerTrackerTable =>
       $$PrayerTrackerTableTableTableManager(_db, _db.prayerTrackerTable);
+  $$CalculationMethodTableTableTableManager get calculationMethodTable =>
+      $$CalculationMethodTableTableTableManager(
+          _db, _db.calculationMethodTable);
 }

@@ -7,6 +7,7 @@ class SettingsPageUiState extends BaseUiState {
     required super.isLoading,
     required super.userMessage,
     required this.selectedJuristicMethod,
+    required this.selectedCalculationMethod,
     required this.selectedCountry,
     required this.isManualLocationSelected,
     required this.countries,
@@ -15,6 +16,7 @@ class SettingsPageUiState extends BaseUiState {
   });
 
   final String selectedJuristicMethod;
+  final String selectedCalculationMethod;
   final String selectedCountry;
   final String selectedCity;
   final bool isManualLocationSelected;
@@ -26,6 +28,7 @@ class SettingsPageUiState extends BaseUiState {
       isLoading: false,
       userMessage: '',
       selectedJuristicMethod: '',
+      selectedCalculationMethod: 'karachi',
       selectedCountry: '',
       selectedCity: '',
       isManualLocationSelected: false,
@@ -39,6 +42,7 @@ class SettingsPageUiState extends BaseUiState {
     isLoading,
     userMessage,
     selectedJuristicMethod,
+    selectedCalculationMethod,
     selectedCountry,
     selectedCity,
     isManualLocationSelected,
@@ -50,6 +54,7 @@ class SettingsPageUiState extends BaseUiState {
     bool? isLoading,
     String? userMessage,
     String? selectedJuristicMethod,
+    String? selectedCalculationMethod,
     String? selectedCountry,
     String? selectedCity,
     bool? isManualLocationSelected,
@@ -61,6 +66,8 @@ class SettingsPageUiState extends BaseUiState {
       userMessage: userMessage ?? this.userMessage,
       selectedJuristicMethod:
           selectedJuristicMethod ?? this.selectedJuristicMethod,
+      selectedCalculationMethod:
+          selectedCalculationMethod ?? this.selectedCalculationMethod,
       selectedCountry: selectedCountry ?? this.selectedCountry,
       selectedCity: selectedCity ?? this.selectedCity,
       isManualLocationSelected:

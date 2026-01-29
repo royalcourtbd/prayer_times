@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/di/setup/setup_module.dart';
+import 'package:prayer_times/data/repositories/calculation_method_repository_impl.dart';
 import 'package:prayer_times/data/repositories/country_repository_impl.dart';
 import 'package:prayer_times/data/repositories/device_info_repository_impl.dart';
 import 'package:prayer_times/data/repositories/juristic_method_repository_impl.dart';
@@ -10,6 +11,7 @@ import 'package:prayer_times/data/repositories/payment_repository_impl.dart';
 import 'package:prayer_times/data/repositories/prayer_time_repository_impl.dart';
 import 'package:prayer_times/data/repositories/prayer_tracker_repository_impl.dart';
 import 'package:prayer_times/data/repositories/user_data_repository_impl.dart';
+import 'package:prayer_times/domain/repositories/calculation_method_repository.dart';
 import 'package:prayer_times/domain/repositories/country_repository.dart';
 import 'package:prayer_times/domain/repositories/device_info_repository.dart';
 import 'package:prayer_times/domain/repositories/juristic_method_repository.dart';
@@ -32,6 +34,9 @@ class RepositorySetup implements SetupModule {
       )
       ..registerLazySingleton<JuristicMethodRepository>(
         () => JuristicMethodRepositoryImpl(locate()),
+      )
+      ..registerLazySingleton<CalculationMethodRepository>(
+        () => CalculationMethodRepositoryImpl(locate()),
       )
       ..registerLazySingleton<PrayerTrackerRepository>(
         () => PrayerTrackerRepositoryImpl(locate()),

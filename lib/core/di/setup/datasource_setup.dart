@@ -19,7 +19,7 @@ class DatasourceSetup implements SetupModule {
   Future<void> setup() async {
     _serviceLocator
       ..registerLazySingleton<PrayerTimeDataSource>(
-        () => PrayerTimeDataSourceImpl(locate(), locate<TimezoneService>()),
+        () => PrayerTimeDataSourceImpl(locate(), locate(), locate<TimezoneService>()),
       )
       ..registerLazySingleton(() => CountryLocalDataSource())
       ..registerLazySingleton<LocationLocalDataSource>(
