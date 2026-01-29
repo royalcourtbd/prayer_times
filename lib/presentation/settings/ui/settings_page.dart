@@ -6,6 +6,7 @@ import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/presentation/common/custom_app_bar.dart';
 import 'package:prayer_times/presentation/common/settings_grid_item.dart';
 import 'package:prayer_times/presentation/settings/presenter/settings_page_presenter.dart';
+import 'package:prayer_times/presentation/settings/widgets/calcutation_method_bottom_sheet.dart';
 import 'package:prayer_times/presentation/settings/widgets/juristic_method_bottom_sheet.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -48,8 +49,9 @@ class SettingsPage extends StatelessWidget {
                 SettingsGridItem(
                   icon: SvgPath.icLocation,
                   title: 'Calculation Method',
-                  onTap: () => showMessage(
-                    message: 'Calculation Method Page Under Construction',
+                  onTap: () => CalculationMethodBottomSheet.show(
+                    context: context,
+                    presenter: _presenter,
                   ),
                 ),
                 SettingsGridItem(
