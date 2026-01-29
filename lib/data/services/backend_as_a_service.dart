@@ -2,15 +2,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:prayer_times/core/utility/logger_utility.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
-import 'package:prayer_times/data/models/device_info_model.dart';
 import 'package:prayer_times/data/models/payment_model.dart';
-import 'package:prayer_times/domain/entities/device_info_entity.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'dart:io';
 
 /// By separating the Firebase code into its own class, we can make it easier to
 /// replace Firebase with another backend-as-a-service provider in the future.
@@ -109,139 +104,6 @@ class BackendAsAService {
         });
       });
     });
-  }
-
-  Stream<List<DeviceInfoEntity>> getAllRegisteredDevices() {
-    return _fireStore
-        .collection(deviceTokensCollection)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs
-              .map((doc) {
-                return catchAndReturn<DeviceInfoEntity>(() {
-                  return DeviceInfoModel.fromJson(doc.data());
-                });
-              })
-              .where((entity) => entity != null)
-              .cast<DeviceInfoEntity>()
-              .toList();
-        })
-        .handleError((error, stackTrace) {
-          logError(
-            "Error in getAllRegisteredDevices stream: $error stackTrace: $stackTrace",
-          );
-          return <DeviceInfoEntity>[];
-        });
-  }
-
-  Future<void> registerDevice({int maxRetry = 3}) async {
-    await catchFutureOrVoid(() async {
-      final String? token = await _messaging.getToken();
-      if (token == null) {
-        logDebug('Token not found');
-        return;
-      }
-
-      DeviceInfoModel deviceInfo = await _getDeviceInfo();
-      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-      final String deviceId = deviceInfo.deviceId;
-      if (deviceId.isEmpty) {
-        logError('Device ID is empty');
-        return;
-      }
-
-      try {
-        final DocumentSnapshot<Map<String, dynamic>> doc =
-            await _fireStore
-                .collection(deviceTokensCollection)
-                .doc(deviceId)
-                .get();
-        final bool isFirstInstall = !doc.exists;
-
-        deviceInfo = deviceInfo.copyWith(
-          token: token,
-          appVersion: packageInfo.version,
-          isOnline: true,
-        );
-
-        // এটি সার্ভার টাইমস্ট্যাম্প ব্যবহার করে
-        final Map<String, dynamic> updateData = deviceInfo
-            .toJsonWithServerTimestamp(isFirstInstall: isFirstInstall);
-
-        if (isFirstInstall) {
-          await _fireStore
-              .collection(deviceTokensCollection)
-              .doc(deviceId)
-              .set(updateData, SetOptions(merge: true));
-          logDebug('New device token registered: $token');
-        } else {
-          // আপডেট ব্যবহার করার সময় installedAt ফিল্ড ডিলিট করার দরকার নেই
-          // toJsonWithServerTimestamp মেথড স্বয়ংক্রিয়ভাবে হ্যান্ডেল করবে
-          await _fireStore
-              .collection(deviceTokensCollection)
-              .doc(deviceId)
-              .update(updateData);
-          logDebug('Device token updated: $token');
-        }
-      } catch (e) {
-        logError('Error registering device: $e');
-
-        // ব্যর্থ হলে পুনরায় চেষ্টা করুন, কিন্তু maxRetry সীমা অতিক্রম না করে
-        if (maxRetry > 0) {
-          logDebug(
-            'Retrying device registration. Attempts left: ${maxRetry - 1}',
-          );
-          await Future.delayed(
-            Duration(seconds: 2),
-          ); // পুনঃচেষ্টার আগে অপেক্ষা করুন
-          await registerDevice(maxRetry: maxRetry - 1);
-        }
-      }
-    });
-  }
-
-  Future<DeviceInfoModel> _getDeviceInfo() async {
-    return await catchAndReturnFuture<DeviceInfoModel>(() async {
-          final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-          String deviceId = '';
-          String platform = '';
-          String model = '';
-          String osVersion = '';
-
-          if (Platform.isAndroid) {
-            final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-            platform = 'android';
-            model = '${androidInfo.brand} ${androidInfo.model}';
-            osVersion = androidInfo.version.release;
-            deviceId = androidInfo.id;
-          } else if (Platform.isIOS) {
-            final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-            platform = 'ios';
-            model = iosInfo.model;
-            osVersion = iosInfo.systemVersion;
-            deviceId = iosInfo.identifierForVendor ?? '';
-          }
-
-          return DeviceInfoModel(
-            deviceId: deviceId,
-            token: '', // এটি পরে আপডেট করা হবে
-            platform: platform,
-            model: model,
-            osVersion: osVersion,
-            appVersion: '',
-            lastActiveAt: DateTime.now(),
-          );
-        }) ??
-        DeviceInfoModel(
-          deviceId: '',
-          token: '',
-          platform: '',
-          model: '',
-          osVersion: '',
-          appVersion: '',
-          lastActiveAt: DateTime.now(),
-        );
   }
 
   Stream<List<BankPaymentModel>> getBankPaymentsStream() {

@@ -3,7 +3,6 @@ import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/di/setup/setup_module.dart';
 import 'package:prayer_times/data/repositories/calculation_method_repository_impl.dart';
 import 'package:prayer_times/data/repositories/country_repository_impl.dart';
-import 'package:prayer_times/data/repositories/device_info_repository_impl.dart';
 import 'package:prayer_times/data/repositories/juristic_method_repository_impl.dart';
 import 'package:prayer_times/data/repositories/location_repository_impl.dart';
 import 'package:prayer_times/data/repositories/notification_repository_impl.dart';
@@ -13,7 +12,6 @@ import 'package:prayer_times/data/repositories/prayer_tracker_repository_impl.da
 import 'package:prayer_times/data/repositories/user_data_repository_impl.dart';
 import 'package:prayer_times/domain/repositories/calculation_method_repository.dart';
 import 'package:prayer_times/domain/repositories/country_repository.dart';
-import 'package:prayer_times/domain/repositories/device_info_repository.dart';
 import 'package:prayer_times/domain/repositories/juristic_method_repository.dart';
 import 'package:prayer_times/domain/repositories/location_repository.dart';
 import 'package:prayer_times/domain/repositories/notification_repository.dart';
@@ -52,9 +50,6 @@ class RepositorySetup implements SetupModule {
       )
       ..registerLazySingleton<NotificationRepository>(
         () => NotificationRepositoryImpl(),
-      )
-      ..registerLazySingleton<DeviceInfoRepository>(
-        () => DeviceInfoRepositoryImpl(locate(), locate(), locate()),
       )
       ..registerLazySingleton<PaymentRepository>(
         () => PaymentRepositoryImpl(locate(), locate()),

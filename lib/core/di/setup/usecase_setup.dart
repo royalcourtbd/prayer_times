@@ -8,7 +8,6 @@ import 'package:prayer_times/domain/usecases/determine_first_run_use_case.dart';
 import 'package:prayer_times/domain/usecases/get_active_waqt_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_bank_payments_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_countries_usecase.dart';
-import 'package:prayer_times/domain/usecases/get_device_info_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_calculation_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_juristic_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_location_usecase.dart';
@@ -18,7 +17,6 @@ import 'package:prayer_times/domain/usecases/get_prayer_times_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_prayer_tracker_data_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_all_prayer_tracker_data_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_remaining_time_usecase.dart';
-import 'package:prayer_times/domain/usecases/register_device_usecase.dart';
 import 'package:prayer_times/domain/usecases/request_notification_permission_usecase.dart';
 import 'package:prayer_times/domain/usecases/save_first_time_use_case.dart';
 import 'package:prayer_times/domain/usecases/save_prayer_tracker_usecase.dart';
@@ -62,8 +60,6 @@ class UsecaseSetup implements SetupModule {
       )
       ..registerLazySingleton(() => SaveFirstTimeUseCase(locate(), locate()))
       ..registerLazySingleton(() => GetNotificationsUseCase(locate(), locate()))
-      ..registerLazySingleton(() => GetDeviceInfoUsecase(locate(), locate()))
-      ..registerLazySingleton(() => RegisterDeviceUsecase(locate(), locate()))
       ..registerLazySingleton(() => GetBankPaymentsUseCase(locate(), locate()))
       ..registerLazySingleton(
         () => GetMobilePaymentsUseCase(locate(), locate()),

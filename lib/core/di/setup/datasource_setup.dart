@@ -4,7 +4,6 @@ import 'package:prayer_times/core/di/setup/setup_module.dart';
 import 'package:prayer_times/data/datasources/local/country_local_data_source.dart';
 import 'package:prayer_times/data/datasources/local/location_local_data_source.dart';
 import 'package:prayer_times/data/datasources/local/user_data_local_data_source.dart';
-import 'package:prayer_times/data/datasources/remote/device_info_remote_data_source.dart';
 import 'package:prayer_times/data/datasources/remote/location_remote_data_source.dart';
 import 'package:prayer_times/data/datasources/remote/prayer_time_datasource.dart';
 import 'package:prayer_times/data/datasources/remote/payment_remote_data_source.dart';
@@ -19,7 +18,11 @@ class DatasourceSetup implements SetupModule {
   Future<void> setup() async {
     _serviceLocator
       ..registerLazySingleton<PrayerTimeDataSource>(
-        () => PrayerTimeDataSourceImpl(locate(), locate(), locate<TimezoneService>()),
+        () => PrayerTimeDataSourceImpl(
+          locate(),
+          locate(),
+          locate<TimezoneService>(),
+        ),
       )
       ..registerLazySingleton(() => CountryLocalDataSource())
       ..registerLazySingleton<LocationLocalDataSource>(
@@ -29,9 +32,6 @@ class DatasourceSetup implements SetupModule {
         () => LocationRemoteDataSourceImpl(locate<TimezoneLookupService>()),
       )
       ..registerLazySingleton(() => UserDataLocalDataSource(locate()))
-      ..registerLazySingleton<DeviceInfoRemoteDataSource>(
-        () => DeviceInfoRemoteDataSourceImpl(locate()),
-      )
       ..registerLazySingleton<PaymentRemoteDataSource>(
         () => PaymentRemoteDataSourceImpl(locate()),
       );

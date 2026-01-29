@@ -2,21 +2,18 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:get/get.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/utility/utility.dart';
-import 'package:prayer_times/domain/entities/device_info_entity.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
 import 'package:prayer_times/domain/service/time_service.dart';
 import 'package:prayer_times/domain/service/waqt_calculation_service.dart';
 import 'package:prayer_times/domain/usecases/check_notification_permission_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_active_waqt_usecase.dart';
-import 'package:prayer_times/domain/usecases/get_device_info_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_location_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_prayer_times_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_remaining_time_usecase.dart';
@@ -34,7 +31,6 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   final GetActiveWaqtUseCase _getActiveWaqtUseCase;
   final GetRemainingTimeUseCase _getRemainingTimeUseCase;
   final TimeService _timeService;
-  final GetDeviceInfoUsecase _getDeviceInfoUsecase;
   final WaqtCalculationService _waqtCalculationService;
   final RequestNotificationPermissionUsecase
   _requestNotificationPermissionUsecase;
@@ -42,7 +38,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   StreamSubscription<DateTime>? _timeSubscription;
 
   final ScrollController prayerTimesScrollController = ScrollController();
-  // ইউজার ম্যানুয়ালি স্ক্রল করেছে কিনা তা ট্র্যাক করা
+
   bool _userScrolled = false;
 
   HomePresenter(
@@ -52,7 +48,6 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     this._getRemainingTimeUseCase,
     this._timeService,
     this._waqtCalculationService,
-    this._getDeviceInfoUsecase,
     this._requestNotificationPermissionUsecase,
     this._checkNotificationPermissionUsecase,
   );
@@ -69,7 +64,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   void onInit() {
     super.onInit();
     _startTimer();
-    fetchDeviceInfo();
+
     checkNotificationPermission();
 
     prayerTimesScrollController.addListener(_onUserScroll);
@@ -153,21 +148,6 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     } finally {
       await toggleLoading(loading: false);
     }
-  }
-
-  StreamSubscription<Either<String, List<DeviceInfoEntity>>>?
-  _deviceInfoSubscription;
-
-  Future<void> fetchDeviceInfo() async {
-    await executeTaskWithLoading(() async {
-      await handleStreamEvents<List<DeviceInfoEntity>>(
-        stream: _getDeviceInfoUsecase.execute(),
-        onData: (List<DeviceInfoEntity> data) {
-          // log('deviceInfo: $data');
-        },
-        subscription: _deviceInfoSubscription,
-      );
-    });
   }
 
   Future<void> _fetchLocationAndPrayerTimes({required bool forceRemote}) async {
