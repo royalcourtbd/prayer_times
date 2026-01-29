@@ -1,10 +1,12 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
+import '../datasources/local/country_local_data_source.dart';
 
 /// Service to lookup timezone from coordinates using the country.json database.
 /// For GPS locations, finds the nearest city and uses its timezone.
 class TimezoneLookupService {
+  final CountryLocalDataSource _countryDataSource;
   List<_CityWithTimezone>? _cities;
+
+  TimezoneLookupService(this._countryDataSource);
 
   Future<String?> getTimezoneFromCoordinates(
     double latitude,
@@ -38,27 +40,22 @@ class TimezoneLookupService {
     if (_cities != null) return;
 
     try {
-      final String response =
-          await rootBundle.loadString('assets/db/country.json');
-      final List<dynamic> countries = json.decode(response);
+      final countries = await _countryDataSource.getAllCountries();
 
       _cities = [];
       for (final country in countries) {
-        final List<dynamic>? cities = country['cities'];
-        if (cities != null) {
-          for (final city in cities) {
-            _cities!.add(_CityWithTimezone(
-              latitude: (city['latitude'] as num).toDouble(),
-              longitude: (city['longitude'] as num).toDouble(),
-              timezone: city['timezone'] as String,
-            ));
-          }
+        for (final city in country.cities) {
+          _cities!.add(_CityWithTimezone(
+            latitude: city.latitude,
+            longitude: city.longitude,
+            timezone: city.timezone,
+          ));
         }
         // Also add the country itself as a fallback
         _cities!.add(_CityWithTimezone(
-          latitude: (country['latitude'] as num).toDouble(),
-          longitude: (country['longitude'] as num).toDouble(),
-          timezone: country['timezone'] as String,
+          latitude: country.latitude,
+          longitude: country.longitude,
+          timezone: country.timezone,
         ));
       }
     } catch (e) {

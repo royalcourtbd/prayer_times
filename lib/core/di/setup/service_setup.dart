@@ -11,6 +11,7 @@ import 'package:prayer_times/data/services/error_message_handler_impl.dart';
 import 'package:prayer_times/data/services/local_cache_service.dart';
 import 'package:prayer_times/data/services/location_service.dart';
 import 'package:prayer_times/data/services/notification/notification_service_impl.dart';
+import 'package:prayer_times/data/datasources/local/country_local_data_source.dart';
 import 'package:prayer_times/data/services/timezone_lookup_service.dart';
 import 'package:prayer_times/data/services/waqt_calculation_service_impl.dart';
 import 'package:prayer_times/domain/service/error_message_handler.dart';
@@ -34,7 +35,9 @@ class ServiceSetup implements SetupModule {
         () => WaqtCalculationServiceImpl(),
       )
       ..registerLazySingleton(() => TimezoneService())
-      ..registerLazySingleton(() => TimezoneLookupService())
+      ..registerLazySingleton(() => TimezoneLookupService(
+        _serviceLocator.get<CountryLocalDataSource>(),
+      ))
       ..registerLazySingleton(() => TimeService(_serviceLocator.get<TimezoneService>()))
       ..registerLazySingleton(BackendAsAService.new)
       ..registerLazySingleton(() => PrayerDatabase())

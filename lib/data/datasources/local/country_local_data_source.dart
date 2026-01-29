@@ -3,11 +3,16 @@ import 'package:flutter/services.dart';
 import '../../../domain/entities/country_entity.dart';
 
 class CountryLocalDataSource {
+  List<CountryNameEntity>? _cachedCountries;
+
   Future<List<CountryNameEntity>> getAllCountries() async {
+    if (_cachedCountries != null) return _cachedCountries!;
+
     final String response =
         await rootBundle.loadString('assets/db/country.json');
     final List<dynamic> data = json.decode(response);
-    return data.map((e) => _mapJsonToCountry(e)).toList();
+    _cachedCountries = data.map((e) => _mapJsonToCountry(e)).toList();
+    return _cachedCountries!;
   }
 
   CountryNameEntity _mapJsonToCountry(Map<String, dynamic> json) {
