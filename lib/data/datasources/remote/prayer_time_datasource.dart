@@ -41,20 +41,21 @@ class PrayerTimeDataSourceImpl implements PrayerTimeDataSource {
         precision: true,
       );
 
+      // adhan_dart returns UTC times, convert to local timezone
       return PrayerTimeEntity(
-        startFajr: prayerTimes.fajr,
-        fajrEnd: prayerTimes.sunrise,
-        sunrise: prayerTimes.sunrise,
-        duhaStart: prayerTimes.sunrise.add(const Duration(minutes: 15)),
-        duhaEnd: prayerTimes.dhuhr,
-        startDhuhr: prayerTimes.dhuhr,
-        dhuhrEnd: prayerTimes.asr,
-        startAsr: prayerTimes.asr,
-        asrEnd: prayerTimes.maghrib,
-        startMaghrib: prayerTimes.maghrib,
-        maghribEnd: prayerTimes.isha,
-        startIsha: prayerTimes.isha,
-        ishaEnd: prayerTimes.fajr.add(const Duration(days: 1)),
+        startFajr: prayerTimes.fajr.toLocal(),
+        fajrEnd: prayerTimes.sunrise.toLocal(),
+        sunrise: prayerTimes.sunrise.toLocal(),
+        duhaStart: prayerTimes.sunrise.toLocal().add(const Duration(minutes: 15)),
+        duhaEnd: prayerTimes.dhuhr.toLocal(),
+        startDhuhr: prayerTimes.dhuhr.toLocal(),
+        dhuhrEnd: prayerTimes.asr.toLocal(),
+        startAsr: prayerTimes.asr.toLocal(),
+        asrEnd: prayerTimes.maghrib.toLocal(),
+        startMaghrib: prayerTimes.maghrib.toLocal(),
+        maghribEnd: prayerTimes.isha.toLocal(),
+        startIsha: prayerTimes.isha.toLocal(),
+        ishaEnd: prayerTimes.fajr.toLocal().add(const Duration(days: 1)),
       );
     });
   }
