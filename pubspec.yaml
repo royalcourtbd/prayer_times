@@ -66,6 +66,7 @@ dependencies:
   firebase_messaging: ^16.1.1
   firebase_analytics: ^12.1.1
   firebase_crashlytics: ^5.0.7
+
   cloud_firestore: ^6.1.2
   geocoding: ^4.0.0
   adhan_dart: ^1.2.0
