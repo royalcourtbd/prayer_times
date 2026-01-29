@@ -47,7 +47,7 @@ class HomePage extends StatelessWidget {
               theme: theme,
               presenter: _homePresenter,
               onTapFetchLocation: () =>
-                  _homePresenter.refreshLocationAndPrayerTimes(),
+                  _homePresenter.showSelectLocationBottomSheet(context),
               onTapCategory: () => MenuDrawerBottomSheet.show(context: context),
             ),
             body: ListView(

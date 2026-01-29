@@ -165,6 +165,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     // Force refresh from GPS after bottomsheet animation completes
     Future.delayed(const Duration(milliseconds: 300), () {
       _homePresenter.refreshLocationAndPrayerTimes();
+      showMessage(message: 'Location updated successfully');
     });
   }
 
@@ -213,6 +214,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
       // Load prayer times after bottomsheet animation completes
       Future.delayed(const Duration(milliseconds: 300), () {
         _homePresenter.loadLocationAndPrayerTimes();
+        showMessage(message: 'Location saved successfully');
       });
       return;
     }

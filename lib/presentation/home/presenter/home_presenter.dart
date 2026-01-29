@@ -24,6 +24,7 @@ import 'package:prayer_times/presentation/home/models/fasting_state.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
 import 'package:prayer_times/presentation/home/presenter/home_ui_state.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
+import 'package:prayer_times/presentation/settings/widgets/select_location_bottomsheet.dart';
 
 class HomePresenter extends BasePresenter<HomeUiState> {
   final GetLocationUseCase _getLocationUseCase;
@@ -148,6 +149,11 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     } finally {
       await toggleLoading(loading: false);
     }
+  }
+
+  /// Shows the select location bottom sheet
+  void showSelectLocationBottomSheet(BuildContext context) {
+    SelectLocationBottomsheet.show(context: context);
   }
 
   Future<void> _fetchLocationAndPrayerTimes({required bool forceRemote}) async {
