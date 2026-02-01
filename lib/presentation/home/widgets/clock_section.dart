@@ -40,7 +40,7 @@ class ClockSection extends StatelessWidget {
                 Text(
                   presenter.getCurrentTime(),
                   style: theme.textTheme.bodyMedium!.copyWith(
-                    fontSize: fiftyFivePx,
+                    fontSize: fiftyPx,
                     fontFamily: FontFamily.bigShouldersText,
                     height: 1,
                     fontWeight: FontWeight.w600,
