@@ -37,6 +37,7 @@ class RamadanTrackerSection extends StatelessWidget {
                   child: CustomPaint(
                     painter: ArcPainter(
                       progress: homePresenter.currentUiState.fastingProgress,
+                      activeColor: context.color.primaryColor,
                     ),
                   ),
                 ),
@@ -123,9 +124,9 @@ class RamadanTrackerSection extends StatelessWidget {
 
 class ArcPainter extends CustomPainter {
   final double progress;
-  final Color activeColor = const Color(0xFF5C8AFF);
+  final Color activeColor;
 
-  ArcPainter({required this.progress});
+  ArcPainter({required this.progress, required this.activeColor});
 
   @override
   void paint(Canvas canvas, Size size) {
