@@ -133,8 +133,14 @@ class ArcPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height);
     final radius = size.width / 2;
 
-    final Paint dashPaint = Paint()
+    final Paint activePaint = Paint()
       ..color = activeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    final Paint inactivePaint = Paint()
+      ..color = activeColor.withOpacityInt(0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
@@ -154,11 +160,13 @@ class ArcPainter extends CustomPainter {
       double distance = 0.0;
       double dashWidth = 6.0;
       double gapWidth = 6.0;
+      final double activeLength = pathMetric.length * progress;
 
       while (distance < pathMetric.length) {
+        final bool isActive = distance < activeLength;
         canvas.drawPath(
           pathMetric.extractPath(distance, distance + dashWidth),
-          dashPaint,
+          isActive ? activePaint : inactivePaint,
         );
         distance += (dashWidth + gapWidth);
       }
