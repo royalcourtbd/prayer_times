@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
-import 'package:prayer_times/core/external_libs/dashed_progress_bar/dashed_progress_bar.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
+import 'dart:math' as math;
 
 class RamadanTrackerSection extends StatelessWidget {
   const RamadanTrackerSection({
@@ -19,13 +19,51 @@ class RamadanTrackerSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: padding15,
+      width: double.infinity,
+      height: 280,
       decoration: BoxDecoration(
         color: context.color.primaryColor.withOpacityInt(0.05),
         borderRadius: radius18,
       ),
       child: Column(
         children: [
-          _buildProgressBar(context),
+          Expanded(
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                SizedBox(
+                  width: 310,
+                  height: 120,
+                  child: CustomPaint(
+                    painter: ArcPainter(
+                      progress: homePresenter.currentUiState.fastingProgress,
+                    ),
+                  ),
+                ),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Remaining ${homePresenter.currentUiState.fastingState.displayName}',
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: context.color.subTitleColor,
+                        fontSize: thirteenPx,
+                      ),
+                    ),
+                    Text(
+                      homePresenter.getFormattedFastingRemainingTime(),
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        fontSize: twentySevenPx,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
           Divider(color: context.color.primaryColor.withOpacityInt(0.1)),
           _buildTimingsRow(context),
         ],
@@ -81,42 +119,97 @@ class RamadanTrackerSection extends StatelessWidget {
       ),
     );
   }
+}
 
-  DashedCircularProgressBar _buildProgressBar(BuildContext context) {
-    return DashedCircularProgressBar.aspectRatio(
-      aspectRatio: 2, // width ÷ height
-      progress: homePresenter.currentUiState.fastingProgress,
-      startAngle: 270,
-      sweepAngle: 180,
-      circleCenterAlignment: Alignment.bottomCenter,
-      foregroundColor: context.color.primaryColor,
-      backgroundColor: context.color.primaryColor.withOpacityInt(0.1),
-      foregroundStrokeWidth: 2,
-      backgroundStrokeWidth: 2,
-      backgroundGapSize: 1,
-      seekColor: context.color.primaryColor,
-      seekSize: 22,
-      animation: true,
-      foregroundGapSize: 1,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            'Remaining ${homePresenter.currentUiState.fastingState.displayName}',
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: context.color.subTitleColor,
-              fontSize: thirteenPx,
-            ),
-          ),
-          Text(
-            homePresenter.getFormattedFastingRemainingTime(),
-            style: theme.textTheme.bodyMedium!.copyWith(
-              fontSize: twentySevenPx,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
+class ArcPainter extends CustomPainter {
+  final double progress;
+  final Color activeColor = const Color(0xFF5C8AFF);
+
+  ArcPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height);
+    final radius = size.width / 2;
+
+    final Paint dashPaint = Paint()
+      ..color = activeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    final double startAngle = math.pi;
+    final double sweepAngle = math.pi;
+
+    Path path = Path();
+    path.addArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
     );
+
+    final pathMetrics = path.computeMetrics();
+    for (final pathMetric in pathMetrics) {
+      double distance = 0.0;
+      double dashWidth = 6.0;
+      double gapWidth = 6.0;
+
+      while (distance < pathMetric.length) {
+        canvas.drawPath(
+          pathMetric.extractPath(distance, distance + dashWidth),
+          dashPaint,
+        );
+        distance += (dashWidth + gapWidth);
+      }
+    }
+
+    double currentAngle = math.pi + (progress * math.pi);
+
+    double sunX = center.dx + radius * math.cos(currentAngle);
+    double sunY = center.dy + radius * math.sin(currentAngle);
+    Offset sunPos = Offset(sunX, sunY);
+
+    Paint sunBgPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(
+      sunPos,
+      18,
+      Paint()
+        ..color = activeColor.withOpacityInt(0.1)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+    );
+
+    canvas.drawCircle(sunPos, 14, sunBgPaint);
+
+    _drawSunIcon(canvas, sunPos);
   }
+
+  void _drawSunIcon(Canvas canvas, Offset center) {
+    final Paint sunPaint = Paint()
+      ..color = activeColor
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(center, 5, sunPaint);
+
+    double rayLength = 10.0;
+    double innerRadius = 7.0;
+    for (int i = 0; i < 8; i++) {
+      double angle = (i * 45) * (math.pi / 180);
+      double startX = center.dx + innerRadius * math.cos(angle);
+      double startY = center.dy + innerRadius * math.sin(angle);
+      double endX = center.dx + rayLength * math.cos(angle);
+      double endY = center.dy + rayLength * math.sin(angle);
+
+      canvas.drawLine(
+        Offset(startX, startY),
+        Offset(endX, endY),
+        sunPaint..strokeWidth = 2,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

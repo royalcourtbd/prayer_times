@@ -390,7 +390,9 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   }
 
   double _calculateProgress(Duration total, Duration remaining) {
-    return (remaining.inSeconds / total.inSeconds * 100).clamp(0, 100);
+    if (total.inSeconds == 0) return 0;
+    final elapsed = total.inSeconds - remaining.inSeconds;
+    return (elapsed / total.inSeconds).clamp(0.0, 1.0);
   }
 
   void initializeTracker() {
