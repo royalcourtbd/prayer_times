@@ -186,11 +186,11 @@ class SunArcPainter extends CustomPainter with SunIconMixin {
     final width = size.width;
     final height = size.height;
 
-    // SVG-like smooth cubic curve
+    // SVG-like smooth cubic curve (LEFT to RIGHT: Suhur to Iftar)
     final path = Path()
-      ..moveTo(width, height)
-      ..cubicTo(width * 0.94, height * 0.43, width * 0.74, 0, width * 0.5, 0)
-      ..cubicTo(width * 0.26, 0, width * 0.06, height * 0.43, 0, height);
+      ..moveTo(0, height)  // Start from LEFT (Suhur)
+      ..cubicTo(width * 0.06, height * 0.43, width * 0.26, 0, width * 0.5, 0)
+      ..cubicTo(width * 0.74, 0, width * 0.94, height * 0.43, width, height);  // End at RIGHT (Iftar)
 
     final basePaint = Paint()
       ..color = activeColor.withOpacityInt(0.25)
