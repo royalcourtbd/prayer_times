@@ -217,9 +217,9 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
-          name: 💰 Binance P2P Order Info ${{ github.ref_name }}
+          name: 💰 Prayer Times Info ${{ github.ref_name }}
           body: |
-            ## 💰 Binance P2P Order Info Release ${{ github.ref_name }}
+            ## 💰 Prayer Times Info Release ${{ github.ref_name }}
 
             ### 📱 Download
 
@@ -337,7 +337,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": "${{ job.status == 'success' && '✅ Binance P2P Release Build' || '❌ Binance P2P Release Build' }}",
+                    "text": "${{ job.status == 'success' && '✅ Prayer Times Release Build' || '❌ Prayer Times Release Build' }}",
                     "emoji": true
                   }
                 },
@@ -389,7 +389,7 @@ jobs:
                         "text": "📦 Download Release",
                         "emoji": true
                       },
-                      "url": "https://github.com/royalcourtbd/binance_order_info/releases/latest",
+                      "url": "https://github.com/royalcourtbd/prayer_times/releases/latest",
                       "style": "primary"
                     },
                     {
@@ -408,7 +408,7 @@ jobs:
                         "text": "📂 Repository",
                         "emoji": true
                       },
-                      "url": "https://github.com/royalcourtbd/binance_order_info"
+                      "url": "https://github.com/royalcourtbd/prayer_times"
                     }
                   ]
                 }
