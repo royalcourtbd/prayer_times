@@ -9,11 +9,13 @@ class RamadanCalendarBanner extends StatelessWidget {
   const RamadanCalendarBanner({
     required this.theme,
     required this.onCalendarTap,
+    this.locationName,
     super.key,
   });
 
   final ThemeData theme;
   final VoidCallback onCalendarTap;
+  final String? locationName;
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +58,10 @@ class RamadanCalendarBanner extends StatelessWidget {
   }
 
   Widget _buildSubtitle(BuildContext context) {
+    final location = locationName ?? 'Dhaka';
     return Text(
-      'Ramadan Time Schedule in Dhaka',
+      'Ramadan Time Schedule in $location',
+      textAlign: TextAlign.center,
       style: theme.textTheme.bodyMedium!.copyWith(
         fontSize: thirteenPx,
         color: context.color.whiteColor.withOpacityInt(0.6),

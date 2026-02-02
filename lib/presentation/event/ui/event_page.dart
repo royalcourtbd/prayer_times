@@ -9,6 +9,7 @@ import 'package:prayer_times/presentation/event/ui/ramadan_calendar_page.dart';
 import 'package:prayer_times/presentation/event/widgets/holiday_section.dart';
 import 'package:prayer_times/presentation/event/widgets/ramadan_calendar_banner.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
+import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/event/widgets/event_calendar.dart';
 
 class EventPage extends StatelessWidget {
@@ -16,6 +17,7 @@ class EventPage extends StatelessWidget {
   final PrayerTrackerPresenter _prayerTrackerPresenter =
       locate<PrayerTrackerPresenter>();
   final EventPresenter _eventPresenter = locate<EventPresenter>();
+  final HomePresenter _homePresenter = locate<HomePresenter>();
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,8 @@ class EventPage extends StatelessWidget {
                 gapH20,
                 RamadanCalendarBanner(
                   theme: theme,
+                  locationName:
+                      _homePresenter.currentUiState.location?.placeName,
                   onCalendarTap: () =>
                       context.navigatorPush(RamadanCalendarPage()),
                 ),
