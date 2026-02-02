@@ -6,20 +6,26 @@ class RamadanCalendarUiState extends BaseUiState {
   final List<RamadanDayEntity> ramadanCalendar;
   final LocationEntity? location;
   final int currentRamadanDay;
+  final int year;
+  final int hijriYear;
 
   const RamadanCalendarUiState({
     required this.ramadanCalendar,
     this.location,
     required this.currentRamadanDay,
+    required this.year,
+    required this.hijriYear,
     required super.isLoading,
     required super.userMessage,
   });
 
   factory RamadanCalendarUiState.empty() {
-    return const RamadanCalendarUiState(
-      ramadanCalendar: [],
+    return RamadanCalendarUiState(
+      ramadanCalendar: const [],
       location: null,
       currentRamadanDay: -1,
+      year: DateTime.now().year,
+      hijriYear: 0,
       isLoading: false,
       userMessage: null,
     );
@@ -29,6 +35,8 @@ class RamadanCalendarUiState extends BaseUiState {
     List<RamadanDayEntity>? ramadanCalendar,
     LocationEntity? location,
     int? currentRamadanDay,
+    int? year,
+    int? hijriYear,
     bool? isLoading,
     String? userMessage,
   }) {
@@ -36,6 +44,8 @@ class RamadanCalendarUiState extends BaseUiState {
       ramadanCalendar: ramadanCalendar ?? this.ramadanCalendar,
       location: location ?? this.location,
       currentRamadanDay: currentRamadanDay ?? this.currentRamadanDay,
+      year: year ?? this.year,
+      hijriYear: hijriYear ?? this.hijriYear,
       isLoading: isLoading ?? this.isLoading,
       userMessage: userMessage ?? this.userMessage,
     );
@@ -48,5 +58,7 @@ class RamadanCalendarUiState extends BaseUiState {
     ramadanCalendar,
     location,
     currentRamadanDay,
+    year,
+    hijriYear,
   ];
 }

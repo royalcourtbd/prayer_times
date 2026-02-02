@@ -49,7 +49,7 @@ class RamadanCalendarPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Ramadan Calendar 2025',
+                          'Ramadan Calendar ${calendarState.year}',
                           style: theme.textTheme.bodyMedium!.copyWith(
                             fontSize: twentyTwoPx,
                             fontWeight: FontWeight.bold,
@@ -58,8 +58,8 @@ class RamadanCalendarPage extends StatelessWidget {
                         gapH10,
                         Text(
                           calendarState.location != null
-                              ? 'Ramadan Time Schedule in ${calendarState.location?.placeName}\n(GMT +6) Hijri 1446'
-                              : 'Ramadan Time Schedule in Dhaka\nDistrict (GMT +6) Hijri 1446',
+                              ? 'Ramadan Time Schedule in ${calendarState.location?.placeName}\n(GMT +6) Hijri ${calendarState.hijriYear}'
+                              : 'Ramadan Time Schedule in Dhaka\nDistrict (GMT +6) Hijri ${calendarState.hijriYear}',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium!.copyWith(
                             fontSize: thirteenPx,
@@ -103,7 +103,7 @@ class RamadanCalendarPage extends StatelessWidget {
                           ),
                           gapH15,
                           Text(
-                            'Ramadan 2025 Timetable',
+                            'Ramadan ${calendarState.year} Timetable',
                             style: theme.textTheme.titleMedium!.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: sixteenPx,

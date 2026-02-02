@@ -46,7 +46,7 @@ class RamadanCalendarBanner extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     return Text(
-      'Ramadan Calendar 2025',
+      'Ramadan Calendar ${DateTime.now().year}',
       style: theme.textTheme.bodyMedium!.copyWith(
         fontSize: twentyTwoPx,
         fontWeight: FontWeight.bold,

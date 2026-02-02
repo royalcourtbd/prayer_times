@@ -23,14 +23,42 @@ class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
   );
   RamadanCalendarUiState get currentUiState => uiState.value;
 
-  // Adjusted Ramadan 2025 start date - this can be updated based on actual moon sighting
-  // For now, adjusting to one day later to fix the current day issue (showing 6 when it should be 5)
-  final DateTime _ramadanStartDate = DateTime(2025, 3, 2);
-
   // Correction offset - this can be adjusted if needed based on local moon sighting decisions
   // Positive value means Ramadan starts later than calculated date
   // Negative value means Ramadan starts earlier than calculated date
   final int _moonSightingOffset = 0;
+
+  /// Dynamically calculate Ramadan start date for a given year
+  /// Ramadan is the 9th month in the Hijri calendar
+  DateTime _calculateRamadanStartDate(int year) {
+    DateTime checkDate = DateTime(year, 1, 1);
+    final DateTime endDate = DateTime(year, 12, 31);
+
+    while (checkDate.isBefore(endDate)) {
+      final HijriCalendar hijri = HijriCalendar.fromDate(checkDate);
+      // Month 9 = Ramadan, Day 1 = First day of Ramadan
+      if (hijri.hMonth == 9 && hijri.hDay == 1) {
+        return checkDate;
+      }
+      checkDate = checkDate.add(const Duration(days: 1));
+    }
+
+    // Fallback (should not reach here)
+    return DateTime(year, 3, 1);
+  }
+
+  /// Get Ramadan start date dynamically based on current year
+  DateTime get _ramadanStartDate =>
+      _calculateRamadanStartDate(DateTime.now().year);
+
+  /// Get current year
+  int get currentYear => DateTime.now().year;
+
+  /// Get Hijri year for current Ramadan
+  int get hijriYear {
+    final DateTime ramadanStart = _ramadanStartDate;
+    return HijriCalendar.fromDate(ramadanStart).hYear;
+  }
 
   // Calculate current Ramadan day based on today's date with adjustment for moon sighting
   int getCurrentRamadanDay() {
@@ -78,6 +106,8 @@ class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
             ramadanCalendar: calendarData,
             location: location,
             currentRamadanDay: getCurrentRamadanDay(),
+            year: currentYear,
+            hijriYear: hijriYear,
           );
         },
       );
