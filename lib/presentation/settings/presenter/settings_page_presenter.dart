@@ -166,8 +166,8 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     clearControllers();
 
     // Force refresh from GPS after bottomsheet animation completes
-    Future.delayed(const Duration(milliseconds: 300), () {
-      _homePresenter.refreshLocationAndPrayerTimes();
+    Future.delayed(const Duration(milliseconds: 300), () async {
+      await _homePresenter.refreshLocationAndPrayerTimes();
       _ramadanCalendarPresenter.loadRamadanCalendar();
       showMessage(message: 'Location updated successfully');
     });
