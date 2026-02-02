@@ -58,8 +58,8 @@ class RamadanCalendarPage extends StatelessWidget {
                         gapH10,
                         Text(
                           calendarState.location != null
-                              ? 'Ramadan Time Schedule in ${calendarState.location?.placeName}\n(GMT +6) Hijri ${calendarState.hijriYear}'
-                              : 'Ramadan Time Schedule in Dhaka\nDistrict (GMT +6) Hijri ${calendarState.hijriYear}',
+                              ? 'Ramadan Time Schedule in ${calendarState.location?.placeName}\n(${calendarState.gmtOffset}) Hijri ${calendarState.hijriYear}'
+                              : 'Ramadan Time Schedule in Dhaka\nDistrict (${calendarState.gmtOffset}) Hijri ${calendarState.hijriYear}',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium!.copyWith(
                             fontSize: thirteenPx,
