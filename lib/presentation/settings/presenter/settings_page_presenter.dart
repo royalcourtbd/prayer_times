@@ -16,6 +16,7 @@ import 'package:prayer_times/domain/usecases/search_countries_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_calculation_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_juristic_method_usecase.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
+import 'package:prayer_times/presentation/event/pesenter/ramadan_calendar_presenter.dart';
 import 'package:prayer_times/presentation/settings/presenter/settings_page_ui_state.dart';
 import 'package:prayer_times/presentation/settings/widgets/calcutation_method_bottom_sheet.dart';
 import 'package:prayer_times/presentation/settings/widgets/juristic_method_bottom_sheet.dart';
@@ -44,6 +45,8 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   SettingsPageUiState get currentUiState => uiState.value;
 
   final HomePresenter _homePresenter = locate<HomePresenter>();
+  final RamadanCalendarPresenter _ramadanCalendarPresenter =
+      locate<RamadanCalendarPresenter>();
 
   final TextEditingController countryController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
@@ -165,6 +168,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     // Force refresh from GPS after bottomsheet animation completes
     Future.delayed(const Duration(milliseconds: 300), () {
       _homePresenter.refreshLocationAndPrayerTimes();
+      _ramadanCalendarPresenter.loadRamadanCalendar();
       showMessage(message: 'Location updated successfully');
     });
   }
@@ -214,6 +218,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
       // Load prayer times after bottomsheet animation completes
       Future.delayed(const Duration(milliseconds: 300), () {
         _homePresenter.loadLocationAndPrayerTimes();
+        _ramadanCalendarPresenter.loadRamadanCalendar();
         showMessage(message: 'Location saved successfully');
       });
       return;
