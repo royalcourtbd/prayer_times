@@ -1,0 +1,416 @@
+name: Android Release Build
+
+on:
+  push:
+    branches:
+      - deployment
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  actions: read
+  checks: write
+
+jobs:
+  build-android-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      #---------------------------------------------------
+      # CHECKOUT SOURCE CODE
+      #---------------------------------------------------
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      #---------------------------------------------------
+      # SETUP JAVA FOR ANDROID BUILD
+      #---------------------------------------------------
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+          cache: "gradle"
+
+      #---------------------------------------------------
+      # SETUP FLUTTER SDK
+      #---------------------------------------------------
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.5"
+          cache: true
+
+      #---------------------------------------------------
+      # CACHE FLUTTER AND GRADLE DEPENDENCIES
+      #---------------------------------------------------
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+            android/.android
+          key: ${{ runner.os }}-flutter-gradle-${{ hashFiles('**/pubspec.lock', '**/gradle-wrapper.properties', '**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-gradle-
+            ${{ runner.os }}-flutter-
+
+      #---------------------------------------------------
+      # INSTALL FLUTTER DEPENDENCIES
+      #---------------------------------------------------
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      #---------------------------------------------------
+      # RUN UNIT TESTS (SKIP IF NO TEST DIRECTORY)
+      #---------------------------------------------------
+
+      - name: Run tests
+        run: |
+          if [ -d "test" ]; then
+            echo "✅ Test directory found, running tests..."
+            flutter test
+          else
+            echo "⚠️ No test directory found, skipping tests..."
+          fi
+
+      #---------------------------------------------------
+      # BUILD APK (SPLIT PER ABI FOR OPTIMIZATION)
+      #---------------------------------------------------
+
+      - name: Build APK (Release)
+        run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/app/outputs/symbols
+
+      #---------------------------------------------------
+      # BUILD AAB FOR PLAY STORE
+      #---------------------------------------------------
+
+      - name: Build AAB (Release)
+        run: flutter build appbundle --release --obfuscate --split-debug-info=build/app/outputs/symbols
+
+      #---------------------------------------------------
+      # VERIFY BUILD OUTPUTS EXIST
+      #---------------------------------------------------
+
+      - name: Verify build outputs
+        run: |
+          echo "📦 Build outputs:"
+          echo "==== APK Files ===="
+          ls -lh build/app/outputs/flutter-apk/
+          echo ""
+          echo "==== AAB File ===="
+          ls -lh build/app/outputs/bundle/release/
+          echo ""
+          echo "==== Debug Symbols ===="
+          ls -lh build/app/outputs/symbols/
+          echo ""
+
+          if [ ! -f "build/app/outputs/bundle/release/app-release.aab" ]; then
+            echo "❌ AAB file not found!"
+            exit 1
+          fi
+
+          echo "✅ Build outputs verified successfully"
+
+      #---------------------------------------------------
+      # EXTRACT APP INFO FROM PUBSPEC.YAML
+      #---------------------------------------------------
+
+      - name: Get app info from pubspec
+        id: app_info
+        run: |
+          # Get version from pubspec.yaml
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d '+' -f 1)
+          echo "PUBSPEC_VERSION=$PUBSPEC_VERSION" >> $GITHUB_OUTPUT
+
+          # If this is a tag push, use tag version; otherwise use pubspec version
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            # Extract version from tag (remove 'v' prefix)
+            TAG_VERSION="${{ github.ref_name }}"
+            VERSION="${TAG_VERSION#v}"
+            echo "Using tag version: $VERSION"
+          else
+            VERSION="$PUBSPEC_VERSION"
+            echo "Using pubspec version: $VERSION"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+          # Get app name
+          if grep -q '^name:' pubspec.yaml; then
+            APP_NAME=$(grep '^name:' pubspec.yaml | sed 's/name: *//' | tr '_' ' ' | sed 's/\b\w/\U&/g')
+          else
+            APP_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '_-' ' ' | sed 's/\b\w/\U&/g')
+          fi
+          echo "APP_NAME=$APP_NAME" >> $GITHUB_OUTPUT
+
+          # Generate changelog from commits since last tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+            git log $PREVIOUS_TAG..HEAD --oneline --pretty=format:"- %s" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG=Initial release" >> $GITHUB_OUTPUT
+          fi
+
+      #---------------------------------------------------
+      # CALCULATE BUILD FILE SIZES
+      #---------------------------------------------------
+
+      - name: Calculate file sizes
+        id: file_sizes
+        run: |
+          # Calculate AAB size
+          AAB_SIZE=$(du -h build/app/outputs/bundle/release/app-release.aab | cut -f1)
+
+          # For split-per-abi APKs
+          if [ -f "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" ]; then
+            TOTAL_APK_SIZE=$(du -ch build/app/outputs/flutter-apk/*.apk | grep total | cut -f1)
+            APK_COUNT=$(ls -1 build/app/outputs/flutter-apk/*.apk 2>/dev/null | wc -l | tr -d ' ')
+          else
+            TOTAL_APK_SIZE=$(du -h build/app/outputs/flutter-apk/app-release.apk 2>/dev/null | cut -f1 || echo "N/A")
+            APK_COUNT=1
+          fi
+
+          # Debug symbols size
+          SYMBOLS_SIZE=$(du -sh build/app/outputs/symbols/ 2>/dev/null | cut -f1 || echo "N/A")
+
+          echo "AAB_SIZE=$AAB_SIZE" >> $GITHUB_OUTPUT
+          echo "TOTAL_APK_SIZE=$TOTAL_APK_SIZE" >> $GITHUB_OUTPUT
+          echo "APK_COUNT=$APK_COUNT" >> $GITHUB_OUTPUT
+          echo "SYMBOLS_SIZE=$SYMBOLS_SIZE" >> $GITHUB_OUTPUT
+
+          echo "📊 Build Statistics:"
+          echo "  Total APK Size: $TOTAL_APK_SIZE"
+          echo "  AAB Size: $AAB_SIZE"
+          echo "  APK Count: $APK_COUNT"
+          echo "  Symbols Size: $SYMBOLS_SIZE"
+
+      #---------------------------------------------------
+      # FORMAT BUILD DATE (BANGLADESH TIMEZONE)
+      #---------------------------------------------------
+
+      - name: Format build date
+        id: build_date
+        run: |
+          BUILD_DATE=$(TZ='Asia/Dhaka' date +'%d %B %Y - %l:%M%p' | sed 's/AM/am/g; s/PM/pm/g; s/  / /g')
+          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # CREATE GITHUB RELEASE (ONLY FOR VERSION TAGS)
+      #---------------------------------------------------
+
+      - name: Create Release (only for tags)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: 💰 Binance P2P Order Info ${{ github.ref_name }}
+          body: |
+            ## 💰 Binance P2P Order Info Release ${{ github.ref_name }}
+
+            ### 📱 Download
+
+            | File Type | Size | Description |
+            |-----------|------|-------------|
+            | **APK** | ${{ steps.file_sizes.outputs.TOTAL_APK_SIZE }} | Direct install for Android devices |
+            | **AAB** | ${{ steps.file_sizes.outputs.AAB_SIZE }} | Google Play Store bundle |
+
+            ### 🔄 What's Changed
+
+            ${{ steps.app_info.outputs.CHANGELOG }}
+
+            ### 📋 Installation Instructions
+
+            **For APK:**
+
+            1. Download the APK matching your device architecture below
+            2. Enable "Install from Unknown Sources" in Android Settings
+            3. Open and install the APK
+
+            **Which APK to download?**
+            - `app-arm64-v8a-release.apk` - Most modern phones (2017+)
+            - `app-armeabi-v7a-release.apk` - Older phones
+            - `app-x86_64-release.apk` - Emulators & some tablets
+
+            **System Requirements:**
+            • Android 7.0+ (API 24)
+            • 50MB+ free storage
+
+            ### 🛡️ Security
+
+            • Built with Flutter 3.38.5
+            • Code obfuscation enabled
+            • Split-per-ABI optimization
+            • Debug symbols preserved for crash analysis
+
+            ---
+
+            **App Version:** ${{ steps.app_info.outputs.VERSION }}
+            **Build Date:** ${{ steps.build_date.outputs.BUILD_DATE }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+          draft: false
+          prerelease: false
+          makeLatest: true
+          artifacts: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/release/app-release.aab
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+
+      #---------------------------------------------------
+      # UPLOAD BUILD ARTIFACTS TO GITHUB
+      #---------------------------------------------------
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-${{ github.ref_name || github.sha }}
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      #---------------------------------------------------
+      # UPLOAD DEBUG SYMBOLS FOR CRASH ANALYSIS
+      #---------------------------------------------------
+
+      - name: Upload Debug Symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-symbols-${{ github.ref_name || github.sha }}
+          path: build/app/outputs/symbols/
+          retention-days: 90
+
+      #---------------------------------------------------
+      # GENERATE BUILD SUMMARY FOR GITHUB UI
+      #---------------------------------------------------
+
+      - name: Build Summary
+        run: |
+          echo "### ✅ Build Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.app_info.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**APK Count:** ${{ steps.file_sizes.outputs.APK_COUNT }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Total APK Size:** ${{ steps.file_sizes.outputs.TOTAL_APK_SIZE }}" >> $GITHUB_STEP_SUMMARY
+          echo "**AAB Size:** ${{ steps.file_sizes.outputs.AAB_SIZE }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Symbols Size:** ${{ steps.file_sizes.outputs.SYMBOLS_SIZE }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🛡️ **Security:** Code obfuscation enabled" >> $GITHUB_STEP_SUMMARY
+          echo "📱 Build artifacts uploaded successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "🔍 Debug symbols preserved for crash analysis" >> $GITHUB_STEP_SUMMARY
+
+      #---------------------------------------------------
+      # GET SHORT COMMIT HASH FOR SLACK NOTIFICATION
+      #---------------------------------------------------
+
+      - name: Get short SHA
+        id: short_sha
+        run: echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # SLACK NOTIFICATION (ALWAYS RUN - SUCCESS OR FAILURE)
+      #---------------------------------------------------
+
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ job.status == 'success' && '✅ Binance P2P Release Build' || '❌ Binance P2P Release Build' }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\n`${{ job.status == 'success' && 'Success' || 'Failure' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Version:*\n`${{ steps.app_info.outputs.VERSION || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n<${{ github.event.head_commit.url }}|`${{ steps.short_sha.outputs.sha }}`>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch/Tag:*\n`${{ github.ref_name }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*APK Size:*\n`${{ steps.file_sizes.outputs.TOTAL_APK_SIZE || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*AAB Size:*\n`${{ steps.file_sizes.outputs.AAB_SIZE || 'N/A' }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "📅 *Build Date:* ${{ steps.build_date.outputs.BUILD_DATE || 'N/A' }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📦 Download Release",
+                        "emoji": true
+                      },
+                      "url": "https://github.com/royalcourtbd/binance_order_info/releases/latest",
+                      "style": "primary"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "🔍 View Workflow",
+                        "emoji": true
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📂 Repository",
+                        "emoji": true
+                      },
+                      "url": "https://github.com/royalcourtbd/binance_order_info"
+                    }
+                  ]
+                }
+              ]
+            }
