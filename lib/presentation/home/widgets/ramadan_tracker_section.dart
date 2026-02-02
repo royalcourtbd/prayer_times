@@ -210,10 +210,9 @@ class SunArcPainter extends CustomPainter with SunIconMixin {
     final double dashWidth = height * 0.05;
     final double gapWidth = height * 0.09;
     final double activeLength = metric.length * progress;
-    final double inactiveThreshold = metric.length - activeLength;
 
     while (distance < metric.length) {
-      final bool isActive = distance > inactiveThreshold;
+      final bool isActive = distance < activeLength;
 
       canvas.drawPath(
         metric.extractPath(distance, distance + dashWidth),
