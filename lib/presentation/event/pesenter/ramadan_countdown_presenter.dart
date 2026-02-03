@@ -31,20 +31,20 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
   }
 
   void _calculateCountdown() {
-    final DateTime now = DateTime.now();
-    final HijriCalendar hijri = HijriCalendar.now();
+    final now = DateTime.now();
+    final hijri = HijriCalendar.now();
 
     // Check if currently Ramadan (Hijri month 9)
-    final bool isRamadan = hijri.hMonth == 9;
+    final isRamadan = hijri.hMonth == 9;
 
     // Get Ramadan dates
-    final DateTime ramadanStart = _getRamadanStartDate(hijri);
-    final DateTime ramadanEnd = _getRamadanEndDate(hijri);
+    final ramadanStart = _getRamadanStartDate(hijri);
+    final ramadanEnd = _getRamadanEndDate(hijri);
 
-    // Calculate visibility (show 60 days before, hide 7 days after)
-    final int daysUntilStart = ramadanStart.difference(now).inDays;
-    final int daysSinceEnd = now.difference(ramadanEnd).inDays;
-    final bool shouldShow = daysUntilStart <= 60 && daysSinceEnd <= 3;
+    // Calculate visibility (show 60 days before, hide 3 days after)
+    final daysUntilStart = ramadanStart.difference(now).inDays;
+    final daysSinceEnd = now.difference(ramadanEnd).inDays;
+    final shouldShow = daysUntilStart <= 60 && daysSinceEnd <= 3;
 
     // Calculate remaining time
     Duration remainingTime;
@@ -56,7 +56,7 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
       remainingTime = ramadanStart.difference(now);
     } else {
       // After Ramadan: countdown to next year's Ramadan
-      final DateTime nextRamadanStart = _getNextRamadanStartDate(hijri);
+      final nextRamadanStart = _getNextRamadanStartDate(hijri);
       remainingTime = nextRamadanStart.difference(now);
     }
 
@@ -65,7 +65,7 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
     }
 
     // Get current Ramadan day if applicable
-    final int? currentDay = isRamadan ? hijri.hDay : null;
+    final currentDay = isRamadan ? hijri.hDay : null;
 
     uiState.value = currentUiState.copyWith(
       days: remainingTime.inDays,
@@ -98,7 +98,7 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
     }
 
     // Ramadan is typically 29 or 30 days, use start of Shawwal minus 1
-    final DateTime shawwalStart = hijri.hijriToGregorian(targetYear, 10, 1);
+    final shawwalStart = hijri.hijriToGregorian(targetYear, 10, 1);
     return shawwalStart.subtract(const Duration(days: 1));
   }
 
