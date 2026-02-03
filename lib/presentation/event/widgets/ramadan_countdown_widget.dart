@@ -63,7 +63,7 @@ class RamadanCountdownWidget extends StatelessWidget {
     return Text(
       isRamadan ? 'Ramadan Mubarak' : 'Ramadan Countdown',
       style: theme.textTheme.titleMedium?.copyWith(
-        color: context.color.primaryColor700,
+        color: context.color.primaryColor,
         fontWeight: FontWeight.bold,
         fontSize: eighteenPx,
       ),
@@ -75,7 +75,7 @@ class RamadanCountdownWidget extends StatelessWidget {
     return Text(
       isRamadan ? 'Ramadan ends in' : 'Ramadan starts in',
       style: theme.textTheme.bodyMedium?.copyWith(
-        color: context.color.blackColor500,
+        color: context.color.subTitleColor,
         fontSize: thirteenPx,
       ),
     );
@@ -122,7 +122,7 @@ class RamadanCountdownWidget extends StatelessWidget {
     return Text(
       'Day $currentDay of Ramadan',
       style: theme.textTheme.bodyMedium?.copyWith(
-        color: context.color.primaryColor600,
+        color: context.color.primaryColor,
         fontWeight: FontWeight.w600,
         fontSize: fourteenPx,
       ),
@@ -146,8 +146,9 @@ class _CountdownUnit extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: tenPx),
       decoration: BoxDecoration(
-        color: context.color.primaryColor100,
-        borderRadius: radius8,
+        border: Border.all(color: context.color.whiteColor, width: 1),
+        color: context.color.whiteColor.withOpacityInt(0.5),
+        borderRadius: radius12,
       ),
       child: Column(
         children: [
@@ -157,7 +158,7 @@ class _CountdownUnit extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
             textStyle: theme.textTheme.headlineSmall?.copyWith(
-              color: context.color.primaryColor700,
+              color: context.color.primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: twentyTwoPx,
             ),
@@ -166,8 +167,8 @@ class _CountdownUnit extends StatelessWidget {
           Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: context.color.blackColor500,
-              fontSize: tenPx,
+              color: context.color.subTitleColor,
+              fontSize: elevenPx,
             ),
           ),
         ],

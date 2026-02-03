@@ -106,6 +106,26 @@ class BackendAsAService {
     });
   }
 
+  /// Stores the FCM device token to Firestore with device metadata
+  Future<void> storeDeviceToken({
+    required String token,
+    required String platform,
+    String? deviceModel,
+    String? deviceId,
+  }) async {
+    await catchFutureOrVoid(() async {
+      await _fireStore.collection(deviceTokensCollection).doc(token).set({
+        'token': token,
+        'platform': platform,
+        'device_model': deviceModel,
+        'device_id': deviceId,
+        'created_at': FieldValue.serverTimestamp(),
+        'updated_at': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      logDebug("Device token stored to Firestore: $token");
+    });
+  }
+
   Stream<List<BankPaymentModel>> getBankPaymentsStream() {
     return _fireStore
         .collection(paymentsCollection)
