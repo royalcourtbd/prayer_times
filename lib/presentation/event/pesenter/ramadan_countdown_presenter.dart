@@ -44,7 +44,7 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
     // Calculate visibility (show 60 days before, hide 7 days after)
     final int daysUntilStart = ramadanStart.difference(now).inDays;
     final int daysSinceEnd = now.difference(ramadanEnd).inDays;
-    final bool shouldShow = daysUntilStart <= 60 && daysSinceEnd <= 7;
+    final bool shouldShow = daysUntilStart <= 60 && daysSinceEnd <= 3;
 
     // Calculate remaining time
     Duration remainingTime;
