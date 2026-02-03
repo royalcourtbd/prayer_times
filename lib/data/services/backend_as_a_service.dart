@@ -107,6 +107,7 @@ class BackendAsAService {
   }
 
   /// Stores the FCM device token to Firestore with device metadata
+  /// Uses deviceId as document ID so reinstalls update existing document
   Future<void> storeDeviceToken({
     required String token,
     required String platform,
@@ -114,15 +115,32 @@ class BackendAsAService {
     String? deviceId,
   }) async {
     await catchFutureOrVoid(() async {
-      await _fireStore.collection(deviceTokensCollection).doc(token).set({
-        'token': token,
-        'platform': platform,
-        'device_model': deviceModel,
-        'device_id': deviceId,
-        'created_at': FieldValue.serverTimestamp(),
-        'updated_at': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-      logDebug("Device token stored to Firestore: $token");
+      // deviceId কে document ID হিসেবে ব্যবহার করি
+      // যদি deviceId না থাকে তাহলে token ব্যবহার করি (fallback)
+      final String docId = deviceId ?? token;
+
+      final docRef = _fireStore.collection(deviceTokensCollection).doc(docId);
+      final docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        // Document exists - update token and updated_at only
+        await docRef.update({
+          'token': token,
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+        logDebug("Device token updated in Firestore for device: $docId");
+      } else {
+        // New device - create new document
+        await docRef.set({
+          'token': token,
+          'platform': platform,
+          'device_model': deviceModel,
+          'device_id': deviceId,
+          'created_at': FieldValue.serverTimestamp(),
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+        logDebug("Device token created in Firestore for device: $docId");
+      }
     });
   }
 
