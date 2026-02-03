@@ -24,6 +24,7 @@ import 'package:prayer_times/domain/usecases/search_countries_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_calculation_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_juristic_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/clear_all_prayer_tracker_data_usecase.dart';
+import 'package:prayer_times/domain/usecases/initialize_device_token_usecase.dart';
 
 class UsecaseSetup implements SetupModule {
   final GetIt _serviceLocator;
@@ -69,6 +70,9 @@ class UsecaseSetup implements SetupModule {
       )
       ..registerLazySingleton(
         () => RequestNotificationPermissionUsecase(locate(), locate()),
+      )
+      ..registerLazySingleton(
+        () => InitializeDeviceTokenUseCase(locate(), locate()),
       );
   }
 }

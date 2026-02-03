@@ -18,6 +18,7 @@ import 'package:prayer_times/domain/usecases/get_location_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_prayer_times_usecase.dart';
 import 'package:prayer_times/domain/usecases/get_remaining_time_usecase.dart';
 import 'package:prayer_times/domain/usecases/request_notification_permission_usecase.dart';
+import 'package:prayer_times/domain/usecases/initialize_device_token_usecase.dart';
 import 'package:prayer_times/presentation/common/notification_denied_dialog.dart';
 import 'package:prayer_times/presentation/main/presenter/main_presenter.dart';
 import 'package:prayer_times/presentation/home/models/fasting_state.dart';
@@ -36,6 +37,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   final RequestNotificationPermissionUsecase
   _requestNotificationPermissionUsecase;
   final CheckNotificationPermissionUsecase _checkNotificationPermissionUsecase;
+  final InitializeDeviceTokenUseCase _initializeDeviceTokenUseCase;
   StreamSubscription<DateTime>? _timeSubscription;
 
   final ScrollController prayerTimesScrollController = ScrollController();
@@ -51,6 +53,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     this._waqtCalculationService,
     this._requestNotificationPermissionUsecase,
     this._checkNotificationPermissionUsecase,
+    this._initializeDeviceTokenUseCase,
   );
 
   final Obs<HomeUiState> uiState = Obs<HomeUiState>(HomeUiState.empty());
@@ -90,8 +93,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
           requestNotificationPermission();
         } else {
           log('hasPermission: $hasPermission');
-          // পারমিশন আছে, প্রয়োজনীয় সেটআপ করুন (যেমন ডিভাইস রেজিস্ট্রেশন)
-          // আপনি ইতিমধ্যেই onInit-এ fetchDeviceInfo() কল করেছেন, যা ঠিক আছে
+          // পারমিশন আছে, FCM token initialize করুন
+          _initializeDeviceToken();
         }
       },
     );
@@ -104,6 +107,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
         onGrantedOrSkippedForNow: () {
           // পারমিশন দেওয়া হয়েছে
           log('onGrantedOrSkippedForNow');
+          // FCM token initialize করুন
+          _initializeDeviceToken();
         },
         onDenied: () {
           // পারমিশন দেওয়া হয়নি
@@ -114,11 +119,23 @@ class HomePresenter extends BasePresenter<HomeUiState> {
               openNotificationSettings();
             },
           );
+          // FCM token permission ছাড়াও কাজ করে, তাই initialize করুন
+          _initializeDeviceToken();
         },
       ),
       showLoading: false,
       onDataLoaded: (_) {
         // এখানে কিছু করার দরকার নেই
+      },
+    );
+  }
+
+  Future<void> _initializeDeviceToken() async {
+    await parseDataFromEitherWithUserMessage<String>(
+      task: () => _initializeDeviceTokenUseCase.execute(),
+      showLoading: false,
+      onDataLoaded: (String token) {
+        log('Device token initialized: ${token.substring(0, 20)}...');
       },
     );
   }
