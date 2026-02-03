@@ -31,15 +31,12 @@ class RamadanCountdownWidget extends StatelessWidget {
             margin: EdgeInsets.only(bottom: twentyPx),
             padding: padding15,
             decoration: BoxDecoration(
-              color: context.color.primaryColor50,
-              borderRadius: radius12,
-              boxShadow: [
-                BoxShadow(
-                  color: context.color.blackColor950.withOpacityInt(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: context.color.primaryColor.withOpacityInt(0.05),
+              borderRadius: radius18,
+              border: Border.all(
+                color: context.color.primaryColor.withOpacityInt(0.1),
+                width: 1,
+              ),
             ),
             child: Column(
               children: [
