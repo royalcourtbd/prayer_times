@@ -8,6 +8,7 @@ import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
 import 'package:prayer_times/presentation/event/ui/ramadan_calendar_page.dart';
 import 'package:prayer_times/presentation/event/widgets/holiday_section.dart';
 import 'package:prayer_times/presentation/event/widgets/ramadan_calendar_banner.dart';
+import 'package:prayer_times/presentation/event/widgets/ramadan_countdown_widget.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/event/widgets/event_calendar.dart';
@@ -44,6 +45,8 @@ class EventPage extends StatelessWidget {
                 ),
                 gapH30,
                 HolidaySection(theme: theme, eventPresenter: _eventPresenter),
+                gapH20,
+                RamadanCountdownWidget(),
                 gapH20,
                 RamadanCalendarBanner(
                   theme: theme,
