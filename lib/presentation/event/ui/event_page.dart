@@ -46,8 +46,8 @@ class EventPage extends StatelessWidget {
                 gapH30,
                 HolidaySection(theme: theme, eventPresenter: _eventPresenter),
                 gapH20,
+
                 RamadanCountdownWidget(),
-                gapH20,
                 RamadanCalendarBanner(
                   theme: theme,
                   locationName:

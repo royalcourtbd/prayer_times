@@ -28,6 +28,7 @@ class RamadanCountdownWidget extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: twentyPx),
           child: Container(
             width: double.infinity,
+            margin: EdgeInsets.only(bottom: twentyPx),
             padding: padding15,
             decoration: BoxDecoration(
               color: context.color.primaryColor50,
@@ -89,11 +90,7 @@ class RamadanCountdownWidget extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: _CountdownUnit(
-            value: state.days,
-            label: 'Days',
-            theme: theme,
-          ),
+          child: _CountdownUnit(value: state.days, label: 'Days', theme: theme),
         ),
         gapW8,
         Expanded(
