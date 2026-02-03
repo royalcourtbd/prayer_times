@@ -10,6 +10,7 @@ import 'package:prayer_times/presentation/notification/presenter/notification_pr
 import 'package:prayer_times/presentation/onboarding/presenter/onboarding_presenter.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/event/pesenter/ramadan_calendar_presenter.dart';
+import 'package:prayer_times/presentation/event/pesenter/ramadan_countdown_presenter.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
 import 'package:prayer_times/presentation/settings/presenter/settings_page_presenter.dart';
 import 'package:prayer_times/presentation/support_us/presenter/support_us_presenter.dart';
@@ -75,6 +76,9 @@ class PresenterSetup implements SetupModule {
         ),
       )
       ..registerLazySingleton(() => loadPresenter(MenuDrawerPresenter()))
-      ..registerLazySingleton(() => loadPresenter(EventPresenter()));
+      ..registerLazySingleton(() => loadPresenter(EventPresenter()))
+      ..registerLazySingleton(
+        () => loadPresenter(RamadanCountdownPresenter()),
+      );
   }
 }
