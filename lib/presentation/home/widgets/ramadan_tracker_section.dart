@@ -24,6 +24,10 @@ class RamadanTrackerSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.color.primaryColor.withOpacityInt(0.05),
         borderRadius: radius18,
+        border: Border.all(
+          color: context.color.primaryColor.withOpacityInt(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
@@ -188,9 +192,16 @@ class SunArcPainter extends CustomPainter with SunIconMixin {
 
     // SVG-like smooth cubic curve (LEFT to RIGHT: Suhur to Iftar)
     final path = Path()
-      ..moveTo(0, height)  // Start from LEFT (Suhur)
+      ..moveTo(0, height) // Start from LEFT (Suhur)
       ..cubicTo(width * 0.06, height * 0.43, width * 0.26, 0, width * 0.5, 0)
-      ..cubicTo(width * 0.74, 0, width * 0.94, height * 0.43, width, height);  // End at RIGHT (Iftar)
+      ..cubicTo(
+        width * 0.74,
+        0,
+        width * 0.94,
+        height * 0.43,
+        width,
+        height,
+      ); // End at RIGHT (Iftar)
 
     final basePaint = Paint()
       ..color = activeColor.withOpacityInt(0.25)
