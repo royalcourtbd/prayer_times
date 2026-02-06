@@ -603,7 +603,12 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*Internal Deploy:*\n`${{ needs.deploy-internal.result == 'success' && 'Success' || needs.deploy-internal.result == 'skipped' && 'Skipped (tag)' || 'Failed' }}`"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*GitHub Release:*\n`${{ needs.github-release.result == 'success' && 'Published' || needs.github-release.result == 'skipped' && 'Skipped (no tag)' || 'Failed' }}`"
@@ -611,7 +616,12 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*Version:*\n`${{ needs.build.outputs.version || needs.github-release.outputs.version || 'N/A' }}`"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*Build Number:*\n`${{ needs.build.outputs.build_number || 'N/A' }}`"
