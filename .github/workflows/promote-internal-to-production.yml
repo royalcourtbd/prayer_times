@@ -1,0 +1,199 @@
+name: Promote Internal to Production (EMERGENCY ONLY)
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollout_percentage:
+        description: "Rollout percentage (0.01 to 1.0, default: 0.05 = 5%)"
+        required: false
+        type: string
+        default: "0.05"
+      update_priority:
+        description: "In-app update priority (0-5, default: 4)"
+        required: false
+        type: choice
+        options:
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+        default: "4"
+      confirmation:
+        description: 'Type "SKIP-TESTING-PRODUCTION" to confirm (EMERGENCY ONLY!)'
+        required: true
+        type: string
+      reason:
+        description: "Emergency reason (required for audit trail)"
+        required: true
+        type: string
+
+env:
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
+
+jobs:
+  promote-to-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      #---------------------------------------------------
+      # EXTRA STRICT SAFETY CHECK
+      #---------------------------------------------------
+      - name: Validate confirmation and reason
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "SKIP-TESTING-PRODUCTION" ]; then
+            echo "❌ Safety check failed!"
+            echo "⚠️  You are trying to skip alpha/beta testing and go DIRECTLY to production!"
+            echo "⚠️  Type 'SKIP-TESTING-PRODUCTION' if you really want to do this."
+            exit 1
+          fi
+
+          if [ -z "${{ github.event.inputs.reason }}" ]; then
+            echo "❌ Emergency reason is required for audit trail!"
+            exit 1
+          fi
+
+          echo "⚠️⚠️⚠️ WARNING: Deploying UNTESTED build directly to production! ⚠️⚠️⚠️"
+          echo "📝 Reason: ${{ github.event.inputs.reason }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get app version
+        id: app_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Validate rollout percentage
+        id: rollout_check
+        run: |
+          VALUE="${{ github.event.inputs.rollout_percentage || '0.05' }}"
+
+          if ! [[ "$VALUE" =~ ^0\.[0-9]+$|^1(\.0+)?$ ]]; then
+            echo "❌ Invalid rollout percentage: $VALUE"
+            exit 1
+          fi
+
+          # Force low rollout for untested builds
+          if (( $(echo "$VALUE > 0.2" | bc -l) )); then
+            echo "❌ ERROR: Cannot deploy untested build to more than 20% of users!"
+            echo "⚠️  Maximum allowed: 0.2 (20%)"
+            exit 1
+          fi
+
+          PERCENT=$(echo "scale=1; $VALUE * 100" | bc)
+          echo "percentage=${PERCENT}%" >> $GITHUB_OUTPUT
+          echo "✅ Valid rollout percentage: $VALUE (${PERCENT}%)"
+
+      #---------------------------------------------------
+      # PROMOTE INTERNAL → PRODUCTION (DANGEROUS!)
+      #---------------------------------------------------
+      - name: Promote Internal → Production (EMERGENCY!)
+        uses: kevin-david/promote-play-release@v1.1.0
+        with:
+          service-account-json-raw: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          package-name: ${{ env.PACKAGE_NAME }}
+          from-track: internal
+          to-track: production
+          inapp-update-priority: ${{ github.event.inputs.update_priority }}
+          user-fraction: ${{ github.event.inputs.rollout_percentage || '0.05' }}
+
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ job.status == 'success' && '🚨 EMERGENCY PRODUCTION Deploy' || '❌ EMERGENCY Deploy FAILED' }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚨 *CRITICAL WARNING: This build SKIPPED all testing phases and went DIRECTLY to production!*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📉 Status:*\n`${{ job.status == 'success' && 'Deployed ⚠️' || 'FAILED ✗' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*🔀 Track:*\n`Internal → Production ⚠️`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📦 Version:*\n`${{ steps.app_version.outputs.version }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*⚡ Priority:*\n`${{ github.event.inputs.update_priority }} (HIGH)`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👥 Rollout:*\n`${{ steps.rollout_check.outputs.percentage || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👤 Released by:*\n`${{ github.actor }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📝 Emergency Reason:*\n```${{ github.event.inputs.reason }}```"
+                    }
+                  ]
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "🔴 *ALERT: Monitor crash analytics, ANRs, and user reviews IMMEDIATELY. This build had ZERO user testing!*"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📱 View on Play Store",
+                        "emoji": true
+                      },
+                      "url": "https://play.google.com/store/apps/details?id=${{ env.PACKAGE_NAME }}",
+                      "style": "danger"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "👁️ Workflow",
+                        "emoji": true
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
