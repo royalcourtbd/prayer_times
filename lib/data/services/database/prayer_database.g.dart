@@ -12,14 +12,23 @@ class $JuristicMethodTableTable extends JuristicMethodTable
   static const VerificationMeta _methodMeta = const VerificationMeta('method');
   @override
   late final GeneratedColumn<String> method = GeneratedColumn<String>(
-      'method', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'method',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [method, updatedAt];
   @override
@@ -29,19 +38,24 @@ class $JuristicMethodTableTable extends JuristicMethodTable
   static const String $name = 'juristic_method_table';
   @override
   VerificationContext validateIntegrity(
-      Insertable<JuristicMethodTableData> instance,
-      {bool isInserting = false}) {
+    Insertable<JuristicMethodTableData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('method')) {
-      context.handle(_methodMeta,
-          method.isAcceptableOrUnknown(data['method']!, _methodMeta));
+      context.handle(
+        _methodMeta,
+        method.isAcceptableOrUnknown(data['method']!, _methodMeta),
+      );
     } else if (isInserting) {
       context.missing(_methodMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
@@ -51,14 +65,20 @@ class $JuristicMethodTableTable extends JuristicMethodTable
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
   @override
-  JuristicMethodTableData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  JuristicMethodTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return JuristicMethodTableData(
-      method: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}method'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      method: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}method'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -72,8 +92,10 @@ class JuristicMethodTableData extends DataClass
     implements Insertable<JuristicMethodTableData> {
   final String method;
   final DateTime updatedAt;
-  const JuristicMethodTableData(
-      {required this.method, required this.updatedAt});
+  const JuristicMethodTableData({
+    required this.method,
+    required this.updatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -89,8 +111,10 @@ class JuristicMethodTableData extends DataClass
     );
   }
 
-  factory JuristicMethodTableData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory JuristicMethodTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return JuristicMethodTableData(
       method: serializer.fromJson<String>(json['method']),
@@ -151,8 +175,8 @@ class JuristicMethodTableCompanion
     required String method,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
-  })  : method = Value(method),
-        updatedAt = Value(updatedAt);
+  }) : method = Value(method),
+       updatedAt = Value(updatedAt);
   static Insertable<JuristicMethodTableData> custom({
     Expression<String>? method,
     Expression<DateTime>? updatedAt,
@@ -165,8 +189,11 @@ class JuristicMethodTableCompanion
     });
   }
 
-  JuristicMethodTableCompanion copyWith(
-      {Value<String>? method, Value<DateTime>? updatedAt, Value<int>? rowid}) {
+  JuristicMethodTableCompanion copyWith({
+    Value<String>? method,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
     return JuristicMethodTableCompanion(
       method: method ?? this.method,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -209,29 +236,52 @@ class $PrayerTrackerTableTable extends PrayerTrackerTable
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
-      'date', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _trackerDataMeta =
-      const VerificationMeta('trackerData');
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _trackerDataMeta = const VerificationMeta(
+    'trackerData',
+  );
   @override
   late final GeneratedColumn<String> trackerData = GeneratedColumn<String>(
-      'tracker_data', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+    'tracker_data',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [date, trackerData, createdAt, updatedAt];
+  List<GeneratedColumn> get $columns => [
+    date,
+    trackerData,
+    createdAt,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -239,33 +289,43 @@ class $PrayerTrackerTableTable extends PrayerTrackerTable
   static const String $name = 'prayer_tracker_table';
   @override
   VerificationContext validateIntegrity(
-      Insertable<PrayerTrackerTableData> instance,
-      {bool isInserting = false}) {
+    Insertable<PrayerTrackerTableData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('date')) {
       context.handle(
-          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
     } else if (isInserting) {
       context.missing(_dateMeta);
     }
     if (data.containsKey('tracker_data')) {
       context.handle(
+        _trackerDataMeta,
+        trackerData.isAcceptableOrUnknown(
+          data['tracker_data']!,
           _trackerDataMeta,
-          trackerData.isAcceptableOrUnknown(
-              data['tracker_data']!, _trackerDataMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_trackerDataMeta);
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
@@ -278,14 +338,22 @@ class $PrayerTrackerTableTable extends PrayerTrackerTable
   PrayerTrackerTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PrayerTrackerTableData(
-      date: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
-      trackerData: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}tracker_data'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      trackerData: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tracker_data'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -301,11 +369,12 @@ class PrayerTrackerTableData extends DataClass
   final String trackerData;
   final DateTime createdAt;
   final DateTime updatedAt;
-  const PrayerTrackerTableData(
-      {required this.date,
-      required this.trackerData,
-      required this.createdAt,
-      required this.updatedAt});
+  const PrayerTrackerTableData({
+    required this.date,
+    required this.trackerData,
+    required this.createdAt,
+    required this.updatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -325,8 +394,10 @@ class PrayerTrackerTableData extends DataClass
     );
   }
 
-  factory PrayerTrackerTableData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory PrayerTrackerTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PrayerTrackerTableData(
       date: serializer.fromJson<DateTime>(json['date']),
@@ -346,22 +417,23 @@ class PrayerTrackerTableData extends DataClass
     };
   }
 
-  PrayerTrackerTableData copyWith(
-          {DateTime? date,
-          String? trackerData,
-          DateTime? createdAt,
-          DateTime? updatedAt}) =>
-      PrayerTrackerTableData(
-        date: date ?? this.date,
-        trackerData: trackerData ?? this.trackerData,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+  PrayerTrackerTableData copyWith({
+    DateTime? date,
+    String? trackerData,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => PrayerTrackerTableData(
+    date: date ?? this.date,
+    trackerData: trackerData ?? this.trackerData,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
   PrayerTrackerTableData copyWithCompanion(PrayerTrackerTableCompanion data) {
     return PrayerTrackerTableData(
       date: data.date.present ? data.date.value : this.date,
-      trackerData:
-          data.trackerData.present ? data.trackerData.value : this.trackerData,
+      trackerData: data.trackerData.present
+          ? data.trackerData.value
+          : this.trackerData,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -410,10 +482,10 @@ class PrayerTrackerTableCompanion
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
-  })  : date = Value(date),
-        trackerData = Value(trackerData),
-        createdAt = Value(createdAt),
-        updatedAt = Value(updatedAt);
+  }) : date = Value(date),
+       trackerData = Value(trackerData),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
   static Insertable<PrayerTrackerTableData> custom({
     Expression<DateTime>? date,
     Expression<String>? trackerData,
@@ -430,12 +502,13 @@ class PrayerTrackerTableCompanion
     });
   }
 
-  PrayerTrackerTableCompanion copyWith(
-      {Value<DateTime>? date,
-      Value<String>? trackerData,
-      Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<int>? rowid}) {
+  PrayerTrackerTableCompanion copyWith({
+    Value<DateTime>? date,
+    Value<String>? trackerData,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
     return PrayerTrackerTableCompanion(
       date: date ?? this.date,
       trackerData: trackerData ?? this.trackerData,
@@ -488,14 +561,23 @@ class $CalculationMethodTableTable extends CalculationMethodTable
   static const VerificationMeta _methodMeta = const VerificationMeta('method');
   @override
   late final GeneratedColumn<String> method = GeneratedColumn<String>(
-      'method', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'method',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [method, updatedAt];
   @override
@@ -505,19 +587,24 @@ class $CalculationMethodTableTable extends CalculationMethodTable
   static const String $name = 'calculation_method_table';
   @override
   VerificationContext validateIntegrity(
-      Insertable<CalculationMethodTableData> instance,
-      {bool isInserting = false}) {
+    Insertable<CalculationMethodTableData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('method')) {
-      context.handle(_methodMeta,
-          method.isAcceptableOrUnknown(data['method']!, _methodMeta));
+      context.handle(
+        _methodMeta,
+        method.isAcceptableOrUnknown(data['method']!, _methodMeta),
+      );
     } else if (isInserting) {
       context.missing(_methodMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
@@ -527,14 +614,20 @@ class $CalculationMethodTableTable extends CalculationMethodTable
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
   @override
-  CalculationMethodTableData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  CalculationMethodTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CalculationMethodTableData(
-      method: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}method'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      method: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}method'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -548,8 +641,10 @@ class CalculationMethodTableData extends DataClass
     implements Insertable<CalculationMethodTableData> {
   final String method;
   final DateTime updatedAt;
-  const CalculationMethodTableData(
-      {required this.method, required this.updatedAt});
+  const CalculationMethodTableData({
+    required this.method,
+    required this.updatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -565,8 +660,10 @@ class CalculationMethodTableData extends DataClass
     );
   }
 
-  factory CalculationMethodTableData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory CalculationMethodTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CalculationMethodTableData(
       method: serializer.fromJson<String>(json['method']),
@@ -588,7 +685,8 @@ class CalculationMethodTableData extends DataClass
         updatedAt: updatedAt ?? this.updatedAt,
       );
   CalculationMethodTableData copyWithCompanion(
-      CalculationMethodTableCompanion data) {
+    CalculationMethodTableCompanion data,
+  ) {
     return CalculationMethodTableData(
       method: data.method.present ? data.method.value : this.method,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -628,8 +726,8 @@ class CalculationMethodTableCompanion
     required String method,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
-  })  : method = Value(method),
-        updatedAt = Value(updatedAt);
+  }) : method = Value(method),
+       updatedAt = Value(updatedAt);
   static Insertable<CalculationMethodTableData> custom({
     Expression<String>? method,
     Expression<DateTime>? updatedAt,
@@ -642,8 +740,11 @@ class CalculationMethodTableCompanion
     });
   }
 
-  CalculationMethodTableCompanion copyWith(
-      {Value<String>? method, Value<DateTime>? updatedAt, Value<int>? rowid}) {
+  CalculationMethodTableCompanion copyWith({
+    Value<String>? method,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
     return CalculationMethodTableCompanion(
       method: method ?? this.method,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -690,22 +791,25 @@ abstract class _$PrayerDatabase extends GeneratedDatabase {
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [juristicMethodTable, prayerTrackerTable, calculationMethodTable];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    juristicMethodTable,
+    prayerTrackerTable,
+    calculationMethodTable,
+  ];
 }
 
-typedef $$JuristicMethodTableTableCreateCompanionBuilder
-    = JuristicMethodTableCompanion Function({
-  required String method,
-  required DateTime updatedAt,
-  Value<int> rowid,
-});
-typedef $$JuristicMethodTableTableUpdateCompanionBuilder
-    = JuristicMethodTableCompanion Function({
-  Value<String> method,
-  Value<DateTime> updatedAt,
-  Value<int> rowid,
-});
+typedef $$JuristicMethodTableTableCreateCompanionBuilder =
+    JuristicMethodTableCompanion Function({
+      required String method,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$JuristicMethodTableTableUpdateCompanionBuilder =
+    JuristicMethodTableCompanion Function({
+      Value<String> method,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
 
 class $$JuristicMethodTableTableFilterComposer
     extends Composer<_$PrayerDatabase, $JuristicMethodTableTable> {
@@ -717,10 +821,14 @@ class $$JuristicMethodTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get method => $composableBuilder(
-      column: $table.method, builder: (column) => ColumnFilters(column));
+    column: $table.method,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$JuristicMethodTableTableOrderingComposer
@@ -733,10 +841,14 @@ class $$JuristicMethodTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get method => $composableBuilder(
-      column: $table.method, builder: (column) => ColumnOrderings(column));
+    column: $table.method,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$JuristicMethodTableTableAnnotationComposer
@@ -755,94 +867,112 @@ class $$JuristicMethodTableTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$JuristicMethodTableTableTableManager extends RootTableManager<
-    _$PrayerDatabase,
-    $JuristicMethodTableTable,
-    JuristicMethodTableData,
-    $$JuristicMethodTableTableFilterComposer,
-    $$JuristicMethodTableTableOrderingComposer,
-    $$JuristicMethodTableTableAnnotationComposer,
-    $$JuristicMethodTableTableCreateCompanionBuilder,
-    $$JuristicMethodTableTableUpdateCompanionBuilder,
-    (
-      JuristicMethodTableData,
-      BaseReferences<_$PrayerDatabase, $JuristicMethodTableTable,
-          JuristicMethodTableData>
-    ),
-    JuristicMethodTableData,
-    PrefetchHooks Function()> {
+class $$JuristicMethodTableTableTableManager
+    extends
+        RootTableManager<
+          _$PrayerDatabase,
+          $JuristicMethodTableTable,
+          JuristicMethodTableData,
+          $$JuristicMethodTableTableFilterComposer,
+          $$JuristicMethodTableTableOrderingComposer,
+          $$JuristicMethodTableTableAnnotationComposer,
+          $$JuristicMethodTableTableCreateCompanionBuilder,
+          $$JuristicMethodTableTableUpdateCompanionBuilder,
+          (
+            JuristicMethodTableData,
+            BaseReferences<
+              _$PrayerDatabase,
+              $JuristicMethodTableTable,
+              JuristicMethodTableData
+            >,
+          ),
+          JuristicMethodTableData,
+          PrefetchHooks Function()
+        > {
   $$JuristicMethodTableTableTableManager(
-      _$PrayerDatabase db, $JuristicMethodTableTable table)
-      : super(TableManagerState(
+    _$PrayerDatabase db,
+    $JuristicMethodTableTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
               $$JuristicMethodTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
               $$JuristicMethodTableTableOrderingComposer(
-                  $db: db, $table: table),
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
               $$JuristicMethodTableTableAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> method = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              JuristicMethodTableCompanion(
-            method: method,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String method,
-            required DateTime updatedAt,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              JuristicMethodTableCompanion.insert(
-            method: method,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> method = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JuristicMethodTableCompanion(
+                method: method,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String method,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => JuristicMethodTableCompanion.insert(
+                method: method,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$JuristicMethodTableTableProcessedTableManager = ProcessedTableManager<
-    _$PrayerDatabase,
-    $JuristicMethodTableTable,
-    JuristicMethodTableData,
-    $$JuristicMethodTableTableFilterComposer,
-    $$JuristicMethodTableTableOrderingComposer,
-    $$JuristicMethodTableTableAnnotationComposer,
-    $$JuristicMethodTableTableCreateCompanionBuilder,
-    $$JuristicMethodTableTableUpdateCompanionBuilder,
-    (
+typedef $$JuristicMethodTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$PrayerDatabase,
+      $JuristicMethodTableTable,
       JuristicMethodTableData,
-      BaseReferences<_$PrayerDatabase, $JuristicMethodTableTable,
-          JuristicMethodTableData>
-    ),
-    JuristicMethodTableData,
-    PrefetchHooks Function()>;
-typedef $$PrayerTrackerTableTableCreateCompanionBuilder
-    = PrayerTrackerTableCompanion Function({
-  required DateTime date,
-  required String trackerData,
-  required DateTime createdAt,
-  required DateTime updatedAt,
-  Value<int> rowid,
-});
-typedef $$PrayerTrackerTableTableUpdateCompanionBuilder
-    = PrayerTrackerTableCompanion Function({
-  Value<DateTime> date,
-  Value<String> trackerData,
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> rowid,
-});
+      $$JuristicMethodTableTableFilterComposer,
+      $$JuristicMethodTableTableOrderingComposer,
+      $$JuristicMethodTableTableAnnotationComposer,
+      $$JuristicMethodTableTableCreateCompanionBuilder,
+      $$JuristicMethodTableTableUpdateCompanionBuilder,
+      (
+        JuristicMethodTableData,
+        BaseReferences<
+          _$PrayerDatabase,
+          $JuristicMethodTableTable,
+          JuristicMethodTableData
+        >,
+      ),
+      JuristicMethodTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$PrayerTrackerTableTableCreateCompanionBuilder =
+    PrayerTrackerTableCompanion Function({
+      required DateTime date,
+      required String trackerData,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PrayerTrackerTableTableUpdateCompanionBuilder =
+    PrayerTrackerTableCompanion Function({
+      Value<DateTime> date,
+      Value<String> trackerData,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
 
 class $$PrayerTrackerTableTableFilterComposer
     extends Composer<_$PrayerDatabase, $PrayerTrackerTableTable> {
@@ -854,16 +984,24 @@ class $$PrayerTrackerTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get date => $composableBuilder(
-      column: $table.date, builder: (column) => ColumnFilters(column));
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get trackerData => $composableBuilder(
-      column: $table.trackerData, builder: (column) => ColumnFilters(column));
+    column: $table.trackerData,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$PrayerTrackerTableTableOrderingComposer
@@ -876,16 +1014,24 @@ class $$PrayerTrackerTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get date => $composableBuilder(
-      column: $table.date, builder: (column) => ColumnOrderings(column));
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get trackerData => $composableBuilder(
-      column: $table.trackerData, builder: (column) => ColumnOrderings(column));
+    column: $table.trackerData,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PrayerTrackerTableTableAnnotationComposer
@@ -901,7 +1047,9 @@ class $$PrayerTrackerTableTableAnnotationComposer
       $composableBuilder(column: $table.date, builder: (column) => column);
 
   GeneratedColumn<String> get trackerData => $composableBuilder(
-      column: $table.trackerData, builder: (column) => column);
+    column: $table.trackerData,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -910,25 +1058,33 @@ class $$PrayerTrackerTableTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$PrayerTrackerTableTableTableManager extends RootTableManager<
-    _$PrayerDatabase,
-    $PrayerTrackerTableTable,
-    PrayerTrackerTableData,
-    $$PrayerTrackerTableTableFilterComposer,
-    $$PrayerTrackerTableTableOrderingComposer,
-    $$PrayerTrackerTableTableAnnotationComposer,
-    $$PrayerTrackerTableTableCreateCompanionBuilder,
-    $$PrayerTrackerTableTableUpdateCompanionBuilder,
-    (
-      PrayerTrackerTableData,
-      BaseReferences<_$PrayerDatabase, $PrayerTrackerTableTable,
-          PrayerTrackerTableData>
-    ),
-    PrayerTrackerTableData,
-    PrefetchHooks Function()> {
+class $$PrayerTrackerTableTableTableManager
+    extends
+        RootTableManager<
+          _$PrayerDatabase,
+          $PrayerTrackerTableTable,
+          PrayerTrackerTableData,
+          $$PrayerTrackerTableTableFilterComposer,
+          $$PrayerTrackerTableTableOrderingComposer,
+          $$PrayerTrackerTableTableAnnotationComposer,
+          $$PrayerTrackerTableTableCreateCompanionBuilder,
+          $$PrayerTrackerTableTableUpdateCompanionBuilder,
+          (
+            PrayerTrackerTableData,
+            BaseReferences<
+              _$PrayerDatabase,
+              $PrayerTrackerTableTable,
+              PrayerTrackerTableData
+            >,
+          ),
+          PrayerTrackerTableData,
+          PrefetchHooks Function()
+        > {
   $$PrayerTrackerTableTableTableManager(
-      _$PrayerDatabase db, $PrayerTrackerTableTable table)
-      : super(TableManagerState(
+    _$PrayerDatabase db,
+    $PrayerTrackerTableTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -937,70 +1093,78 @@ class $$PrayerTrackerTableTableTableManager extends RootTableManager<
               $$PrayerTrackerTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$PrayerTrackerTableTableAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> date = const Value.absent(),
-            Value<String> trackerData = const Value.absent(),
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              PrayerTrackerTableCompanion(
-            date: date,
-            trackerData: trackerData,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required DateTime date,
-            required String trackerData,
-            required DateTime createdAt,
-            required DateTime updatedAt,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              PrayerTrackerTableCompanion.insert(
-            date: date,
-            trackerData: trackerData,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> date = const Value.absent(),
+                Value<String> trackerData = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PrayerTrackerTableCompanion(
+                date: date,
+                trackerData: trackerData,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required DateTime date,
+                required String trackerData,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PrayerTrackerTableCompanion.insert(
+                date: date,
+                trackerData: trackerData,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$PrayerTrackerTableTableProcessedTableManager = ProcessedTableManager<
-    _$PrayerDatabase,
-    $PrayerTrackerTableTable,
-    PrayerTrackerTableData,
-    $$PrayerTrackerTableTableFilterComposer,
-    $$PrayerTrackerTableTableOrderingComposer,
-    $$PrayerTrackerTableTableAnnotationComposer,
-    $$PrayerTrackerTableTableCreateCompanionBuilder,
-    $$PrayerTrackerTableTableUpdateCompanionBuilder,
-    (
+typedef $$PrayerTrackerTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$PrayerDatabase,
+      $PrayerTrackerTableTable,
       PrayerTrackerTableData,
-      BaseReferences<_$PrayerDatabase, $PrayerTrackerTableTable,
-          PrayerTrackerTableData>
-    ),
-    PrayerTrackerTableData,
-    PrefetchHooks Function()>;
-typedef $$CalculationMethodTableTableCreateCompanionBuilder
-    = CalculationMethodTableCompanion Function({
-  required String method,
-  required DateTime updatedAt,
-  Value<int> rowid,
-});
-typedef $$CalculationMethodTableTableUpdateCompanionBuilder
-    = CalculationMethodTableCompanion Function({
-  Value<String> method,
-  Value<DateTime> updatedAt,
-  Value<int> rowid,
-});
+      $$PrayerTrackerTableTableFilterComposer,
+      $$PrayerTrackerTableTableOrderingComposer,
+      $$PrayerTrackerTableTableAnnotationComposer,
+      $$PrayerTrackerTableTableCreateCompanionBuilder,
+      $$PrayerTrackerTableTableUpdateCompanionBuilder,
+      (
+        PrayerTrackerTableData,
+        BaseReferences<
+          _$PrayerDatabase,
+          $PrayerTrackerTableTable,
+          PrayerTrackerTableData
+        >,
+      ),
+      PrayerTrackerTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$CalculationMethodTableTableCreateCompanionBuilder =
+    CalculationMethodTableCompanion Function({
+      required String method,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CalculationMethodTableTableUpdateCompanionBuilder =
+    CalculationMethodTableCompanion Function({
+      Value<String> method,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
 
 class $$CalculationMethodTableTableFilterComposer
     extends Composer<_$PrayerDatabase, $CalculationMethodTableTable> {
@@ -1012,10 +1176,14 @@ class $$CalculationMethodTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get method => $composableBuilder(
-      column: $table.method, builder: (column) => ColumnFilters(column));
+    column: $table.method,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$CalculationMethodTableTableOrderingComposer
@@ -1028,10 +1196,14 @@ class $$CalculationMethodTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get method => $composableBuilder(
-      column: $table.method, builder: (column) => ColumnOrderings(column));
+    column: $table.method,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CalculationMethodTableTableAnnotationComposer
@@ -1050,80 +1222,99 @@ class $$CalculationMethodTableTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$CalculationMethodTableTableTableManager extends RootTableManager<
-    _$PrayerDatabase,
-    $CalculationMethodTableTable,
-    CalculationMethodTableData,
-    $$CalculationMethodTableTableFilterComposer,
-    $$CalculationMethodTableTableOrderingComposer,
-    $$CalculationMethodTableTableAnnotationComposer,
-    $$CalculationMethodTableTableCreateCompanionBuilder,
-    $$CalculationMethodTableTableUpdateCompanionBuilder,
-    (
-      CalculationMethodTableData,
-      BaseReferences<_$PrayerDatabase, $CalculationMethodTableTable,
-          CalculationMethodTableData>
-    ),
-    CalculationMethodTableData,
-    PrefetchHooks Function()> {
+class $$CalculationMethodTableTableTableManager
+    extends
+        RootTableManager<
+          _$PrayerDatabase,
+          $CalculationMethodTableTable,
+          CalculationMethodTableData,
+          $$CalculationMethodTableTableFilterComposer,
+          $$CalculationMethodTableTableOrderingComposer,
+          $$CalculationMethodTableTableAnnotationComposer,
+          $$CalculationMethodTableTableCreateCompanionBuilder,
+          $$CalculationMethodTableTableUpdateCompanionBuilder,
+          (
+            CalculationMethodTableData,
+            BaseReferences<
+              _$PrayerDatabase,
+              $CalculationMethodTableTable,
+              CalculationMethodTableData
+            >,
+          ),
+          CalculationMethodTableData,
+          PrefetchHooks Function()
+        > {
   $$CalculationMethodTableTableTableManager(
-      _$PrayerDatabase db, $CalculationMethodTableTable table)
-      : super(TableManagerState(
+    _$PrayerDatabase db,
+    $CalculationMethodTableTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
               $$CalculationMethodTableTableFilterComposer(
-                  $db: db, $table: table),
+                $db: db,
+                $table: table,
+              ),
           createOrderingComposer: () =>
               $$CalculationMethodTableTableOrderingComposer(
-                  $db: db, $table: table),
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
               $$CalculationMethodTableTableAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> method = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              CalculationMethodTableCompanion(
-            method: method,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String method,
-            required DateTime updatedAt,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              CalculationMethodTableCompanion.insert(
-            method: method,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> method = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CalculationMethodTableCompanion(
+                method: method,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String method,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CalculationMethodTableCompanion.insert(
+                method: method,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$CalculationMethodTableTableProcessedTableManager
-    = ProcessedTableManager<
-        _$PrayerDatabase,
-        $CalculationMethodTableTable,
+typedef $$CalculationMethodTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$PrayerDatabase,
+      $CalculationMethodTableTable,
+      CalculationMethodTableData,
+      $$CalculationMethodTableTableFilterComposer,
+      $$CalculationMethodTableTableOrderingComposer,
+      $$CalculationMethodTableTableAnnotationComposer,
+      $$CalculationMethodTableTableCreateCompanionBuilder,
+      $$CalculationMethodTableTableUpdateCompanionBuilder,
+      (
         CalculationMethodTableData,
-        $$CalculationMethodTableTableFilterComposer,
-        $$CalculationMethodTableTableOrderingComposer,
-        $$CalculationMethodTableTableAnnotationComposer,
-        $$CalculationMethodTableTableCreateCompanionBuilder,
-        $$CalculationMethodTableTableUpdateCompanionBuilder,
-        (
-          CalculationMethodTableData,
-          BaseReferences<_$PrayerDatabase, $CalculationMethodTableTable,
-              CalculationMethodTableData>
-        ),
-        CalculationMethodTableData,
-        PrefetchHooks Function()>;
+        BaseReferences<
+          _$PrayerDatabase,
+          $CalculationMethodTableTable,
+          CalculationMethodTableData
+        >,
+      ),
+      CalculationMethodTableData,
+      PrefetchHooks Function()
+    >;
 
 class $PrayerDatabaseManager {
   final _$PrayerDatabase _db;
@@ -1134,5 +1325,7 @@ class $PrayerDatabaseManager {
       $$PrayerTrackerTableTableTableManager(_db, _db.prayerTrackerTable);
   $$CalculationMethodTableTableTableManager get calculationMethodTable =>
       $$CalculationMethodTableTableTableManager(
-          _db, _db.calculationMethodTable);
+        _db,
+        _db.calculationMethodTable,
+      );
 }
