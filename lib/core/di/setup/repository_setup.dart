@@ -3,6 +3,7 @@ import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/di/setup/setup_module.dart';
 import 'package:prayer_times/data/repositories/calculation_method_repository_impl.dart';
 import 'package:prayer_times/data/repositories/country_repository_impl.dart';
+import 'package:prayer_times/data/repositories/event_repository_impl.dart';
 import 'package:prayer_times/data/repositories/juristic_method_repository_impl.dart';
 import 'package:prayer_times/data/repositories/location_repository_impl.dart';
 import 'package:prayer_times/data/repositories/notification_repository_impl.dart';
@@ -21,6 +22,7 @@ import 'package:prayer_times/domain/repositories/prayer_time_repository.dart';
 import 'package:prayer_times/domain/repositories/prayer_tracker_repository.dart';
 import 'package:prayer_times/domain/repositories/user_data_repository.dart';
 import 'package:prayer_times/domain/repositories/device_token_repository.dart';
+import 'package:prayer_times/domain/repositories/event_repository.dart';
 
 class RepositorySetup implements SetupModule {
   final GetIt _serviceLocator;
@@ -58,6 +60,9 @@ class RepositorySetup implements SetupModule {
       )
       ..registerLazySingleton<DeviceTokenRepository>(
         () => DeviceTokenRepositoryImpl(locate(), locate()),
+      )
+      ..registerLazySingleton<EventRepository>(
+        () => EventRepositoryImpl(locate(), locate(), locate()),
       );
   }
 }

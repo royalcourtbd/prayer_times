@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/domain/entities/event_entity.dart';
 import 'package:prayer_times/presentation/common/section_header_with_action.dart';
 import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
 import 'package:prayer_times/presentation/event/ui/holiday_page.dart';
@@ -11,10 +12,12 @@ class HolidaySection extends StatelessWidget {
   const HolidaySection({
     super.key,
     required this.theme,
+    required this.events,
     required this.eventPresenter,
   });
 
   final ThemeData theme;
+  final List<EventEntity> events;
   final EventPresenter eventPresenter;
 
   @override
@@ -33,7 +36,7 @@ class HolidaySection extends StatelessWidget {
           ),
         ),
         gapH18,
-        GovtHolidayList(theme: theme),
+        GovtHolidayList(theme: theme, events: events),
       ],
     );
   }

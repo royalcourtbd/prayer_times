@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/domain/entities/event_entity.dart';
+import 'package:prayer_times/domain/usecases/get_events_usecase.dart';
 import 'package:prayer_times/presentation/event/pesenter/event_ui_state.dart';
 
 class EventPresenter extends BasePresenter<EventUiState> {
+  final GetEventsUseCase _getEventsUseCase;
+
+  EventPresenter(this._getEventsUseCase);
+
   final Obs<EventUiState> uiState = Obs(EventUiState.empty());
   EventUiState get currentUiState => uiState.value;
 
@@ -13,7 +19,7 @@ class EventPresenter extends BasePresenter<EventUiState> {
   @override
   void onInit() {
     super.onInit();
-    processEvents();
+    loadEvents();
 
     // TextEditingController এ লিসেনার যোগ করি যাতে ইনপুট পরিবর্তন হলেও সার্চ কাজ করে
     searchController.addListener(() {
@@ -29,6 +35,19 @@ class EventPresenter extends BasePresenter<EventUiState> {
     super.onClose();
   }
 
+  Future<void> loadEvents({bool forceRefresh = false}) async {
+    await parseDataFromEitherWithUserMessage<List<EventEntity>>(
+      task: () => _getEventsUseCase.execute(forceRefresh: forceRefresh),
+      showLoading: true,
+      onDataLoaded: (List<EventEntity> events) {
+        final sortedEvents = List<EventEntity>.from(events)
+          ..sort((a, b) => a.date.compareTo(b.date));
+        uiState.value = currentUiState.copyWith(allEvents: sortedEvents);
+        processEvents();
+      },
+    );
+  }
+
   // সার্চ কুয়েরি আপডেট মেথড
   void updateSearchQuery(String query) {
     if (currentUiState.searchQuery != query) {
@@ -40,7 +59,7 @@ class EventPresenter extends BasePresenter<EventUiState> {
   // ইভেন্ট প্রসেসিং এবং গ্রুপিং মেথড
   void processEvents() {
     final filteredAndSortedEvents = _processEvents(
-      eventList,
+      currentUiState.allEvents,
       currentUiState.searchQuery,
     );
     final groupedEvents = _groupEventsByMonth(filteredAndSortedEvents);
@@ -48,7 +67,7 @@ class EventPresenter extends BasePresenter<EventUiState> {
   }
 
   // ইভেন্ট ফিল্টারিং মেথড
-  List<EventModel> _processEvents(List<EventModel> events, String query) {
+  List<EventEntity> _processEvents(List<EventEntity> events, String query) {
     var filteredEvents = events;
     if (query.isNotEmpty) {
       filteredEvents = events
@@ -64,8 +83,10 @@ class EventPresenter extends BasePresenter<EventUiState> {
     return filteredEvents;
   }
 
-  Map<String, List<EventModel>> _groupEventsByMonth(List<EventModel> events) {
-    final Map<String, List<EventModel>> grouped = {};
+  Map<String, List<EventEntity>> _groupEventsByMonth(
+    List<EventEntity> events,
+  ) {
+    final Map<String, List<EventEntity>> grouped = {};
 
     for (var event in events) {
       final date = DateTime.parse(event.date);
@@ -97,204 +118,3 @@ class EventPresenter extends BasePresenter<EventUiState> {
     showMessage(message: currentUiState.userMessage);
   }
 }
-
-class EventModel {
-  final String title;
-  final String description;
-  final String holidayType;
-  final String date;
-  final Color color;
-
-  EventModel({
-    required this.title,
-    required this.description,
-    required this.holidayType,
-    required this.date,
-    required this.color,
-  });
-}
-
-List<EventModel> eventList = [
-  EventModel(
-    title: 'Shab e-Barat',
-    description: 'Islamic holy night of forgiveness',
-    holidayType: 'Holiday in Bangladesh',
-    date: '2026-02-04',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Shaheed Day',
-    description: 'Day commemorating language martyrs',
-    holidayType: 'Cultural Festival in Bangladesh',
-    date: '2026-02-21',
-    color: Colors.blue,
-  ),
-  EventModel(
-    title: 'Independence Day',
-    description: 'Celebration of national independence',
-    holidayType: 'National Holiday in Bangladesh',
-    date: '2026-03-26',
-    color: Colors.blue,
-  ),
-  EventModel(
-    title: 'Laylat al-Qadr',
-    description: 'Islamic night of power and destiny',
-    holidayType: 'Holiday in Bangladesh',
-    date: '2026-03-17',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Jumatul Bidah',
-    description: 'The last Friday of Ramadan',
-    holidayType: 'Holiday in Bangladesh',
-    date: '2026-03-13',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Fitr Holiday',
-    description: 'Holiday before Eid ul-Fitr',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-03-18',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Fitr Holiday',
-    description: 'Holiday before Eid ul-Fitr',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-03-19',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Fitr',
-    description: 'Islamic festival marking the end of Ramadan',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-03-20',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Fitr Holiday',
-    description: 'Second day of Eid ul-Fitr celebrations',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-03-21',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Fitr Holiday',
-    description: 'Third day of Eid ul-Fitr celebrations',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-03-22',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Bengali New Year',
-    description: 'Bengali New Year celebration',
-    holidayType: 'Cultural Festival in Bangladesh',
-    date: '2026-04-14',
-    color: Colors.blue,
-  ),
-  EventModel(
-    title: 'May Day',
-    description: 'International Workers\' Day',
-    holidayType: 'National Holiday in Bangladesh',
-    date: '2026-05-01',
-    color: Colors.blue,
-  ),
-  EventModel(
-    title: 'Buddha Purnima',
-    description: 'Buddhist festival celebrating Buddha\'s birthday',
-    holidayType: 'Cultural Festival in Bangladesh',
-    date: '2025-05-11',
-    color: Colors.orange,
-  ),
-  EventModel(
-    title: 'Eid ul-Adha Holiday',
-    description: 'Holiday before Eid ul-Adha',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-05-25',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Adha Holiday',
-    description: 'Holiday before Eid ul-Adha',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-05-26',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Adha',
-    description: 'Islamic festival of sacrifice',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-05-27',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Adha Holiday',
-    description: 'Second day of Eid ul-Adha celebrations',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-05-28',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Adha Holiday',
-    description: 'Third day of Eid ul-Adha celebrations',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-05-29',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Eid ul-Adha Holiday',
-    description: 'Fourth day of Eid ul-Adha celebrations',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-05-30',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Ashura',
-    description: 'Islamic day of remembrance',
-    holidayType: 'Holiday in Bangladesh',
-    date: '2026-06-26',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'National Mourning Day',
-    description: 'Day commemorating national tragedy',
-    holidayType: 'National Holiday in Bangladesh',
-    date: '2026-08-15',
-    color: Colors.blue,
-  ),
-  EventModel(
-    title: 'Shuba Janmashtami',
-    description: 'Hindu festival celebrating Krishna\'s birth',
-    holidayType: 'Cultural Festival in Bangladesh',
-    date: '2025-08-16',
-    color: Colors.orange,
-  ),
-  EventModel(
-    title: 'Eid-e-Milad un-Nabi',
-    description: 'Celebration of Prophet Muhammad\'s birthday',
-    holidayType: 'Islamic Festival in Bangladesh',
-    date: '2026-08-25',
-    color: Colors.green,
-  ),
-  EventModel(
-    title: 'Vijaya Dashami',
-    description: 'Hindu festival celebrating victory of good over evil',
-    holidayType: 'Cultural Festival in Bangladesh',
-    date: '2025-10-02',
-    color: Colors.orange,
-  ),
-  EventModel(
-    title: 'Victory Day',
-    description: 'Celebration of victory in the Liberation War',
-    holidayType: 'National Holiday in Bangladesh',
-    date: '2026-12-16',
-    color: Colors.blue,
-  ),
-  EventModel(
-    title: 'Christmas Day',
-    description: 'Christian festival celebrating the birth of Jesus',
-    holidayType: 'Holiday in Bangladesh',
-    date: '2026-12-25',
-    color: Colors.red,
-  ),
-];

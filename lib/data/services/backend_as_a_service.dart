@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:prayer_times/core/utility/logger_utility.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
+import 'package:prayer_times/data/models/event_model.dart';
 import 'package:prayer_times/data/models/payment_model.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -40,6 +41,7 @@ class BackendAsAService {
   static const String appUpdateDoc = 'app-update';
   static const String deviceTokensCollection = 'device_tokens';
   static const String paymentsCollection = 'payments';
+  static const String eventsCollection = 'events';
   static const String paymentType = 'payment_type';
   static const String isActive = 'is_active';
 
@@ -165,6 +167,42 @@ class BackendAsAService {
           logError('Error in bank payments stream: $error');
           return <BankPaymentModel>[];
         });
+  }
+
+  Future<List<EventModel>> getEvents(int year) async {
+    logDebug("getEvents called for year: $year");
+
+    final List<EventModel>? events = await catchAndReturnFuture(() async {
+      logDebug("Fetching events from Firestore collection: $eventsCollection");
+
+      final snapshot = await _fireStore
+          .collection(eventsCollection)
+          .where(isActive, isEqualTo: true)
+          .where('year', isEqualTo: year)
+          .get();
+
+      logDebug(
+        "Firestore query completed. Documents found: ${snapshot.docs.length}",
+      );
+
+      final mappedEvents = snapshot.docs
+          .map((doc) {
+            logDebug("Processing event document: ${doc.id}");
+            return catchAndReturn<EventModel>(
+              () => EventModel.fromFirestore(doc.data()),
+            );
+          })
+          .where((model) => model != null)
+          .cast<EventModel>()
+          .toList();
+
+      logDebug("Successfully mapped ${mappedEvents.length} events");
+      return mappedEvents;
+    });
+
+    final result = events ?? [];
+    logDebug("getEvents returning ${result.length} events for year $year");
+    return result;
   }
 
   Stream<List<MobilePaymentModel>> getMobilePaymentsStream() {

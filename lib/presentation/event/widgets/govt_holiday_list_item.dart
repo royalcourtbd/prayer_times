@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
+import 'package:prayer_times/core/utility/color_utility.dart';
 import 'package:prayer_times/core/utility/utility.dart';
-import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
+import 'package:prayer_times/domain/entities/event_entity.dart';
 
 class GovtHolidayListItem extends StatelessWidget {
   const GovtHolidayListItem({
@@ -13,7 +14,7 @@ class GovtHolidayListItem extends StatelessWidget {
   });
 
   final ThemeData theme;
-  final EventModel event;
+  final EventEntity event;
   final bool isLastItem;
 
   String _getDisplayDate(DateTime eventDate) {
@@ -29,6 +30,7 @@ class GovtHolidayListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color color = getColorFromHex(event.colorHex);
     final maxWidthConstraint = BoxConstraints(maxWidth: 50.percentWidth);
     return Container(
       width: 55.percentWidth,
@@ -36,7 +38,7 @@ class GovtHolidayListItem extends StatelessWidget {
       padding: padding15,
       margin: EdgeInsets.only(right: isLastItem ? twentyPx : twelvePx),
       decoration: BoxDecoration(
-        color: event.color.withOpacityInt(0.1),
+        color: color.withOpacityInt(0.1),
         borderRadius: radius15,
       ),
       child: Column(
@@ -45,7 +47,7 @@ class GovtHolidayListItem extends StatelessWidget {
           Container(
             padding: padding10,
             decoration: BoxDecoration(
-              color: event.color,
+              color: color,
               borderRadius: radius12,
             ),
             child: Text(
@@ -81,7 +83,7 @@ class GovtHolidayListItem extends StatelessWidget {
               style: theme.textTheme.bodyMedium!.copyWith(
                 fontWeight: FontWeight.w500,
                 fontSize: twelvePx,
-                color: event.color,
+                color: color,
                 height: 1.2,
               ),
             ),

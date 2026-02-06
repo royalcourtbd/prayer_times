@@ -77,7 +77,7 @@ class PresenterSetup implements SetupModule {
         ),
       )
       ..registerLazySingleton(() => loadPresenter(MenuDrawerPresenter()))
-      ..registerLazySingleton(() => loadPresenter(EventPresenter()))
+      ..registerLazySingleton(() => loadPresenter(EventPresenter(locate())))
       ..registerLazySingleton(
         () => loadPresenter(RamadanCountdownPresenter()),
       );

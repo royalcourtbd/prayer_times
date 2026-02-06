@@ -44,7 +44,17 @@ class EventPage extends StatelessWidget {
                   presenter: _prayerTrackerPresenter,
                 ),
                 gapH30,
-                HolidaySection(theme: theme, eventPresenter: _eventPresenter),
+                PresentableWidgetBuilder(
+                  presenter: _eventPresenter,
+                  builder: () {
+                    final events = _eventPresenter.uiState.value.allEvents;
+                    return HolidaySection(
+                      theme: theme,
+                      events: events,
+                      eventPresenter: _eventPresenter,
+                    );
+                  },
+                ),
                 gapH20,
 
                 RamadanCountdownWidget(),

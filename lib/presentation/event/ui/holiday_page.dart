@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
+import 'package:prayer_times/core/utility/color_utility.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/domain/entities/event_entity.dart';
 import 'package:prayer_times/presentation/common/custom_app_bar.dart';
 import 'package:prayer_times/presentation/common/custom_text_input_field.dart';
 import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
@@ -24,7 +26,10 @@ class HolidayPage extends StatelessWidget {
             eventPresenter.clearSearchController();
           },
           child: Scaffold(
-            appBar: CustomAppBar(theme: theme, title: 'Govt Holiday\'s 2025'),
+            appBar: CustomAppBar(
+              theme: theme,
+              title: 'Govt Holiday\'s ${DateTime.now().year}',
+            ),
             body: Column(
               children: [
                 Padding(
@@ -60,7 +65,7 @@ class HolidayListView extends StatelessWidget {
     required this.eventPresenter,
   });
 
-  final Map<String, List<EventModel>> groupedEvents;
+  final Map<String, List<EventEntity>> groupedEvents;
   final ThemeData theme;
   final EventPresenter eventPresenter;
 
@@ -74,9 +79,8 @@ class HolidayListView extends StatelessWidget {
       itemCount: groupedEvents.length,
       padding: EdgeInsets.symmetric(horizontal: sixteenPx),
       itemBuilder: (context, index) {
-        final MapEntry<String, List<EventModel>> monthEntry = groupedEvents
-            .entries
-            .elementAt(index);
+        final MapEntry<String, List<EventEntity>> monthEntry =
+            groupedEvents.entries.elementAt(index);
         return MonthEventsSection(
           month: monthEntry.key,
           events: monthEntry.value,
@@ -98,7 +102,7 @@ class MonthEventsSection extends StatelessWidget {
   });
 
   final String month;
-  final List<EventModel> events;
+  final List<EventEntity> events;
   final ThemeData theme;
   final EventPresenter eventPresenter;
 
@@ -156,7 +160,7 @@ class HolidayItem extends StatelessWidget {
     required this.theme,
   });
 
-  final EventModel event;
+  final EventEntity event;
   final EventPresenter eventPresenter;
   final ThemeData theme;
 
@@ -164,11 +168,12 @@ class HolidayItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final DateTime date = DateTime.parse(event.date);
     final String day = date.day.toString();
+    final Color color = getColorFromHex(event.colorHex);
 
     return Container(
       margin: EdgeInsets.only(bottom: tenPx),
       decoration: BoxDecoration(
-        color: event.color.withOpacityInt(0.1),
+        color: color.withOpacityInt(0.1),
         borderRadius: radius20,
       ),
       child: Padding(
@@ -176,7 +181,7 @@ class HolidayItem extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            DateCircle(day: day, color: event.color, theme: theme),
+            DateCircle(day: day, color: color, theme: theme),
             gapW12,
             Expanded(
               child: Column(
@@ -195,7 +200,7 @@ class HolidayItem extends StatelessWidget {
                   Text(
                     event.holidayType,
                     style: theme.textTheme.bodyMedium!.copyWith(
-                      color: event.color,
+                      color: color,
                       fontSize: twelvePx,
                       fontWeight: FontWeight.normal,
                     ),
