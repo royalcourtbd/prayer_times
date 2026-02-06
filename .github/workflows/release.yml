@@ -66,6 +66,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
           fetch-depth: 0
 
       #---------------------------------------------------
@@ -452,7 +453,6 @@ jobs:
         uses: dawidd6/action-download-artifact@v6
         with:
           workflow: release.yml
-          branch: deployment
           workflow_conclusion: success
           name: apk-release
           path: artifacts/apk/
@@ -461,7 +461,6 @@ jobs:
         uses: dawidd6/action-download-artifact@v6
         with:
           workflow: release.yml
-          branch: deployment
           workflow_conclusion: success
           name: aab-release
           path: artifacts/aab/
@@ -578,10 +577,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get short SHA
-        id: short_sha
-        run: echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-
       - name: Notify Slack
         uses: slackapi/slack-github-action@v2.0.0
         with:
@@ -632,23 +627,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ steps.short_sha.outputs.sha }}`>"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch/Tag:*\n`${{ github.ref_name }}`"
-                    },
-                    {
-                      "type": "mrkdwn",
                       "text": "*APK Size:*\n`${{ needs.build.outputs.total_apk_size || needs.github-release.outputs.total_apk_size || 'N/A' }}`"
                     },
                     {
                       "type": "mrkdwn",
                       "text": "*AAB Size:*\n`${{ needs.build.outputs.aab_size || needs.github-release.outputs.aab_size || 'N/A' }}`"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Triggered by:*\n`${{ github.actor }}`"
                     }
                   ]
                 },
@@ -678,19 +661,10 @@ jobs:
                       "type": "button",
                       "text": {
                         "type": "plain_text",
-                        "text": "View Workflow",
+                        "text": "GitHub Release",
                         "emoji": true
                       },
-                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "Repository",
-                        "emoji": true
-                      },
-                      "url": "${{ github.server_url }}/${{ github.repository }}"
+                      "url": "${{ github.server_url }}/${{ github.repository }}/releases"
                     }
                   ]
                 }
