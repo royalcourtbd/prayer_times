@@ -415,7 +415,7 @@ jobs:
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: artifacts/app-release.aab
           track: internal
-          status: completed
+          status: draft
 
   #=============================================================
   # JOB 3: GITHUB RELEASE (ONLY FOR VERSION TAGS)
