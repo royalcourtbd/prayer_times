@@ -30,9 +30,9 @@ const String websiteUrl = "";
 //==============================================//
 const String reportEmailAddress = '';
 const String donationUrl = '';
-const String messengerUrl = "https://m.me/ihadis.official";
-const String twitterUrl = "https://twitter.com/irdofficial";
-const String facebookGroupUrl = "https://www.facebook.com/groups/irdofficial";
-const String facebookPageUrl = "https://www.facebook.com/com.oratiq/";
+const String messengerUrl = "";
+const String twitterUrl = "";
+const String facebookGroupUrl = "";
+const String facebookPageUrl = "";
 
 const Duration defaultPageTransitionDuration = Duration(milliseconds: 370);

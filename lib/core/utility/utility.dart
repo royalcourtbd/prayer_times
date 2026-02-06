@@ -248,7 +248,7 @@ Future<void> launchFacebookPage() async {
 }
 
 Future<void> launchFacebookGroup() async {
-  const String fbProtocolUrl = 'fb://group/irdofficial';
+  const String fbProtocolUrl = 'fb://group/';
   await openUrl(url: fbProtocolUrl, fallbackUrl: facebookGroupUrl);
 }
 
@@ -266,7 +266,7 @@ Future<void> launchTwitter() async {
 }
 
 Future<void> launchLinkedInProfile() async {
-  const String companyId = "oratiq";
+  const String companyId = "";
 
   const String linkedInProtocolUrl = 'linkedin://company/$companyId';
   const String fallbackUrl = 'https://www.linkedin.com/company/$companyId/';
