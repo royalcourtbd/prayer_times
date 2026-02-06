@@ -5,9 +5,6 @@ on:
     workflows: ["CI Validation"]
     types: [completed]
     branches: [deployment]
-  push:
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
     inputs:
       version_override:
@@ -30,7 +27,6 @@ jobs:
   #=============================================================
   # JOB 1: BUILD — Compile, test, and produce all artifacts
   # Runs on: CI Validation success (workflow_run), workflow_dispatch
-  # Skipped on: tag push (reuses previous build artifacts)
   # Skipped on: CI Validation failure
   #=============================================================
 
@@ -400,7 +396,6 @@ jobs:
 
   #=============================================================
   # JOB 2: DEPLOY TO PLAY STORE INTERNAL TESTING
-  # Auto-skipped on tag push (dependency on build which is skipped)
   #=============================================================
 
   deploy-internal:
@@ -424,110 +419,47 @@ jobs:
           status: draft
 
   #=============================================================
-  # JOB 3: GITHUB RELEASE (ONLY FOR VERSION TAGS)
-  # Downloads artifacts from the last successful deployment build
-  # No rebuild — same binary that was tested internally
+  # JOB 3: GITHUB RELEASE
+  # Auto-creates a version tag and publishes a GitHub Release
+  # Uses the same artifacts from the build job
   #=============================================================
 
   github-release:
-    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.release_info.outputs.VERSION }}
-      changelog: ${{ steps.release_info.outputs.CHANGELOG }}
-      aab_size: ${{ steps.release_sizes.outputs.AAB_SIZE }}
-      total_apk_size: ${{ steps.release_sizes.outputs.TOTAL_APK_SIZE }}
-      build_date: ${{ steps.release_date.outputs.BUILD_DATE }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Download APK artifacts
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
-
-      #---------------------------------------------------
-      # DOWNLOAD ARTIFACTS FROM LAST SUCCESSFUL BUILD
-      #---------------------------------------------------
-
-      - name: Download APK from deployment build
-        uses: dawidd6/action-download-artifact@v6
-        with:
-          workflow: release.yml
-          workflow_conclusion: success
           name: apk-release
           path: artifacts/apk/
 
-      - name: Download AAB from deployment build
-        uses: dawidd6/action-download-artifact@v6
+      - name: Download AAB artifact
+        uses: actions/download-artifact@v4
         with:
-          workflow: release.yml
-          workflow_conclusion: success
           name: aab-release
           path: artifacts/aab/
-
-      #---------------------------------------------------
-      # GATHER RELEASE INFO
-      #---------------------------------------------------
-
-      - name: Get release info
-        id: release_info
-        run: |
-          VERSION="${{ github.ref_name }}"
-          VERSION="${VERSION#v}"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-          if [ -n "$PREVIOUS_TAG" ]; then
-            echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-            git log $PREVIOUS_TAG..HEAD --oneline --pretty=format:"- %s" >> $GITHUB_OUTPUT
-            echo "" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          else
-            echo "CHANGELOG=Initial release" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Calculate file sizes
-        id: release_sizes
-        run: |
-          AAB_SIZE=$(du -h artifacts/aab/app-release.aab | cut -f1)
-
-          if [ -f "artifacts/apk/app-arm64-v8a-release.apk" ]; then
-            TOTAL_APK_SIZE=$(du -ch artifacts/apk/*.apk | grep total | cut -f1)
-          else
-            TOTAL_APK_SIZE=$(du -h artifacts/apk/app-release.apk 2>/dev/null | cut -f1 || echo "N/A")
-          fi
-
-          echo "AAB_SIZE=$AAB_SIZE" >> $GITHUB_OUTPUT
-          echo "TOTAL_APK_SIZE=$TOTAL_APK_SIZE" >> $GITHUB_OUTPUT
-
-      - name: Format build date
-        id: release_date
-        run: |
-          BUILD_DATE=$(TZ='Asia/Dhaka' date +'%d %B %Y - %l:%M%p' | sed 's/AM/am/g; s/PM/pm/g; s/  / /g')
-          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_OUTPUT
-
-      #---------------------------------------------------
-      # CREATE GITHUB RELEASE WITH SAME BINARY
-      #---------------------------------------------------
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.ref_name }}
-          name: Prayer Times ${{ github.ref_name }}
+          tag: v${{ needs.build.outputs.version }}
+          commit: ${{ github.event.workflow_run.head_sha || github.sha }}
+          name: Prayer Times v${{ needs.build.outputs.version }}
           body: |
-            ## Prayer Times Release ${{ github.ref_name }}
+            ## Prayer Times Release v${{ needs.build.outputs.version }}
 
             ### Download
 
             | File Type | Size | Description |
             |-----------|------|-------------|
-            | **APK** | ${{ steps.release_sizes.outputs.TOTAL_APK_SIZE }} | Direct install for Android devices |
-            | **AAB** | ${{ steps.release_sizes.outputs.AAB_SIZE }} | Google Play Store bundle |
+            | **APK** | ${{ needs.build.outputs.total_apk_size }} | Direct install for Android devices |
+            | **AAB** | ${{ needs.build.outputs.aab_size }} | Google Play Store bundle |
 
             ### What's Changed
 
-            ${{ steps.release_info.outputs.CHANGELOG }}
+            ${{ needs.build.outputs.changelog }}
 
             ### Installation Instructions
 
@@ -555,8 +487,9 @@ jobs:
 
             ---
 
-            **App Version:** ${{ steps.release_info.outputs.VERSION }}
-            **Build Date:** ${{ steps.release_date.outputs.BUILD_DATE }}
+            **App Version:** ${{ needs.build.outputs.version }}
+            **Build Number:** ${{ needs.build.outputs.build_number }}
+            **Build Date:** ${{ needs.build.outputs.build_date }}
             **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
           draft: false
           prerelease: false
@@ -598,11 +531,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Build:*\n`${{ needs.build.result == 'success' && 'Success' || needs.build.result == 'skipped' && 'Skipped (tag)' || 'Failed' }}`"
+                      "text": "*Build:*\n`${{ needs.build.result == 'success' && 'Success' || needs.build.result == 'skipped' && 'Skipped' || 'Failed' }}`"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Internal Deploy:*\n`${{ needs.deploy-internal.result == 'success' && 'Success' || needs.deploy-internal.result == 'skipped' && 'Skipped (tag)' || 'Failed' }}`"
+                      "text": "*Internal Deploy:*\n`${{ needs.deploy-internal.result == 'success' && 'Success' || needs.deploy-internal.result == 'skipped' && 'Skipped' || 'Failed' }}`"
                     }
                   ]
                 },
@@ -611,11 +544,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*GitHub Release:*\n`${{ needs.github-release.result == 'success' && 'Published' || needs.github-release.result == 'skipped' && 'Skipped (no tag)' || 'Failed' }}`"
+                      "text": "*GitHub Release:*\n`${{ needs.github-release.result == 'success' && 'Published' || needs.github-release.result == 'skipped' && 'Skipped' || 'Failed' }}`"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Version:*\n`${{ needs.build.outputs.version || needs.github-release.outputs.version || 'N/A' }}`"
+                      "text": "*Version:*\n`${{ needs.build.outputs.version || 'N/A' }}`"
                     }
                   ]
                 },
@@ -637,11 +570,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*APK Size:*\n`${{ needs.build.outputs.total_apk_size || needs.github-release.outputs.total_apk_size || 'N/A' }}`"
+                      "text": "*APK Size:*\n`${{ needs.build.outputs.total_apk_size || 'N/A' }}`"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*AAB Size:*\n`${{ needs.build.outputs.aab_size || needs.github-release.outputs.aab_size || 'N/A' }}`"
+                      "text": "*AAB Size:*\n`${{ needs.build.outputs.aab_size || 'N/A' }}`"
                     }
                   ]
                 },
@@ -650,7 +583,7 @@ jobs:
                   "elements": [
                     {
                       "type": "mrkdwn",
-                      "text": "Build Date: ${{ needs.build.outputs.build_date || needs.github-release.outputs.build_date || 'N/A' }}"
+                      "text": "Build Date: ${{ needs.build.outputs.build_date || 'N/A' }}"
                     }
                   ]
                 },
