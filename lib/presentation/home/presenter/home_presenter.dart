@@ -20,6 +20,7 @@ import 'package:prayer_times/domain/usecases/get_remaining_time_usecase.dart';
 import 'package:prayer_times/domain/usecases/request_notification_permission_usecase.dart';
 import 'package:prayer_times/domain/usecases/initialize_device_token_usecase.dart';
 import 'package:prayer_times/presentation/common/notification_denied_dialog.dart';
+import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
 import 'package:prayer_times/presentation/main/presenter/main_presenter.dart';
 import 'package:prayer_times/presentation/home/models/fasting_state.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
@@ -68,10 +69,16 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   void onInit() {
     super.onInit();
     _startTimer();
-
     checkNotificationPermission();
+    _syncEventsInBackground();
 
     prayerTimesScrollController.addListener(_onUserScroll);
+  }
+
+  Future<void> _syncEventsInBackground() async {
+    // Silent sync - user কে loading দেখাবে না
+    final eventPresenter = locate<EventPresenter>();
+    await eventPresenter.loadEvents(forceRefresh: true);
   }
 
   @override
@@ -88,19 +95,17 @@ class HomePresenter extends BasePresenter<HomeUiState> {
       showLoading: false,
       onDataLoaded: (bool hasPermission) {
         if (!hasPermission) {
-          // পারমিশন নেই, রিকোয়েস্ট করুন
           log('requestNotificationPermission');
           requestNotificationPermission();
         } else {
           log('hasPermission: $hasPermission');
-          // পারমিশন আছে, FCM token initialize করুন
+
           _initializeDeviceToken();
         }
       },
     );
   }
 
-  // নতুন মেথড যোগ করুন
   Future<void> requestNotificationPermission() async {
     await parseDataFromEitherWithUserMessage<void>(
       task: () => _requestNotificationPermissionUsecase.execute(
