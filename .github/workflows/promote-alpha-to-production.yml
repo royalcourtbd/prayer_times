@@ -1,0 +1,190 @@
+name: Promote Alpha to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollout_percentage:
+        description: "Rollout percentage (0.01 to 1.0, default: 0.1 = 10%)"
+        required: false
+        type: string
+        default: "0.1"
+      update_priority:
+        description: "In-app update priority (0-5, default: 3)"
+        required: false
+        type: choice
+        options:
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+        default: "3"
+      confirmation:
+        description: 'Type "PRODUCTION" to confirm deployment'
+        required: true
+        type: string
+
+env:
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
+
+jobs:
+  promote-to-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      #---------------------------------------------------
+      # SAFETY CHECK - MUST TYPE "PRODUCTION"
+      #---------------------------------------------------
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "PRODUCTION" ]; then
+            echo "❌ Safety check failed! You must type 'PRODUCTION' to confirm."
+            echo "⚠️  This will deploy to ALL USERS in production!"
+            exit 1
+          fi
+          echo "✅ Confirmation validated. Proceeding to production deployment..."
+
+      #---------------------------------------------------
+      # CHECKOUT
+      #---------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      #---------------------------------------------------
+      # GET APP VERSION FROM PUBSPEC
+      #---------------------------------------------------
+      - name: Get app version
+        id: app_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # VALIDATE ROLLOUT PERCENTAGE
+      #---------------------------------------------------
+      - name: Validate rollout percentage
+        id: rollout_check
+        run: |
+          VALUE="${{ github.event.inputs.rollout_percentage || '0.1' }}"
+
+          # Validate format
+          if ! [[ "$VALUE" =~ ^0\.[0-9]+$|^1(\.0+)?$ ]]; then
+            echo "❌ Invalid rollout percentage: $VALUE"
+            exit 1
+          fi
+
+          # Calculate percentage for display
+          PERCENT=$(echo "scale=1; $VALUE * 100" | bc)
+          echo "percentage=${PERCENT}%" >> $GITHUB_OUTPUT
+          echo "✅ Valid rollout percentage: $VALUE (${PERCENT}%)"
+
+          # Warning for high rollout
+          if (( $(echo "$VALUE >= 0.5" | bc -l) )); then
+            echo "⚠️  WARNING: Deploying to ${PERCENT}% of production users!"
+          fi
+
+      #---------------------------------------------------
+      # PROMOTE ALPHA RELEASE TO PRODUCTION TRACK
+      #---------------------------------------------------
+      - name: Promote Alpha → Production
+        uses: kevin-david/promote-play-release@v1.1.0
+        with:
+          service-account-json-raw: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          package-name: ${{ env.PACKAGE_NAME }}
+          from-track: alpha
+          to-track: production
+          inapp-update-priority: ${{ github.event.inputs.update_priority }}
+          user-fraction: ${{ github.event.inputs.rollout_percentage || '0.1' }}
+
+      #---------------------------------------------------
+      # SLACK NOTIFICATION (ALWAYS RUN)
+      #---------------------------------------------------
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ job.status == 'success' && '🚀 Prayer Times PRODUCTION Release' || '❌ Prayer Times PRODUCTION Failed' }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ job.status == 'success' && '🎉 *App successfully released to production users!*' || '⚠️ *Production deployment failed. Check logs immediately.*' }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📉 Status:*\n`${{ job.status == 'success' && 'Success ✓' || 'FAILED ✗' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*🔀 Track:*\n`Alpha → Production`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📦 App Version:*\n`${{ steps.app_version.outputs.version || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*⚡ Update Priority:*\n`${{ github.event.inputs.update_priority }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👥 Rollout:*\n`${{ steps.rollout_check.outputs.percentage || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👤 Released by:*\n`${{ github.actor }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "⚠️ *Production release active. Monitor crash reports and user reviews closely.*"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📱 View on Play Store",
+                        "emoji": true
+                      },
+                      "url": "https://play.google.com/store/apps/details?id=${{ env.PACKAGE_NAME }}",
+                      "style": "primary"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "👁️ View Workflow",
+                        "emoji": true
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }

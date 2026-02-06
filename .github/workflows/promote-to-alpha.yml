@@ -1,0 +1,137 @@
+name: Promote Internal to Closed Testing (Alpha)
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollout_percentage:
+        description: "Rollout percentage (0.1 to 1.0, default: 1.0 = 100%)"
+        required: false
+        type: string
+        default: "1.0"
+      update_priority:
+        description: "In-app update priority (0-5, default: 2)"
+        required: false
+        type: choice
+        options:
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+        default: "2"
+
+env:
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
+
+jobs:
+  promote-to-alpha:
+    runs-on: ubuntu-latest
+
+    steps:
+      #---------------------------------------------------
+      # CHECKOUT (OPTIONAL - Only Commit Info Needed)
+      #---------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      #---------------------------------------------------
+      # GET APP VERSION FROM PUBSPEC
+      #---------------------------------------------------
+      - name: Get app version
+        id: app_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # VALIDATE ROLLOUT PERCENTAGE
+      #---------------------------------------------------
+      - name: Validate rollout percentage
+        run: |
+          VALUE="${{ github.event.inputs.rollout_percentage || '1.0' }}"
+          if ! [[ "$VALUE" =~ ^0\.[0-9]+$|^1(\.0+)?$ ]]; then
+            echo "❌ Invalid rollout percentage: $VALUE"
+            exit 1
+          fi
+          echo "✅ Valid rollout percentage: $VALUE"
+
+      #---------------------------------------------------
+      # PROMOTE INTERNAL RELEASE TO ALPHA TRACK
+      #---------------------------------------------------
+      - name: Promote Internal → Closed Testing (Alpha)
+        uses: kevin-david/promote-play-release@v1.1.0
+        with:
+          service-account-json-raw: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          package-name: ${{ env.PACKAGE_NAME }}
+          from-track: internal
+          to-track: alpha
+          inapp-update-priority: ${{ github.event.inputs.update_priority }}
+          user-fraction: ${{ github.event.inputs.rollout_percentage || '1.0' }}
+
+      #---------------------------------------------------
+      # SLACK NOTIFICATION (ALWAYS RUN)
+      #---------------------------------------------------
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ job.status == 'success' && '✅ Prayer Times Alpha Promotion Success' || '❌ Prayer Times Alpha Promotion Failed' }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📉 Status:*\n`${{ job.status == 'success' && 'Success' || 'Failure' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*🔀 Track:*\n`Internal → Alpha`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📦 App Version:*\n`${{ steps.app_version.outputs.version || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*⚡ Update Priority:*\n`${{ github.event.inputs.update_priority }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👥 Rollout:*\n`${{ github.event.inputs.rollout_percentage || '1.0' }}` (100% = 1.0)"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👤 Triggered by:*\n`${{ github.actor }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📱 Open Play Store",
+                        "emoji": true
+                      },
+                      "url": "https://play.google.com/store/apps/details?id=${{ env.PACKAGE_NAME }}",
+                      "style": "primary"
+                    }
+                  ]
+                }
+              ]
+            }

@@ -1,0 +1,362 @@
+name: Deploy to Play Store Internal Testing
+
+on:
+  workflow_run:
+    workflows: ["CI Validation"]
+    types: [completed]
+    branches: [deployment]
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: "Override version code (leave empty for auto-increment)"
+        required: false
+        type: string
+
+env:
+  JAVA_VERSION: "17"
+  FLUTTER_VERSION: "3.38.7"
+  NODE_VERSION: "20"
+  PACKAGE_NAME: ${{vars.PACKAGE_NAME}}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    # Only run if CI Validation succeeded (or manual trigger)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      #---------------------------------------------------
+      # CHECKOUT SOURCE CODE
+      #---------------------------------------------------
+
+      - name: Record start time
+        id: start_time
+        run: echo "start=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get app version
+        id: app_version
+        run: |
+          set -e
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # SETUP JAVA FOR ANDROID BUILD
+      #---------------------------------------------------
+
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: "gradle"
+
+      #---------------------------------------------------
+      # SETUP FLUTTER SDK
+      #---------------------------------------------------
+
+      - name: Set up Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: true
+
+      #---------------------------------------------------
+      # SETUP NODE FOR PLAY STORE API QUERY
+      #---------------------------------------------------
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      #---------------------------------------------------
+      # CACHE NPM PACKAGES
+      #---------------------------------------------------
+
+      - name: Cache npm global packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-google-play-cli
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      #---------------------------------------------------
+      # DECODE ANDROID KEYSTORE
+      #---------------------------------------------------
+
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_FILE }}
+        run: |
+          set -e
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+
+      #---------------------------------------------------
+      # CREATE KEY.PROPERTIES FOR SIGNING
+      #---------------------------------------------------
+
+      - name: Create key.properties
+        env:
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          set -e
+          echo "storePassword=$STORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
+
+      #---------------------------------------------------
+      # INSTALL FLUTTER DEPENDENCIES
+      #---------------------------------------------------
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      #---------------------------------------------------
+      # GENERATE LOCALIZATION FILES
+      #---------------------------------------------------
+
+      - name: Generate localizations
+        run: flutter gen-l10n
+        continue-on-error: true
+
+      #---------------------------------------------------
+      # GENERATE CODE WITH BUILD_RUNNER (HIVE, DRIFT, ETC.)
+      #---------------------------------------------------
+
+      - name: Run build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      #---------------------------------------------------
+      # FETCH VERSION CODE FROM ALL PLAY STORE TRACKS
+      #---------------------------------------------------
+
+      - name: Get latest version code from Play Store (all tracks)
+        id: version
+        run: |
+          set -e
+
+          # Check if manual override is provided
+          if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            NEW_CODE="${{ github.event.inputs.version_override }}"
+            echo "✅ Using manual version override: $NEW_CODE"
+            echo "build_number=$NEW_CODE" >> $GITHUB_OUTPUT
+            echo "New version code for this build: $NEW_CODE"
+            exit 0
+          fi
+
+          echo '${{ secrets.PLAY_STORE_JSON_KEY }}' > service-account.json
+          npm install googleapis --silent
+
+          # Try Play Store first - check ALL tracks
+          PLAY_STORE_CODE=$(node -e "
+            const { google } = require('googleapis');
+            (async () => {
+              try {
+                const auth = new google.auth.GoogleAuth({
+                  keyFile: 'service-account.json',
+                  scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+                });
+                const androidPublisher = google.androidpublisher({ version: 'v3', auth });
+                const packageName = '${{ env.PACKAGE_NAME }}';
+
+                const { data: { id: editId } } = await androidPublisher.edits.insert({ packageName });
+
+                // Check all tracks to find the highest version code
+                const tracks = ['internal', 'alpha', 'beta', 'production'];
+                let max = 0;
+
+                for (const track of tracks) {
+                  try {
+                    const { data: { releases = [] } } = await androidPublisher.edits.tracks.get({
+                      packageName,
+                      editId,
+                      track,
+                    });
+
+                    console.error(\`📊 Checked \${track}: found \${releases.length} releases\`);
+
+                    for (const r of releases) {
+                      for (const c of (r.versionCodes || [])) {
+                        const n = parseInt(c, 10);
+                        if (n > max) {
+                          max = n;
+                          console.error(\`  ↗️  New max from \${track}: \${n}\`);
+                        }
+                      }
+                    }
+                  } catch (e) {
+                    console.error(\`⚠️  Skipping track: \${track} (\${e.message})\`);
+                  }
+                }
+
+                await androidPublisher.edits.delete({ packageName, editId });
+
+                // Output only the final number to stdout for shell capture
+                process.stdout.write(String(max));
+
+              } catch (e) {
+                console.error(e.message);
+                process.exit(1);
+              }
+            })();
+          " || echo "0")
+
+          # Calculate fallback version code
+          FALLBACK_CODE=0
+          PUBSPEC_CODE=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f2 || echo "0")
+          GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
+
+          if [ -n "$PUBSPEC_CODE" ] && [ "$PUBSPEC_CODE" != "null" ] && [ "$PUBSPEC_CODE" -gt 0 ]; then
+            FALLBACK_CODE="$PUBSPEC_CODE"
+            echo "📄 Fallback from pubspec.yaml: $FALLBACK_CODE"
+          else
+            FALLBACK_CODE="$GIT_COMMIT_COUNT"
+            echo "🔢 Fallback from git commit count: $FALLBACK_CODE"
+          fi
+
+          # Use the maximum of Play Store and fallback
+          if [ "$PLAY_STORE_CODE" -gt 0 ]; then
+            echo "✅ Play Store max version code: $PLAY_STORE_CODE"
+
+            if [ "$PLAY_STORE_CODE" -gt "$FALLBACK_CODE" ]; then
+              LATEST_CODE="$PLAY_STORE_CODE"
+            else
+              LATEST_CODE="$FALLBACK_CODE"
+            fi
+
+            echo "🎯 Using max(Play Store: $PLAY_STORE_CODE, Fallback: $FALLBACK_CODE) = $LATEST_CODE"
+          else
+            echo "⚠️  Warning: Could not fetch from Play Store, using fallback only"
+            LATEST_CODE="$FALLBACK_CODE"
+          fi
+
+          NEW_CODE=$((LATEST_CODE + 1))
+          echo "build_number=$NEW_CODE" >> $GITHUB_OUTPUT
+          echo "🚀 New version code for this build: $NEW_CODE"
+
+          rm -f service-account.json
+
+      #---------------------------------------------------
+      # BUILD STEP FOR ANDROID AAB WITH UNIQUE BUILD NUMBER
+      #---------------------------------------------------
+
+      - name: Build AAB
+        run: |
+          set -e
+          echo "🔨 Starting build with Build Number: ${{ steps.version.outputs.build_number }}"
+          flutter build appbundle --release --obfuscate --split-debug-info=build/debug-info --build-number=${{ steps.version.outputs.build_number }}
+
+      #---------------------------------------------------
+      # UPLOAD DEBUG SYMBOLS AS ARTIFACT
+      #---------------------------------------------------
+
+      - name: Upload debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-symbols-${{ steps.version.outputs.build_number }}
+          path: build/debug-info/
+          retention-days: 90
+
+      #---------------------------------------------------
+      # PLAY STORE DEPLOYMENT STEP FOR INTERNAL TESTING TRACK
+      #---------------------------------------------------
+
+      - name: Upload to Play Store Internal Testing
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+
+      #---------------------------------------------------
+      # CALCULATE BUILD DURATION
+      #---------------------------------------------------
+
+      - name: Calculate build duration
+        if: always()
+        id: duration
+        run: |
+          set -e
+          END_TIME=$(date +%s)
+          START_TIME=${{ steps.start_time.outputs.start }}
+          DURATION=$((END_TIME - START_TIME))
+          MINUTES=$((DURATION / 60))
+          SECONDS=$((DURATION % 60))
+          echo "time=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # SLACK NOTIFICATION STEP (ALWAYS RUN)
+      #---------------------------------------------------
+
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ job.status == 'success' && '✅ Prayer Times Internal Deploy' || '❌ Prayer Times Internal Deploy' }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📉 Status:*\n`${{ job.status == 'success' && 'Success' || 'Failure' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*🔢 Build Number:*\n`${{ steps.version.outputs.build_number || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📦 App Version:*\n`${{ steps.app_version.outputs.version || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*⏱️ Build Time:*\n`${{ steps.duration.outputs.time || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👤 Triggered by:*\n`${{ github.actor }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📱 Open Play Store",
+                        "emoji": true
+                      },
+                      "url": "https://play.google.com/store/apps/details?id=${{ env.PACKAGE_NAME }}",
+                      "style": "primary"
+                    }
+                  ]
+                }
+              ]
+            }
