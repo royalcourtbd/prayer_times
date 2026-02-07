@@ -21,8 +21,7 @@ class PrayerTrackerHistoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<DateTime> dates = trackerHistory.keys.toList()
-      ..sort((a, b) => b.compareTo(a)); // সর্বশেষ তারিখ থেকে শুরু
-
+      ..sort((a, b) => b.compareTo(a));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

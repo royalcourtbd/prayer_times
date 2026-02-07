@@ -32,12 +32,16 @@ class CalculationMethodBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final List<CalculationMethodEntity> methods =
-        CalculationMethodEntity.allMethods;
 
     return PresentableWidgetBuilder(
       presenter: presenter,
       builder: () {
+        final List<CalculationMethodEntity> methods =
+            CalculationMethodEntity.allMethods;
+
+        // Access observable early to ensure GetX tracks it properly
+        final String selectedMethod = presenter.currentUiState.selectedCalculationMethod;
+
         return CustomModalSheet(
           theme: theme,
           bottomSheetTitle: 'Calculation Method',
@@ -46,30 +50,27 @@ class CalculationMethodBottomSheet extends StatelessWidget {
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height * 0.6,
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: methods.map((method) {
-                    return CustomRadioListTile(
-                      title: method.displayName,
-                      subtitle: method.subtitle,
-                      isSelected: presenter
-                              .currentUiState
-                              .selectedCalculationMethod ==
-                          method.id,
-                      onTap: () async {
-                        await presenter.onCalculationMethodChanged(
-                          method: method.id,
-                          onPrayerTimeUpdateRequired: () =>
-                              homePresenter.refreshLocationAndPrayerTimes(),
-                        );
-                        if (context.mounted) {
-                          context.navigatorPop();
-                        }
-                      },
-                    );
-                  }).toList(),
-                ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: methods.length,
+                itemBuilder: (context, index) {
+                  final CalculationMethodEntity method = methods[index];
+                  return CustomRadioListTile(
+                    title: method.displayName,
+                    subtitle: method.subtitle,
+                    isSelected: selectedMethod == method.id,
+                    onTap: () async {
+                      await presenter.onCalculationMethodChanged(
+                        method: method.id,
+                        onPrayerTimeUpdateRequired: () =>
+                            homePresenter.refreshLocationAndPrayerTimes(),
+                      );
+                      if (context.mounted) {
+                        context.navigatorPop();
+                      }
+                    },
+                  );
+                },
               ),
             ),
           ],
