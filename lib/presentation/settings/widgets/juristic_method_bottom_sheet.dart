@@ -43,22 +43,32 @@ class JuristicMethodBottomSheet extends StatelessWidget {
               subtitle: 'Late Asr Prayer',
               isSelected:
                   presenter.currentUiState.selectedJuristicMethod == 'Hanafi',
-              onTap: () => presenter.onJuristicMethodChanged(
-                method: 'Hanafi',
-                onPrayerTimeUpdateRequired: () =>
-                    homePresenter.refreshLocationAndPrayerTimes(),
-              ),
+              onTap: () async {
+                await presenter.onJuristicMethodChanged(
+                  method: 'Hanafi',
+                  onPrayerTimeUpdateRequired: () =>
+                      homePresenter.refreshLocationAndPrayerTimes(),
+                );
+                if (context.mounted) {
+                  context.navigatorPop();
+                }
+              },
             ),
             CustomRadioListTile(
               title: 'Shafi, Maliki, Hanbali',
               subtitle: 'Earlier Asr Prayer',
               isSelected:
                   presenter.currentUiState.selectedJuristicMethod == 'Shafi',
-              onTap: () => presenter.onJuristicMethodChanged(
-                method: 'Shafi',
-                onPrayerTimeUpdateRequired: () =>
-                    homePresenter.refreshLocationAndPrayerTimes(),
-              ),
+              onTap: () async {
+                await presenter.onJuristicMethodChanged(
+                  method: 'Shafi',
+                  onPrayerTimeUpdateRequired: () =>
+                      homePresenter.refreshLocationAndPrayerTimes(),
+                );
+                if (context.mounted) {
+                  context.navigatorPop();
+                }
+              },
             ),
           ],
         );

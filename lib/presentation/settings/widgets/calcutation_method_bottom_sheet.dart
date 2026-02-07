@@ -57,11 +57,16 @@ class CalculationMethodBottomSheet extends StatelessWidget {
                               .currentUiState
                               .selectedCalculationMethod ==
                           method.id,
-                      onTap: () => presenter.onCalculationMethodChanged(
-                        method: method.id,
-                        onPrayerTimeUpdateRequired: () =>
-                            homePresenter.refreshLocationAndPrayerTimes(),
-                      ),
+                      onTap: () async {
+                        await presenter.onCalculationMethodChanged(
+                          method: method.id,
+                          onPrayerTimeUpdateRequired: () =>
+                              homePresenter.refreshLocationAndPrayerTimes(),
+                        );
+                        if (context.mounted) {
+                          context.navigatorPop();
+                        }
+                      },
                     );
                   }).toList(),
                 ),
