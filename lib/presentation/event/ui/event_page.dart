@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
+import 'package:prayer_times/core/utility/ui_helper.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/presentation/common/custom_app_bar.dart';
 import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
@@ -48,10 +49,16 @@ class EventPage extends StatelessWidget {
                   presenter: _eventPresenter,
                   builder: () {
                     final events = _eventPresenter.uiState.value.allEvents;
+
+                    UiHelper.doOnPageLoaded(() {
+                      _eventPresenter.scrollToCurrentHolidayWithDelay(context);
+                    });
+
                     return HolidaySection(
                       theme: theme,
                       events: events,
                       eventPresenter: _eventPresenter,
+                      scrollController: _eventPresenter.holidayScrollController,
                     );
                   },
                 ),

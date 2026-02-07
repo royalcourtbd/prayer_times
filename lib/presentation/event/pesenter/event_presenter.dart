@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
+import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/domain/entities/event_entity.dart';
 import 'package:prayer_times/domain/usecases/get_events_usecase.dart';
@@ -16,6 +19,9 @@ class EventPresenter extends BasePresenter<EventUiState> {
 
   final TextEditingController searchController = TextEditingController();
 
+  final ScrollController holidayScrollController = ScrollController();
+  bool _userScrolled = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -27,10 +33,14 @@ class EventPresenter extends BasePresenter<EventUiState> {
         updateSearchQuery(searchController.text);
       }
     });
+
+    holidayScrollController.addListener(_onUserScroll);
   }
 
   @override
   void onClose() {
+    holidayScrollController.removeListener(_onUserScroll);
+    holidayScrollController.dispose();
     searchController.dispose();
     super.onClose();
   }
@@ -116,5 +126,66 @@ class EventPresenter extends BasePresenter<EventUiState> {
   Future<void> addUserMessage(String message) async {
     uiState.value = currentUiState.copyWith(userMessage: message);
     showMessage(message: currentUiState.userMessage);
+  }
+
+  /// Current বা next upcoming holiday-তে scroll করা (screen-এর center-এ)
+  void scrollToCurrentHoliday([BuildContext? context, bool forceScroll = false]) {
+    try {
+      if (_userScrolled && !forceScroll) return;
+
+      final events = currentUiState.allEvents;
+      if (events.isEmpty || !holidayScrollController.hasClients) return;
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      int activeIndex = events.indexWhere((event) {
+        final eventDate = DateTime.parse(event.date);
+        final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
+        return !eventDay.isBefore(today);
+      });
+
+      // সব event past হলে শেষ item-এ scroll
+      if (activeIndex == -1) activeIndex = events.length - 1;
+
+      double screenWidth = holidayScrollController.position.viewportDimension;
+      if (context != null) {
+        screenWidth = MediaQuery.of(context).size.width;
+      }
+
+      final double itemWidth = 55.percentWidth;
+      final double leftPadding = twentyPx;
+      final double rightMargin = twelvePx;
+
+      double activePosition = leftPadding + activeIndex * (itemWidth + rightMargin);
+      double scrollTo = activePosition - (screenWidth / 2) + (itemWidth / 2);
+
+      scrollTo = scrollTo.clamp(
+        0.0,
+        holidayScrollController.position.maxScrollExtent,
+      );
+
+      holidayScrollController.animateTo(
+        scrollTo,
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeOutCubic,
+      );
+    } catch (e) {
+      log('Error in scrollToCurrentHoliday: $e');
+    }
+  }
+
+  void scrollToCurrentHolidayWithDelay([BuildContext? context]) {
+    _userScrolled = false;
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (context != null && !context.mounted) return;
+      scrollToCurrentHoliday(context);
+    });
+  }
+
+  void _onUserScroll() {
+    if (holidayScrollController.position.isScrollingNotifier.value) {
+      _userScrolled = true;
+    }
   }
 }

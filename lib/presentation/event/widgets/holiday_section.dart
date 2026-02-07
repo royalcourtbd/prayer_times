@@ -14,11 +14,13 @@ class HolidaySection extends StatelessWidget {
     required this.theme,
     required this.events,
     required this.eventPresenter,
+    required this.scrollController,
   });
 
   final ThemeData theme;
   final List<EventEntity> events;
   final EventPresenter eventPresenter;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class HolidaySection extends StatelessWidget {
           ),
         ),
         gapH18,
-        GovtHolidayList(theme: theme, events: events),
+        GovtHolidayList(theme: theme, events: events, scrollController: scrollController),
       ],
     );
   }

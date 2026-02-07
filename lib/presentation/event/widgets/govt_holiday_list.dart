@@ -8,16 +8,19 @@ class GovtHolidayList extends StatelessWidget {
     super.key,
     required this.theme,
     required this.events,
+    required this.scrollController,
   });
 
   final ThemeData theme;
   final List<EventEntity> events;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 34.percentWidth,
       child: ListView.builder(
+        controller: scrollController,
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemCount: events.length,
