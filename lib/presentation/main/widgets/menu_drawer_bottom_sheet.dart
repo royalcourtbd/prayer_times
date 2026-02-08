@@ -8,15 +8,12 @@ import 'package:prayer_times/presentation/common/settings_grid_item.dart';
 import 'package:prayer_times/presentation/main/presenter/menu_drawer_presenter.dart';
 import 'package:prayer_times/presentation/main/widgets/drawer_top_widget.dart';
 import 'package:prayer_times/presentation/notification/ui/notification_page.dart';
-import 'package:prayer_times/presentation/settings/presenter/settings_page_presenter.dart';
 import 'package:prayer_times/presentation/support_us/ui/support_us_page.dart';
 
 class MenuDrawerBottomSheet extends StatelessWidget {
   MenuDrawerBottomSheet({super.key});
 
   final MenuDrawerPresenter menuDrawerPresenter = locate<MenuDrawerPresenter>();
-  late final SettingsPagePresenter _settingsPagePresenter =
-      locate<SettingsPagePresenter>();
 
   static Future<void> show({required BuildContext context}) async {
     final MenuDrawerBottomSheet menuDrawerBottomsheet = MenuDrawerBottomSheet();
@@ -114,13 +111,13 @@ class MenuDrawerBottomSheet extends StatelessWidget {
                               SettingsGridItem(
                                 icon: SvgPath.icSecuritySafe,
                                 title: 'Privacy Policy',
-                                onTap: () =>
-                                    showMessage(message: 'Under Construction'),
+                                onTap: () => menuDrawerPresenter
+                                    .onPrivacyPolicyClicked(),
                               ),
                               SettingsGridItem(
                                 icon: SvgPath.icShare,
                                 title: 'Share This App',
-                                onTap: _settingsPagePresenter.onShareAppTap,
+                                onTap: menuDrawerPresenter.onShareAppTap,
                               ),
                               SettingsGridItem(
                                 icon: SvgPath.icLike,
@@ -131,7 +128,7 @@ class MenuDrawerBottomSheet extends StatelessWidget {
                               SettingsGridItem(
                                 icon: SvgPath.icStar,
                                 title: 'Rate this App',
-                                onTap: _settingsPagePresenter.onRatingClicked,
+                                onTap: menuDrawerPresenter.onRatingClicked,
                               ),
                             ],
                           ),

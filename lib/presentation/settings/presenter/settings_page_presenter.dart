@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/flutter_toast/debouncer.dart';
-import 'package:prayer_times/core/static/constants.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/data/datasources/local/location_local_data_source.dart';
 import 'package:prayer_times/domain/entities/country_entity.dart';
@@ -174,12 +172,8 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
 
     final selectedCity = currentUiState.selectedCountryCities.firstWhere(
       (city) => city.name == selectedCityName,
-      orElse: () => CityNameEntity(
-        name: '',
-        timezone: '',
-        latitude: 0,
-        longitude: 0,
-      ),
+      orElse: () =>
+          CityNameEntity(name: '', timezone: '', latitude: 0, longitude: 0),
     );
 
     if (selectedCity.name.isEmpty) {
@@ -332,14 +326,6 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   void onCitySelected({required CityNameEntity city}) {
     clearControllers();
     uiState.value = currentUiState.copyWith(selectedCity: city.name);
-  }
-
-  Future<void> onRatingClicked() {
-    return openUrl(url: Platform.isIOS ? appStoreUrl : playStoreUrl);
-  }
-
-  Future<void> onShareAppTap() async {
-    await shareText(text: playStoreUrl);
   }
 
   @override
