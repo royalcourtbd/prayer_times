@@ -130,7 +130,6 @@ class BackendAsAService {
           'token': token,
           'updated_at': FieldValue.serverTimestamp(),
         });
-        logDebug("Device token updated in Firestore for device: $docId");
       } else {
         // New device - create new document
         await docRef.set({
@@ -141,7 +140,6 @@ class BackendAsAService {
           'created_at': FieldValue.serverTimestamp(),
           'updated_at': FieldValue.serverTimestamp(),
         });
-        logDebug("Device token created in Firestore for device: $docId");
       }
     });
   }
@@ -170,24 +168,15 @@ class BackendAsAService {
   }
 
   Future<List<EventModel>> getEvents(int year) async {
-    logDebug("getEvents called for year: $year");
-
     final List<EventModel>? events = await catchAndReturnFuture(() async {
-      logDebug("Fetching events from Firestore collection: $eventsCollection");
-
       final snapshot = await _fireStore
           .collection(eventsCollection)
           .where(isActive, isEqualTo: true)
           .where('year', isEqualTo: year)
           .get();
 
-      logDebug(
-        "Firestore query completed. Documents found: ${snapshot.docs.length}",
-      );
-
       final mappedEvents = snapshot.docs
           .map((doc) {
-            logDebug("Processing event document: ${doc.id}");
             return catchAndReturn<EventModel>(
               () => EventModel.fromFirestore(doc.data()),
             );
@@ -196,12 +185,11 @@ class BackendAsAService {
           .cast<EventModel>()
           .toList();
 
-      logDebug("Successfully mapped ${mappedEvents.length} events");
       return mappedEvents;
     });
 
     final result = events ?? [];
-    logDebug("getEvents returning ${result.length} events for year $year");
+
     return result;
   }
 
@@ -223,7 +211,6 @@ class BackendAsAService {
               .toList();
         })
         .handleError((error) {
-          logError('Error in mobile payments stream: $error');
           return <MobilePaymentModel>[];
         });
   }

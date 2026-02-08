@@ -42,9 +42,5 @@ buildscript {
             } else {
                 "27.0.12077973"
             }
-        )
-        
-        // Debug print
-        println("🔧 Using NDK Version: ${get("ndkVersion")}")
     }
 }
