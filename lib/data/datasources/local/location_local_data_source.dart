@@ -7,6 +7,12 @@ import 'package:prayer_times/domain/entities/location_entity.dart';
 abstract class LocationLocalDataSource {
   Future<LocationEntity?> getCachedLocation();
   Future<void> cacheLocation(LocationEntity location);
+  Future<void> cacheLocationPreference({
+    required bool isManual,
+    required String country,
+    required String city,
+  });
+  ({bool isManual, String country, String city})? getCachedLocationPreference();
 }
 
 class LocationLocalDataSourceImpl implements LocationLocalDataSource {
@@ -41,5 +47,46 @@ class LocationLocalDataSourceImpl implements LocationLocalDataSource {
     } catch (e) {
       return null;
     }
+  }
+
+  @override
+  Future<void> cacheLocationPreference({
+    required bool isManual,
+    required String country,
+    required String city,
+  }) async {
+    await _localCacheService.saveData(
+      key: CacheKeys.isManualLocation,
+      value: isManual,
+    );
+    await _localCacheService.saveData(
+      key: CacheKeys.manualLocationCountry,
+      value: country,
+    );
+    await _localCacheService.saveData(
+      key: CacheKeys.manualLocationCity,
+      value: city,
+    );
+  }
+
+  @override
+  ({bool isManual, String country, String city})? getCachedLocationPreference() {
+    final bool? isManual = _localCacheService.getData<bool>(
+      key: CacheKeys.isManualLocation,
+    );
+    if (isManual == null) return null;
+
+    final String? country = _localCacheService.getData<String>(
+      key: CacheKeys.manualLocationCountry,
+    );
+    final String? city = _localCacheService.getData<String>(
+      key: CacheKeys.manualLocationCity,
+    );
+
+    return (
+      isManual: isManual,
+      country: country ?? '',
+      city: city ?? '',
+    );
   }
 }

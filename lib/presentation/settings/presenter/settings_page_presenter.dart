@@ -159,6 +159,11 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
 
   Future<void> onUseCurrentLocationSelected(BuildContext context) async {
     onManualLocationSelected(isManualLocationSelected: false);
+    await _locationLocalDataSource.cacheLocationPreference(
+      isManual: false,
+      country: '',
+      city: '',
+    );
     _locationActionTaken = true;
 
     // Close the bottom sheet first
@@ -207,8 +212,13 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
         timezone: selectedCity.timezone,
       );
 
-      // Cache the location
+      // Cache the location and preference
       await _locationLocalDataSource.cacheLocation(location);
+      await _locationLocalDataSource.cacheLocationPreference(
+        isManual: true,
+        country: currentUiState.selectedCountry,
+        city: selectedCityName,
+      );
       _locationActionTaken = true;
 
       // Close the bottom sheet first
@@ -245,9 +255,35 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
         task: () => _getCountriesUseCase.execute(),
         onDataLoaded: (List<CountryNameEntity> countries) {
           uiState.value = currentUiState.copyWith(countries: countries);
+          _restoreLocationPreference(countries);
         },
       );
     });
+  }
+
+  void _restoreLocationPreference(List<CountryNameEntity> countries) {
+    final preference = _locationLocalDataSource.getCachedLocationPreference();
+    if (preference == null || !preference.isManual) return;
+
+    final countryName = preference.country;
+    final cityName = preference.city;
+
+    List<CityNameEntity> cities = [];
+    if (countryName.isNotEmpty) {
+      final matchingCountry = countries
+          .where((c) => c.name == countryName)
+          .firstOrNull;
+      if (matchingCountry != null) {
+        cities = matchingCountry.cities;
+      }
+    }
+
+    uiState.value = currentUiState.copyWith(
+      isManualLocationSelected: true,
+      selectedCountry: countryName,
+      selectedCity: cityName,
+      selectedCountryCities: cities,
+    );
   }
 
   Future<void> onSearchQueryChanged({required String searchQuery}) async {
