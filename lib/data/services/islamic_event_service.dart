@@ -1,7 +1,11 @@
-import 'package:hijri/hijri_calendar.dart';
 import 'package:prayer_times/data/models/event_model.dart';
+import 'package:prayer_times/data/services/hijri_date_service.dart';
 
 class IslamicEventService {
+  final HijriDateService _hijriDateService;
+
+  IslamicEventService(this._hijriDateService);
+
   static const String _islamicColor = '#FF4CAF50';
 
   List<EventModel> generateIslamicEvents(int year) {
@@ -157,7 +161,7 @@ class IslamicEventService {
     final DateTime endDate = DateTime(gregorianYear, 12, 31);
 
     while (checkDate.isBefore(endDate) || checkDate.isAtSameMomentAs(endDate)) {
-      final HijriCalendar hijri = HijriCalendar.fromDate(checkDate);
+      final hijri = _hijriDateService.fromDate(checkDate);
       if (hijri.hMonth == hijriMonth && hijri.hDay == hijriDay) {
         return checkDate;
       }

@@ -1,6 +1,6 @@
-import 'package:hijri/hijri_calendar.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/data/services/hijri_date_service.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
 import 'package:prayer_times/domain/entities/ramadan_day_entity.dart';
@@ -12,21 +12,18 @@ import 'package:intl/intl.dart';
 class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
   final GetPrayerTimesUseCase _getPrayerTimesUseCase;
   final GetLocationUseCase _getLocationUseCase;
+  final HijriDateService _hijriDateService;
 
   RamadanCalendarPresenter(
     this._getPrayerTimesUseCase,
     this._getLocationUseCase,
+    this._hijriDateService,
   );
 
   final Obs<RamadanCalendarUiState> uiState = Obs(
     RamadanCalendarUiState.empty(),
   );
   RamadanCalendarUiState get currentUiState => uiState.value;
-
-  // Correction offset - this can be adjusted if needed based on local moon sighting decisions
-  // Positive value means Ramadan starts later than calculated date
-  // Negative value means Ramadan starts earlier than calculated date
-  final int _moonSightingOffset = 0;
 
   /// Dynamically calculate Ramadan start date for a given year
   /// Ramadan is the 9th month in the Hijri calendar
@@ -35,7 +32,7 @@ class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
     final DateTime endDate = DateTime(year, 12, 31);
 
     while (checkDate.isBefore(endDate)) {
-      final HijriCalendar hijri = HijriCalendar.fromDate(checkDate);
+      final hijri = _hijriDateService.fromDate(checkDate);
       // Month 9 = Ramadan, Day 1 = First day of Ramadan
       if (hijri.hMonth == 9 && hijri.hDay == 1) {
         return checkDate;
@@ -57,10 +54,10 @@ class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
   /// Get Hijri year for current Ramadan
   int get hijriYear {
     final DateTime ramadanStart = _ramadanStartDate;
-    return HijriCalendar.fromDate(ramadanStart).hYear;
+    return _hijriDateService.fromDate(ramadanStart).hYear;
   }
 
-  // Calculate current Ramadan day based on today's date with adjustment for moon sighting
+  // Calculate current Ramadan day based on today's date
   int getCurrentRamadanDay() {
     final DateTime now = DateTime.now();
 
@@ -75,8 +72,8 @@ class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
       return 31; // Ramadan has ended
     }
 
-    // Calculate which day of Ramadan with adjustment for moon sighting
-    return now.difference(_ramadanStartDate).inDays + 1 - _moonSightingOffset;
+    // Calculate which day of Ramadan
+    return now.difference(_ramadanStartDate).inDays + 1;
   }
 
   @override
@@ -132,10 +129,10 @@ class RamadanCalendarPresenter extends BasePresenter<RamadanCalendarUiState> {
       }
 
       // Calculate Hijri date
-      final hijriDate = HijriCalendar.fromDate(currentDate);
+      final hijriDate = _hijriDateService.fromDate(currentDate);
 
-      // Adjusted Ramadan day number to account for moon sighting correction
-      final ramadanDay = (i + 1 - _moonSightingOffset).toString();
+      // Ramadan day number
+      final ramadanDay = (i + 1).toString();
 
       // Sehri time (start of Fajr)
       final sehriTime = getFormattedTime(prayerTime.startFajr);

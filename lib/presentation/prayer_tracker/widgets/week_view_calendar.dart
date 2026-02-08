@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hijri/hijri_calendar.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
+import 'package:prayer_times/core/di/service_locator.dart';
+import 'package:prayer_times/data/services/hijri_date_service.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/presentation/prayer_tracker/model/calendar_date_cell_view_model.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
@@ -168,7 +169,7 @@ class _ScrollableCalendarViewState extends State<_ScrollableCalendarView> {
   }
 
   Widget _buildDateCell(BuildContext context, DateTime date) {
-    final HijriCalendar hijri = HijriCalendar.fromDate(date);
+    final hijri = locate<HijriDateService>().fromDate(date);
     final DateTime now = DateTime.now();
     final bool isToday =
         date.day == now.day && date.month == now.month && date.year == now.year;

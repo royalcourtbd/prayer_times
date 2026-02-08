@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hijri/hijri_calendar.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
+import 'package:prayer_times/data/services/hijri_date_service.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/utility/utility.dart';
@@ -46,6 +46,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   final InitializeDeviceTokenUseCase _initializeDeviceTokenUseCase;
   final GetAppUpdateInfoUseCase _getAppUpdateInfoUseCase;
   final LocalCacheService _cacheService;
+  final HijriDateService _hijriDateService;
   StreamSubscription<DateTime>? _timeSubscription;
 
   final ScrollController prayerTimesScrollController = ScrollController();
@@ -64,6 +65,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     this._initializeDeviceTokenUseCase,
     this._getAppUpdateInfoUseCase,
     this._cacheService,
+    this._hijriDateService,
   );
 
   final Obs<HomeUiState> uiState = Obs<HomeUiState>(HomeUiState.empty());
@@ -330,7 +332,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   }
 
   String _getHijriDate(DateTime date) {
-    final HijriCalendar hijri = HijriCalendar.fromDate(date);
+    final hijri = _hijriDateService.fromDate(date);
     return '${hijri.format(hijri.hYear, hijri.hMonth, hijri.hDay, 'dd MMMM yyyy')} H';
   }
 

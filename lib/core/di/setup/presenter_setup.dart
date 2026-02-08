@@ -45,6 +45,7 @@ class PresenterSetup implements SetupModule {
             locate(),
             locate(),
             locate(),
+            locate(),
           ),
         ),
       )
@@ -59,11 +60,12 @@ class PresenterSetup implements SetupModule {
         () => loadPresenter(SupportUsPresenter(locate(), locate())),
       )
       ..registerLazySingleton(
-        () => loadPresenter(RamadanCalendarPresenter(locate(), locate())),
+        () => loadPresenter(RamadanCalendarPresenter(locate(), locate(), locate())),
       )
       ..registerLazySingleton(
         () => loadPresenter(
           HomePresenter(
+            locate(),
             locate(),
             locate(),
             locate(),
@@ -81,7 +83,7 @@ class PresenterSetup implements SetupModule {
       ..registerLazySingleton(() => loadPresenter(MenuDrawerPresenter()))
       ..registerLazySingleton(() => loadPresenter(EventPresenter(locate())))
       ..registerLazySingleton(
-        () => loadPresenter(RamadanCountdownPresenter()),
+        () => loadPresenter(RamadanCountdownPresenter(locate())),
       );
   }
 }

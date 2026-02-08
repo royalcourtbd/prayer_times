@@ -13,12 +13,14 @@ class SettingsPageUiState extends BaseUiState {
     required this.countries,
     required this.selectedCountryCities,
     required this.selectedCity,
+    required this.selectedDayAdjustment,
   });
 
   final String selectedJuristicMethod;
   final String selectedCalculationMethod;
   final String selectedCountry;
   final String selectedCity;
+  final int selectedDayAdjustment;
   final bool isManualLocationSelected;
   final List<CountryNameEntity> countries;
   final List<CityNameEntity> selectedCountryCities;
@@ -31,6 +33,7 @@ class SettingsPageUiState extends BaseUiState {
       selectedCalculationMethod: 'karachi',
       selectedCountry: '',
       selectedCity: '',
+      selectedDayAdjustment: 0,
       isManualLocationSelected: false,
       countries: [],
       selectedCountryCities: [],
@@ -45,6 +48,7 @@ class SettingsPageUiState extends BaseUiState {
     selectedCalculationMethod,
     selectedCountry,
     selectedCity,
+    selectedDayAdjustment,
     isManualLocationSelected,
     countries,
     selectedCountryCities,
@@ -57,6 +61,7 @@ class SettingsPageUiState extends BaseUiState {
     String? selectedCalculationMethod,
     String? selectedCountry,
     String? selectedCity,
+    int? selectedDayAdjustment,
     bool? isManualLocationSelected,
     List<CountryNameEntity>? countries,
     List<CityNameEntity>? selectedCountryCities,
@@ -70,6 +75,8 @@ class SettingsPageUiState extends BaseUiState {
           selectedCalculationMethod ?? this.selectedCalculationMethod,
       selectedCountry: selectedCountry ?? this.selectedCountry,
       selectedCity: selectedCity ?? this.selectedCity,
+      selectedDayAdjustment:
+          selectedDayAdjustment ?? this.selectedDayAdjustment,
       isManualLocationSelected:
           isManualLocationSelected ?? this.isManualLocationSelected,
       countries: countries ?? this.countries,

@@ -1,12 +1,15 @@
 import 'dart:async';
 
-import 'package:hijri/hijri_calendar.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/data/services/hijri_date_service.dart';
 import 'package:prayer_times/presentation/event/pesenter/ramadan_countdown_ui_state.dart';
 
 class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
+  final HijriDateService _hijriDateService;
   Timer? _timer;
+
+  RamadanCountdownPresenter(this._hijriDateService);
 
   final Obs<RamadanCountdownUiState> uiState = Obs(
     RamadanCountdownUiState.empty(),
@@ -32,7 +35,7 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
 
   void _calculateCountdown() {
     final now = DateTime.now();
-    final hijri = HijriCalendar.now();
+    final hijri = _hijriDateService.now();
 
     // Check if currently Ramadan (Hijri month 9)
     final isRamadan = hijri.hMonth == 9;
@@ -78,7 +81,7 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
     );
   }
 
-  DateTime _getRamadanStartDate(HijriCalendar hijri) {
+  DateTime _getRamadanStartDate(dynamic hijri) {
     int targetYear = hijri.hYear;
 
     // If we're past Ramadan this year, target next year
@@ -86,10 +89,10 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
       targetYear++;
     }
 
-    return hijri.hijriToGregorian(targetYear, 9, 1);
+    return _hijriDateService.hijriToGregorian(targetYear, 9, 1);
   }
 
-  DateTime _getRamadanEndDate(HijriCalendar hijri) {
+  DateTime _getRamadanEndDate(dynamic hijri) {
     int targetYear = hijri.hYear;
 
     // If we're past Ramadan this year, target next year
@@ -98,12 +101,12 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
     }
 
     // Ramadan is typically 29 or 30 days, use start of Shawwal minus 1
-    final shawwalStart = hijri.hijriToGregorian(targetYear, 10, 1);
+    final shawwalStart = _hijriDateService.hijriToGregorian(targetYear, 10, 1);
     return shawwalStart.subtract(const Duration(days: 1));
   }
 
-  DateTime _getNextRamadanStartDate(HijriCalendar hijri) {
-    return hijri.hijriToGregorian(hijri.hYear + 1, 9, 1);
+  DateTime _getNextRamadanStartDate(dynamic hijri) {
+    return _hijriDateService.hijriToGregorian(hijri.hYear + 1, 9, 1);
   }
 
   @override

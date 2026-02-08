@@ -5,6 +5,7 @@ import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/flutter_toast/debouncer.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/data/datasources/local/location_local_data_source.dart';
+import 'package:prayer_times/data/services/hijri_date_service.dart';
 import 'package:prayer_times/domain/entities/country_entity.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/usecases/get_countries_usecase.dart';
@@ -28,6 +29,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   final GetCountriesUseCase _getCountriesUseCase;
   final SearchCountriesUseCase _searchCountriesUseCase;
   final LocationLocalDataSource _locationLocalDataSource;
+  final HijriDateService _hijriDateService;
 
   SettingsPagePresenter(
     this._getJuristicMethodUseCase,
@@ -37,6 +39,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     this._getCountriesUseCase,
     this._searchCountriesUseCase,
     this._locationLocalDataSource,
+    this._hijriDateService,
   );
 
   final Obs<SettingsPageUiState> uiState = Obs(SettingsPageUiState.empty());
@@ -60,6 +63,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     _loadJuristicMethod();
     _loadCalculationMethod();
     _loadCountries();
+    _loadDayAdjustment();
     super.onInit();
   }
 
@@ -127,6 +131,19 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
         },
       );
     });
+  }
+
+  void _loadDayAdjustment() {
+    uiState.value = currentUiState.copyWith(
+      selectedDayAdjustment: _hijriDateService.dayAdjustment,
+    );
+  }
+
+  Future<void> onDayAdjustmentChanged({required int value}) async {
+    await _hijriDateService.saveDayAdjustment(value);
+    uiState.value = currentUiState.copyWith(selectedDayAdjustment: value);
+    _homePresenter.refreshLocationAndPrayerTimes();
+    showMessage(message: 'Day adjustment saved successfully');
   }
 
   void showCalculationMethodBottomSheet(BuildContext context) {
