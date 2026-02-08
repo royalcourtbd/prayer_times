@@ -93,6 +93,7 @@ jobs:
                     "emoji": true
                   }
                 },
+
                 {
                   "type": "section",
                   "fields": [
@@ -103,7 +104,13 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*🌿 Branch:*\n`${{ github.ref_name }}`"
-                    },
+                    }
+                  ]
+                },
+
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*👤 Triggered by:*\n`${{ github.actor }}`"
