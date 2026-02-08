@@ -68,8 +68,9 @@ extension ContextExtensions on BuildContext {
 
   Future<T?> showBottomSheet<T>(
     Widget bottomSheet,
-    BuildContext context,
-  ) async {
+    BuildContext context, {
+    bool isDismissible = true,
+  }) async {
     if (!mounted) return null;
     final T? result = await showModalBottomSheet<T>(
       context: context,
@@ -77,7 +78,8 @@ extension ContextExtensions on BuildContext {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       useSafeArea: true,
-      enableDrag: true,
+      enableDrag: isDismissible,
+      isDismissible: isDismissible,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(twentyPx),

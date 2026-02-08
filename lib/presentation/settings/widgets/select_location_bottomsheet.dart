@@ -31,80 +31,103 @@ class SelectLocationBottomsheet extends StatelessWidget {
     return PresentableWidgetBuilder(
       presenter: presenter,
       builder: () {
-        return CustomModalSheet(
-          theme: theme,
-          bottomSheetTitle: 'Set Your Location',
+        final isLoading = presenter.currentUiState.isLoading;
+        return Stack(
           children: [
-            CustomRadioListTile(
-              title: 'Use Current Location',
-              subtitle: presenter.showLocationName(),
-              isSelected: !presenter.currentUiState.isManualLocationSelected,
-              onTap: () => presenter.onManualLocationSelected(
-                isManualLocationSelected: false,
-              ),
-            ),
-            gapH25,
-            CustomRadioListTile(
-              title: 'Select Location Manually',
-              isSelected: presenter.currentUiState.isManualLocationSelected,
-              onTap: () {
-                presenter.onManualLocationSelected(
-                  isManualLocationSelected: true,
-                );
+            PopScope(
+              canPop: !isLoading,
+              onPopInvokedWithResult: (didPop, result) {
+                if (!didPop && isLoading) {
+                  // Prevent dismissal during loading
+                }
               },
+              child: CustomModalSheet(
+                theme: theme,
+                bottomSheetTitle: 'Set Your Location',
+                children: [
+                  CustomRadioListTile(
+                    title: 'Use Current Location',
+                    subtitle: presenter.showLocationName(),
+                    isSelected: !presenter.currentUiState.isManualLocationSelected,
+                    onTap: () => presenter.onManualLocationSelected(
+                      isManualLocationSelected: false,
+                    ),
+                  ),
+                  gapH25,
+                  CustomRadioListTile(
+                    title: 'Select Location Manually',
+                    isSelected: presenter.currentUiState.isManualLocationSelected,
+                    onTap: () {
+                      presenter.onManualLocationSelected(
+                        isManualLocationSelected: true,
+                      );
+                    },
+                  ),
+                  if (presenter.currentUiState.isManualLocationSelected) ...[
+                    gapH10,
+                    SlideInUp(
+                      delay: const Duration(milliseconds: 50),
+                      child: CustomDropdownField(
+                        title: 'Select Country',
+                        value: presenter.currentUiState.selectedCountry.isEmpty
+                            ? 'Select Country'
+                            : presenter.currentUiState.selectedCountry,
+                        onTap: () {
+                          ChooseCountryOrCityBottomSheet.show(
+                            context: context,
+                            isCountrySelection: true,
+                          );
+                        },
+                      ),
+                    ),
+                    gapH25,
+                    SlideInUp(
+                      delay: const Duration(milliseconds: 50),
+                      child: CustomDropdownField(
+                        title: 'Select City',
+                        value: presenter.currentUiState.selectedCity.isEmpty
+                            ? 'Select City'
+                            : presenter.currentUiState.selectedCity,
+                        onTap: () {
+                          if (presenter.currentUiState.selectedCountry.isEmpty) {
+                            showMessage(message: 'Please select a country first');
+                            return;
+                          }
+                          if (presenter
+                              .currentUiState
+                              .selectedCountryCities
+                              .isEmpty) {
+                            showMessage(
+                              message: 'No cities found for this country',
+                            );
+                            return;
+                          }
+                          ChooseCountryOrCityBottomSheet.show(
+                            context: context,
+                            isCountrySelection: false,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                  gapH25,
+                  CustomButton(
+                    title: 'Save',
+                    isLoading: presenter.currentUiState.isLoading,
+                    onPressed: () => presenter.onSaveLocationSelected(context),
+                    horizontalPadding: 0,
+                  ),
+                ],
+              ),
             ),
-            if (presenter.currentUiState.isManualLocationSelected) ...[
-              gapH10,
-              SlideInUp(
-                delay: const Duration(milliseconds: 50),
-                child: CustomDropdownField(
-                  title: 'Select Country',
-                  value: presenter.currentUiState.selectedCountry.isEmpty
-                      ? 'Select Country'
-                      : presenter.currentUiState.selectedCountry,
-                  onTap: () {
-                    ChooseCountryOrCityBottomSheet.show(
-                      context: context,
-                      isCountrySelection: true,
-                    );
-                  },
+            if (isLoading)
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () {},
+                  onVerticalDragUpdate: (_) {},
+                  child: Container(color: Colors.transparent),
                 ),
               ),
-              gapH25,
-              SlideInUp(
-                delay: const Duration(milliseconds: 50),
-                child: CustomDropdownField(
-                  title: 'Select City',
-                  value: presenter.currentUiState.selectedCity.isEmpty
-                      ? 'Select City'
-                      : presenter.currentUiState.selectedCity,
-                  onTap: () {
-                    if (presenter.currentUiState.selectedCountry.isEmpty) {
-                      showMessage(message: 'Please select a country first');
-                      return;
-                    }
-                    if (presenter
-                        .currentUiState
-                        .selectedCountryCities
-                        .isEmpty) {
-                      showMessage(message: 'No cities found for this country');
-                      return;
-                    }
-                    ChooseCountryOrCityBottomSheet.show(
-                      context: context,
-                      isCountrySelection: false,
-                    );
-                  },
-                ),
-              ),
-            ],
-            gapH25,
-            CustomButton(
-              title: 'Save',
-              isLoading: presenter.currentUiState.isLoading,
-              onPressed: () => presenter.onSaveLocationSelected(context),
-              horizontalPadding: 0,
-            ),
           ],
         );
       },
