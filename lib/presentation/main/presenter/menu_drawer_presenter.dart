@@ -1,9 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
+import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/static/constants.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/data/services/in_app_review_service.dart';
 import 'package:prayer_times/presentation/main/presenter/menu_drawer_ui_state.dart';
 
 class MenuDrawerPresenter extends BasePresenter<MenuDrawerUiState> {
@@ -11,8 +11,13 @@ class MenuDrawerPresenter extends BasePresenter<MenuDrawerUiState> {
 
   MenuDrawerUiState get currentUiState => uiState.value;
 
-  Future<void> onRatingClicked() {
-    return openUrl(url: Platform.isIOS ? appStoreUrl : playStoreUrl);
+  Future<void> onRatingClicked() async {
+    final inAppReviewService = locate<InAppReviewService>();
+    final bool success = await inAppReviewService.requestReview();
+
+    if (!success) {
+      await inAppReviewService.openStoreListing();
+    }
   }
 
   Future<void> onShareAppTap() async {

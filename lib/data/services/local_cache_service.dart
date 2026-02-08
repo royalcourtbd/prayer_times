@@ -119,4 +119,6 @@ class CacheKeys {
   static const String isManualLocation = "is_manual_location_key";
   static const String manualLocationCountry = "manual_location_country_key";
   static const String manualLocationCity = "manual_location_city_key";
+  static const String reviewRequestCount = "review_request_count_key";
+  static const String lastReviewRequestTime = "last_review_request_time_key";
 }

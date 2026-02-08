@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:prayer_times/core/di/setup/setup_module.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
+import 'package:prayer_times/data/services/in_app_review_service.dart';
 import 'package:prayer_times/data/services/backend_as_a_service.dart';
 import 'package:prayer_times/data/services/database/prayer_database.dart';
 import 'package:prayer_times/data/services/error_message_handler_impl.dart';
@@ -43,8 +44,11 @@ class ServiceSetup implements SetupModule {
       ..registerLazySingleton(BackendAsAService.new)
       ..registerLazySingleton(() => PrayerDatabase())
       ..registerLazySingleton(() => LocationService())
-      ..registerLazySingleton(() => InAppReview.instance)
       ..registerLazySingleton(LocalCacheService.new)
+      ..registerLazySingleton(() => InAppReviewService(
+            InAppReview.instance,
+            _serviceLocator<LocalCacheService>(),
+          ))
       ..registerLazySingleton(() => IslamicEventService());
 
     await LocalCacheService.setUp();
