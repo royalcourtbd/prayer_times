@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/external_libs/flutter_animated_dialog/src/animated_dialog.dart';
+import 'package:prayer_times/core/external_libs/svg_image.dart';
 import 'package:prayer_times/core/static/svg_path.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
@@ -48,10 +48,9 @@ class RemoveDialog extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   height: 60.percentWidth,
-                  child: SvgPicture.asset(
+                  child: SvgImage(
                     SvgPath.dicBG,
-                    width: double.infinity,
-                    fit: BoxFit.fill,
+                    color: context.color.primaryColor,
                   ),
                 ),
               ),
@@ -59,10 +58,10 @@ class RemoveDialog extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: EdgeInsets.only(top: twentyPx),
-                  child: SvgPicture.asset(
+                  child: SvgImage(
                     SvgPath.icDelete,
-                    fit: BoxFit.cover,
                     height: 25.percentWidth,
+                    color: context.color.primaryColor,
                   ),
                 ),
               ),

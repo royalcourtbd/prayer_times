@@ -242,7 +242,7 @@ class PrayerTrackerPresenter extends BasePresenter<PrayerTrackerUiState> {
     if (!context.mounted) return;
 
     if (historyData.isEmpty) {
-      addUserMessage('No data to clear');
+      addUserMessage('No data for deletion');
     } else {
       await RemoveDialog.show(
         context: context,
