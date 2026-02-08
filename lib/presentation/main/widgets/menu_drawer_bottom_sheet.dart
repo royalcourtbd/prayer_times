@@ -121,9 +121,9 @@ class MenuDrawerBottomSheet extends StatelessWidget {
                               ),
                               SettingsGridItem(
                                 icon: SvgPath.icLike,
-                                title: 'Thanks & Credit',
-                                onTap: () =>
-                                    showMessage(message: 'Under Construction'),
+                                title: 'Other Apps',
+                                onTap: () => menuDrawerPresenter
+                                    .onPlayStoreLinkClicked(context),
                               ),
                               SettingsGridItem(
                                 icon: SvgPath.icStar,

@@ -26,8 +26,7 @@ class MenuDrawerPresenter extends BasePresenter<MenuDrawerUiState> {
   Future<void> onPlayStoreLinkClicked(BuildContext context) =>
       _onPromotionInteraction(
         onInternet: (url) => openUrl(url: url),
-        onNoInternet: () =>
-            () => addUserMessage('No internet connection available'),
+        onNoInternet: () => addUserMessage('No internet connection available'),
       );
 
   Future<void> _onPromotionInteraction({
@@ -39,7 +38,6 @@ class MenuDrawerPresenter extends BasePresenter<MenuDrawerUiState> {
       onNoInternet();
       return;
     }
-
     onInternet(suitableAppStoreUrl);
   }
 
