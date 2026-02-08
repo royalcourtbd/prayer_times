@@ -112,7 +112,7 @@ class AppUpdateBottomSheet extends StatelessWidget {
         ),
         gapW8,
         Text(
-          'Latest version: ${appUpdateEntity.latestVersion}',
+          'Latest version: v${appUpdateEntity.latestVersion}',
           style: theme.textTheme.bodySmall?.copyWith(
             fontSize: twelvePx,
             color: context.color.subTitleColor,
