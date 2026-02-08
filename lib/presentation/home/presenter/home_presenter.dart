@@ -27,6 +27,10 @@ import 'package:prayer_times/presentation/home/models/waqt.dart';
 import 'package:prayer_times/presentation/home/presenter/home_ui_state.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
 import 'package:prayer_times/data/services/in_app_review_service.dart';
+import 'package:prayer_times/data/services/local_cache_service.dart';
+import 'package:prayer_times/domain/entities/app_update_entity.dart';
+import 'package:prayer_times/domain/usecases/get_app_update_info_usecase.dart';
+import 'package:prayer_times/presentation/home/widgets/app_update_bottom_sheet.dart';
 import 'package:prayer_times/presentation/settings/widgets/select_location_bottomsheet.dart';
 
 class HomePresenter extends BasePresenter<HomeUiState> {
@@ -40,6 +44,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   _requestNotificationPermissionUsecase;
   final CheckNotificationPermissionUsecase _checkNotificationPermissionUsecase;
   final InitializeDeviceTokenUseCase _initializeDeviceTokenUseCase;
+  final GetAppUpdateInfoUseCase _getAppUpdateInfoUseCase;
+  final LocalCacheService _cacheService;
   StreamSubscription<DateTime>? _timeSubscription;
 
   final ScrollController prayerTimesScrollController = ScrollController();
@@ -56,6 +62,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     this._requestNotificationPermissionUsecase,
     this._checkNotificationPermissionUsecase,
     this._initializeDeviceTokenUseCase,
+    this._getAppUpdateInfoUseCase,
+    this._cacheService,
   );
 
   final Obs<HomeUiState> uiState = Obs<HomeUiState>(HomeUiState.empty());
@@ -73,6 +81,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     checkNotificationPermission();
     _syncEventsInBackground();
     _trackLaunchAndRequestReview();
+    _checkForAppUpdate();
 
     prayerTimesScrollController.addListener(_onUserScroll);
   }
@@ -81,6 +90,86 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     final inAppReviewService = locate<InAppReviewService>();
     await inAppReviewService.trackAppLaunch();
     await inAppReviewService.requestReviewIfEligible();
+  }
+
+  Future<void> _checkForAppUpdate() async {
+    await parseDataFromEitherWithUserMessage<AppUpdateEntity>(
+      task: () => _getAppUpdateInfoUseCase.execute(),
+      showLoading: false,
+      onDataLoaded: (AppUpdateEntity appUpdate) async {
+        if (appUpdate.latestVersion.isEmpty) return;
+
+        final String currentVersion = await currentAppVersion;
+        final bool isUpdateAvailable = _isVersionNewer(
+          appUpdate.latestVersion,
+          currentVersion,
+        );
+
+        if (!isUpdateAvailable) return;
+
+        final bool isForceUpdate = appUpdate.forceUpdate ||
+            _isBelowMinSupported(currentVersion, appUpdate.minSupportedVersion);
+
+        // force update না হলে, user আগে dismiss করে থাকলে আবার দেখাবে না
+        if (!isForceUpdate) {
+          final String? dismissedVersion = _cacheService.getData<String>(
+            key: CacheKeys.dismissedUpdateVersion,
+          );
+          if (dismissedVersion == appUpdate.latestVersion) return;
+        }
+
+        // UI ready হওয়ার জন্য সামান্য delay
+        await Future.delayed(const Duration(seconds: 2));
+
+        final BuildContext? context = Get.context;
+        if (context == null || !context.mounted) return;
+
+        await AppUpdateBottomSheet.show(
+          context: context,
+          appUpdateEntity: isForceUpdate
+              ? AppUpdateEntity(
+                  changeLogs: appUpdate.changeLogs,
+                  forceUpdate: true,
+                  latestVersion: appUpdate.latestVersion,
+                  minSupportedVersion: appUpdate.minSupportedVersion,
+                  title: appUpdate.title,
+                  storeUrl: appUpdate.storeUrl,
+                  iosStoreUrl: appUpdate.iosStoreUrl,
+                )
+              : appUpdate,
+          onUpdate: () => openUrl(url: suitableAppStoreUrl),
+          onLater: () {
+            _cacheService.saveData<String>(
+              key: CacheKeys.dismissedUpdateVersion,
+              value: appUpdate.latestVersion,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// latestVersion > currentVersion কিনা check করে
+  bool _isVersionNewer(String latest, String current) {
+    final List<int> latestParts = _parseVersion(latest);
+    final List<int> currentParts = _parseVersion(current);
+
+    for (int i = 0; i < latestParts.length; i++) {
+      if (i >= currentParts.length) return true;
+      if (latestParts[i] > currentParts[i]) return true;
+      if (latestParts[i] < currentParts[i]) return false;
+    }
+    return false;
+  }
+
+  /// currentVersion < minSupported কিনা check করে
+  bool _isBelowMinSupported(String current, String minSupported) {
+    if (minSupported.isEmpty) return false;
+    return _isVersionNewer(minSupported, current);
+  }
+
+  List<int> _parseVersion(String version) {
+    return version.split('.').map((e) => int.tryParse(e) ?? 0).toList();
   }
 
   Future<void> _syncEventsInBackground() async {

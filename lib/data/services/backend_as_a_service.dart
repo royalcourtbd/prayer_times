@@ -38,7 +38,8 @@ class BackendAsAService {
 
   static const String noticeCollection = 'notice';
   static const String noticeDoc = 'notice-bn';
-  static const String appUpdateDoc = 'app-update';
+  static const String settingsCollection = 'settings';
+  static const String appUpdateDoc = 'app_update';
   static const String deviceTokensCollection = 'device_tokens';
   static const String paymentsCollection = 'payments';
   static const String eventsCollection = 'events';
@@ -78,7 +79,7 @@ class BackendAsAService {
     Map<String, dynamic>? appUpdateInfo = {};
     appUpdateInfo = await catchAndReturnFuture(() async {
       final DocumentSnapshot<Map<String, dynamic>> docSnapshot =
-          await _fireStore.collection(noticeCollection).doc(appUpdateDoc).get();
+          await _fireStore.collection(settingsCollection).doc(appUpdateDoc).get();
       return docSnapshot.data();
     });
     return appUpdateInfo ?? {};

@@ -122,4 +122,5 @@ class CacheKeys {
   static const String firstLaunchDate = "first_launch_date_key";
   static const String reviewRequestCount = "review_request_count_key";
   static const String lastReviewRequestTime = "last_review_request_time_key";
+  static const String dismissedUpdateVersion = "dismissed_update_version_key";
 }
