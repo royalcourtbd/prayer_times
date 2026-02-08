@@ -2,16 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/external_libs/loading_animation/ink_drop_loading_animation.dart';
 
 class LoadingIndicator extends StatelessWidget {
-  const LoadingIndicator({
-    super.key,
-    this.ringColor,
-    this.color,
-    required this.theme,
-  });
+  const LoadingIndicator({super.key, this.ringColor, this.color});
 
   final Color? color;
   final Color? ringColor;
-  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +13,7 @@ class LoadingIndicator extends StatelessWidget {
       child: InkDropLoading(
         size: 30,
         ringColor: ringColor,
-        color: color ?? theme.primaryColor,
+        color: color ?? Theme.of(context).primaryColor,
       ),
     );
   }

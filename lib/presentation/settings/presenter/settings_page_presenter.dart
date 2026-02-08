@@ -157,89 +157,85 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     );
   }
 
-  Future<void> onUseCurrentLocationSelected(BuildContext context) async {
-    onManualLocationSelected(isManualLocationSelected: false);
+  Future<void> onSaveLocationSelected(BuildContext context) async {
+    if (currentUiState.isManualLocationSelected) {
+      await _saveManualLocation(context);
+    } else {
+      await _saveCurrentLocation(context);
+    }
+  }
+
+  Future<void> _saveManualLocation(BuildContext context) async {
+    final selectedCityName = currentUiState.selectedCity;
+    if (selectedCityName.isEmpty) {
+      showMessage(message: 'Please select a city');
+      return;
+    }
+
+    final selectedCity = currentUiState.selectedCountryCities.firstWhere(
+      (city) => city.name == selectedCityName,
+      orElse: () => CityNameEntity(
+        name: '',
+        timezone: '',
+        latitude: 0,
+        longitude: 0,
+      ),
+    );
+
+    if (selectedCity.name.isEmpty) {
+      showMessage(message: 'City not found');
+      return;
+    }
+
+    final location = LocationEntity(
+      latitude: selectedCity.latitude,
+      longitude: selectedCity.longitude,
+      placeName: '${selectedCity.name}, ${currentUiState.selectedCountry}',
+      timezone: selectedCity.timezone,
+    );
+
+    await _locationLocalDataSource.cacheLocation(location);
     await _locationLocalDataSource.cacheLocationPreference(
-      isManual: false,
-      country: '',
-      city: '',
+      isManual: true,
+      country: currentUiState.selectedCountry,
+      city: selectedCityName,
     );
     _locationActionTaken = true;
 
-    // Close the bottom sheet first
     if (context.mounted) {
       context.navigatorPop();
     }
     clearControllers();
 
-    // Force refresh from GPS after bottomsheet animation completes
-    Future.delayed(const Duration(milliseconds: 300), () async {
-      await _homePresenter.refreshLocationAndPrayerTimes();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _homePresenter.loadLocationAndPrayerTimes();
       _ramadanCalendarPresenter.loadRamadanCalendar();
-      showMessage(message: 'Location updated successfully');
+      showMessage(message: 'Location saved successfully');
     });
   }
 
-  Future<void> onSaveLocationSelected(BuildContext context) async {
-    if (currentUiState.isManualLocationSelected) {
-      // Find the selected city from the list
-      final selectedCityName = currentUiState.selectedCity;
-      if (selectedCityName.isEmpty) {
-        showMessage(message: 'Please select a city');
-        return;
-      }
-
-      final selectedCity = currentUiState.selectedCountryCities.firstWhere(
-        (city) => city.name == selectedCityName,
-        orElse: () => CityNameEntity(
-          name: '',
-          timezone: '',
-          latitude: 0,
-          longitude: 0,
-        ),
-      );
-
-      if (selectedCity.name.isEmpty) {
-        showMessage(message: 'City not found');
-        return;
-      }
-
-      // Create LocationEntity from selected city - including timezone
-      final location = LocationEntity(
-        latitude: selectedCity.latitude,
-        longitude: selectedCity.longitude,
-        placeName: '${selectedCity.name}, ${currentUiState.selectedCountry}',
-        timezone: selectedCity.timezone,
-      );
-
-      // Cache the location and preference
-      await _locationLocalDataSource.cacheLocation(location);
+  Future<void> _saveCurrentLocation(BuildContext context) async {
+    try {
+      await toggleLoading(loading: true);
+      await _homePresenter.refreshLocationAndPrayerTimes();
       await _locationLocalDataSource.cacheLocationPreference(
-        isManual: true,
-        country: currentUiState.selectedCountry,
-        city: selectedCityName,
+        isManual: false,
+        country: '',
+        city: '',
       );
       _locationActionTaken = true;
+      _ramadanCalendarPresenter.loadRamadanCalendar();
+      await toggleLoading(loading: false);
 
-      // Close the bottom sheet first
+      showMessage(message: 'Location updated successfully');
       if (context.mounted) {
         context.navigatorPop();
       }
       clearControllers();
-
-      // Load prayer times after bottomsheet animation completes
-      Future.delayed(const Duration(milliseconds: 300), () {
-        _homePresenter.loadLocationAndPrayerTimes();
-        _ramadanCalendarPresenter.loadRamadanCalendar();
-        showMessage(message: 'Location saved successfully');
-      });
-      return;
+    } catch (e) {
+      await toggleLoading(loading: false);
+      showMessage(message: 'Failed to get current location');
     }
-
-    if (context.mounted) {
-      context.navigatorPop();
-    }
-    clearControllers();
   }
 
   void clearControllers() {

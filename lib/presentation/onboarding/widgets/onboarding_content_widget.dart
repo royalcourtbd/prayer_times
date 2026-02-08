@@ -30,10 +30,7 @@ class OnboardingContentWidget extends StatelessWidget {
           children: [
             Image.asset(content.image, height: 105.percentWidth),
             presenter.currentUiState.isLoading
-                ? LoadingIndicator(
-                    theme: theme,
-                    ringColor: context.color.primaryColor400,
-                  )
+                ? LoadingIndicator(ringColor: context.color.primaryColor400)
                 : const SizedBox.shrink(),
           ],
         ),

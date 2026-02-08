@@ -39,7 +39,9 @@ class SelectLocationBottomsheet extends StatelessWidget {
               title: 'Use Current Location',
               subtitle: presenter.showLocationName(),
               isSelected: !presenter.currentUiState.isManualLocationSelected,
-              onTap: () => presenter.onUseCurrentLocationSelected(context),
+              onTap: () => presenter.onManualLocationSelected(
+                isManualLocationSelected: false,
+              ),
             ),
             gapH25,
             CustomRadioListTile(
@@ -99,6 +101,7 @@ class SelectLocationBottomsheet extends StatelessWidget {
             gapH25,
             CustomButton(
               title: 'Save',
+              isLoading: presenter.currentUiState.isLoading,
               onPressed: () => presenter.onSaveLocationSelected(context),
               horizontalPadding: 0,
             ),

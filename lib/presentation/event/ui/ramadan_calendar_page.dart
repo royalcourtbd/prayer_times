@@ -7,6 +7,7 @@ import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/domain/entities/ramadan_day_entity.dart';
 import 'package:prayer_times/presentation/common/custom_app_bar.dart';
+import 'package:prayer_times/presentation/common/loading_indicator.dart';
 
 import 'package:prayer_times/presentation/event/pesenter/ramadan_calendar_presenter.dart';
 
@@ -184,10 +185,7 @@ class RamadanCalendarPage extends StatelessWidget {
 
   Widget _buildLoadingIndicator() {
     return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(32.0),
-        child: CircularProgressIndicator(),
-      ),
+      child: Padding(padding: EdgeInsets.all(32.0), child: LoadingIndicator()),
     );
   }
 

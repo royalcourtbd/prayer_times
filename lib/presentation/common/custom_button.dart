@@ -3,12 +3,14 @@ import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/external_libs/svg_image.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/presentation/common/loading_indicator.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
     required this.title,
     required this.onPressed,
     this.isPrimary = true,
+    this.isLoading = false,
     this.width,
     this.horizontalPadding,
     this.liftIconPath,
@@ -19,6 +21,7 @@ class CustomButton extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
   final bool isPrimary;
+  final bool isLoading;
   final double? horizontalPadding;
   final String? liftIconPath;
   final String? rightIconPath;
@@ -30,7 +33,7 @@ class CustomButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding ?? twentyPx),
       child: GestureDetector(
-        onTap: onPressed,
+        onTap: isLoading ? null : onPressed,
         child: Container(
           height: fiftyPx,
           alignment: Alignment.center,
@@ -42,23 +45,38 @@ class CustomButton extends StatelessWidget {
                 : Border.all(color: context.color.primaryColor300),
             borderRadius: BorderRadius.circular(twentySevenPx),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (liftIconPath != null) ...[SvgImage(liftIconPath!), gapW10],
-              Text(
-                title,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: fourteenPx,
-                  color: isPrimary
-                      ? context.color.buttonColor
-                      : context.color.buttonBgColor,
+          child: isLoading
+              ? SizedBox(
+                  height: twentyFourPx,
+                  width: twentyFourPx,
+                  child: LoadingIndicator(
+                    color: context.color.buttonColor,
+                    ringColor: context.color.buttonColor.withOpacityInt(100),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (liftIconPath != null) ...[
+                      SvgImage(liftIconPath!),
+                      gapW10,
+                    ],
+                    Text(
+                      title,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        fontSize: fourteenPx,
+                        color: isPrimary
+                            ? context.color.buttonColor
+                            : context.color.buttonBgColor,
+                      ),
+                    ),
+                    if (rightIconPath != null) ...[
+                      gapW10,
+                      SvgImage(rightIconPath!),
+                    ],
+                  ],
                 ),
-              ),
-              if (rightIconPath != null) ...[gapW10, SvgImage(rightIconPath!)],
-            ],
-          ),
         ),
       ),
     );
