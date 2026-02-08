@@ -92,6 +92,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
             selectedJuristicMethod: method,
           );
           onPrayerTimeUpdateRequired?.call();
+          showMessage(message: 'Juristic method saved successfully');
         },
       );
     });
@@ -124,6 +125,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
             selectedCalculationMethod: method,
           );
           onPrayerTimeUpdateRequired?.call();
+          showMessage(message: 'Calculation method saved successfully');
         },
       );
     });
