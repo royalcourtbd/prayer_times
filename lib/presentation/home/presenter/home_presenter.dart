@@ -26,6 +26,7 @@ import 'package:prayer_times/presentation/home/models/fasting_state.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
 import 'package:prayer_times/presentation/home/presenter/home_ui_state.dart';
 import 'package:prayer_times/presentation/prayer_tracker/presenter/prayer_tracker_presenter.dart';
+import 'package:prayer_times/data/services/in_app_review_service.dart';
 import 'package:prayer_times/presentation/settings/widgets/select_location_bottomsheet.dart';
 
 class HomePresenter extends BasePresenter<HomeUiState> {
@@ -71,8 +72,15 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     _startTimer();
     checkNotificationPermission();
     _syncEventsInBackground();
+    _trackLaunchAndRequestReview();
 
     prayerTimesScrollController.addListener(_onUserScroll);
+  }
+
+  Future<void> _trackLaunchAndRequestReview() async {
+    final inAppReviewService = locate<InAppReviewService>();
+    await inAppReviewService.trackAppLaunch();
+    await inAppReviewService.requestReviewIfEligible();
   }
 
   Future<void> _syncEventsInBackground() async {
