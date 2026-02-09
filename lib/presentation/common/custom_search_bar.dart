@@ -4,14 +4,16 @@ import 'package:prayer_times/core/external_libs/user_input_field/user_input_fiel
 import 'package:prayer_times/core/static/svg_path.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 
-class ReciterSearchBar extends StatelessWidget {
-  const ReciterSearchBar({
+class CustomSearchBar extends StatelessWidget {
+  const CustomSearchBar({
     super.key,
     required TextEditingController searchController,
+    required this.hintText,
     this.onChanged,
   }) : _searchController = searchController;
 
   final TextEditingController _searchController;
+  final String hintText;
   final Function(String)? onChanged;
 
   @override
@@ -26,8 +28,8 @@ class ReciterSearchBar extends StatelessWidget {
       onChanged: onChanged,
       prefixIconPath: SvgPath.icSearch,
       prefixIconColor: context.color.primaryColor,
-      hintText: 'Search Reciter',
-      borderColor: context.color.primaryColor.withValues(alpha: 0.5),
+      hintText: hintText,
+      borderColor: context.color.primaryColor.withValues(alpha: 0.7),
       borderRadius: BorderRadius.circular(50),
     );
   }
