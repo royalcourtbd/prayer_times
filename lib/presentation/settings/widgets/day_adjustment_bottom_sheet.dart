@@ -41,52 +41,49 @@ class DayAdjustmentBottomSheet extends StatelessWidget {
         gapH20,
         SizedBox(
           height: fortyFivePx,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: adjustmentValues.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              final value = adjustmentValues[index];
+          child: Row(
+            children: adjustmentValues.map((value) {
               final isSelected =
                   presenter.currentUiState.selectedDayAdjustment == value;
               final String label = value > 0 ? '+$value' : '$value';
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: fourPx),
-                child: GestureDetector(
-                  onTap: () async {
-                    await presenter.onDayAdjustmentChanged(value: value);
-                    if (context.mounted) {
-                      context.navigatorPop();
-                    }
-                  },
-                  child: Container(
-                    constraints: BoxConstraints(minWidth: fortyFivePx),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: twelvePx,
-                      vertical: tenPx,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.color.primaryColor
-                          : context.color.blackColor100,
-                      borderRadius: radius8,
-                    ),
-                    child: Center(
-                      child: Text(
-                        label,
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          fontSize: fourteenPx,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected
-                              ? context.color.whiteColor
-                              : context.color.titleColor,
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: fourPx),
+                  child: GestureDetector(
+                    onTap: () async {
+                      await presenter.onDayAdjustmentChanged(value: value);
+                      if (context.mounted) {
+                        context.navigatorPop();
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: twelvePx,
+                        vertical: tenPx,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? context.color.primaryColor
+                            : context.color.blackColor100,
+                        borderRadius: radius8,
+                      ),
+                      child: Center(
+                        child: Text(
+                          label,
+                          style: theme.textTheme.bodyMedium!.copyWith(
+                            fontSize: fourteenPx,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected
+                                ? context.color.whiteColor
+                                : context.color.titleColor,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
               );
-            },
+            }).toList(),
           ),
         ),
         gapH20,
