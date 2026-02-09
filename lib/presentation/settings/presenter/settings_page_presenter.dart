@@ -15,6 +15,7 @@ import 'package:prayer_times/domain/usecases/search_countries_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_calculation_method_usecase.dart';
 import 'package:prayer_times/domain/usecases/update_juristic_method_usecase.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
+import 'package:prayer_times/presentation/event/pesenter/event_presenter.dart';
 import 'package:prayer_times/presentation/event/pesenter/ramadan_calendar_presenter.dart';
 import 'package:prayer_times/presentation/settings/presenter/settings_page_ui_state.dart';
 import 'package:prayer_times/presentation/settings/widgets/calcutation_method_bottom_sheet.dart';
@@ -46,6 +47,7 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
   SettingsPageUiState get currentUiState => uiState.value;
 
   final HomePresenter _homePresenter = locate<HomePresenter>();
+  final EventPresenter _eventPresenter = locate<EventPresenter>();
   final RamadanCalendarPresenter _ramadanCalendarPresenter =
       locate<RamadanCalendarPresenter>();
 
@@ -143,6 +145,8 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
     await _hijriDateService.saveDayAdjustment(value);
     uiState.value = currentUiState.copyWith(selectedDayAdjustment: value);
     _homePresenter.refreshLocationAndPrayerTimes();
+    _eventPresenter.loadEvents();
+    _ramadanCalendarPresenter.loadRamadanCalendar();
     showMessage(message: 'Day adjustment saved successfully');
   }
 
