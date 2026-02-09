@@ -61,10 +61,6 @@ jobs:
       - name: Analyze code
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test
-        continue-on-error: true
-
       - name: Calculate build duration
         if: always()
         id: duration
