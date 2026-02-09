@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
-import 'package:prayer_times/core/utility/utility.dart';
+import 'package:prayer_times/presentation/audio/ui/audio_page.dart';
 import 'package:prayer_times/presentation/event/ui/event_page.dart';
 import 'package:prayer_times/presentation/main/presenter/main_presenter.dart';
 import 'package:prayer_times/presentation/main/presenter/main_ui_state.dart';
@@ -20,8 +20,7 @@ class MainPage extends StatelessWidget {
     HomePage(),
     PrayerTrackerPage(),
     EventPage(),
-    EventPage(),
-
+    const AudioPage(),
     SettingsPage(),
   ];
 
@@ -40,10 +39,6 @@ class MainPage extends StatelessWidget {
             bottomNavigationBar: MainNavigationBar(
               selectedIndex: state.selectedBottomNavIndex,
               onDestinationSelected: (index) {
-                if (index == 3) {
-                  showMessage(message: 'Coming soon');
-                  return;
-                }
                 _mainPresenter.changeNavigationIndex(index);
               },
             ),

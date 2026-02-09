@@ -20,6 +20,7 @@ class SvgPath {
       'assets/svg/ic_notification_outline.svg';
   static const String icGpsOutline = 'assets/svg/ic_gps_outline.svg';
   static const String icFazrOutline = 'assets/svg/ic_fazr_outline.svg';
+  static const String icSearch = 'assets/svg/ic_search.svg';
   static const String icFazrFill = 'assets/svg/ic_fazr_fill.svg';
   static const String icDhuhrOutline = 'assets/svg/ic_dhur_outline.svg';
   static const String icDhuhrFill = 'assets/svg/ic_dhur_fill.svg';

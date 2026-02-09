@@ -13,6 +13,8 @@ class PrayerTimes extends StatelessWidget {
 
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
+  static final RouteObserver<PageRoute<dynamic>> appRouteObserver =
+      RouteObserver<PageRoute<dynamic>>();
 
   static BuildContext get globalContext =>
       navigatorKey.currentContext ?? Get.context!;
@@ -23,6 +25,7 @@ class PrayerTimes extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return GetMaterialApp(
           navigatorKey: navigatorKey,
+          navigatorObservers: [PrayerTimes.appRouteObserver],
           builder: (context, child) {
             return Overlay(
               initialEntries: [OverlayEntry(builder: (context) => child!)],
