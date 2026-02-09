@@ -8,9 +8,11 @@ class ReciterSearchBar extends StatelessWidget {
   const ReciterSearchBar({
     super.key,
     required TextEditingController searchController,
+    this.onChanged,
   }) : _searchController = searchController;
 
   final TextEditingController _searchController;
+  final Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,7 @@ class ReciterSearchBar extends StatelessWidget {
         fontSize: fourteenPx,
         color: context.color.placeHolderColor,
       ),
+      onChanged: onChanged,
       prefixIconPath: SvgPath.icSearch,
       prefixIconColor: context.color.primaryColor,
       hintText: 'Search Reciter',
