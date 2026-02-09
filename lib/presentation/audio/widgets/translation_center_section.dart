@@ -84,18 +84,6 @@ class _TranslatorItem extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.all(twoPx),
-                  decoration: BoxDecoration(
-                    color: context.color.whiteColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(flag, style: TextStyle(fontSize: fourteenPx)),
-                ),
-              ),
             ],
           ),
           SizedBox(height: sixPx),
