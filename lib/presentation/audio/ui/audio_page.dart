@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/presentation/audio/widgets/education_section.dart';
-import 'package:prayer_times/presentation/audio/widgets/custom_search_bar.dart';
+import 'package:prayer_times/presentation/common/custom_search_bar.dart';
 import 'package:prayer_times/presentation/audio/widgets/top_pick_section.dart';
 import 'package:prayer_times/presentation/audio/widgets/translation_center_section.dart';
 import 'package:prayer_times/presentation/common/custom_app_bar.dart';
