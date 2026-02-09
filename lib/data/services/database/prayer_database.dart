@@ -7,7 +7,9 @@ import 'package:prayer_times/data/services/database/database_loader.dart';
 import 'package:prayer_times/data/services/database/table/prayer_tracker_table.dart';
 part 'prayer_database.g.dart';
 
-@DriftDatabase(tables: [JuristicMethodTable, PrayerTrackerTable, CalculationMethodTable])
+@DriftDatabase(
+  tables: [JuristicMethodTable, PrayerTrackerTable, CalculationMethodTable],
+)
 class PrayerDatabase extends _$PrayerDatabase {
   PrayerDatabase({QueryExecutor? queryExecutor})
     : super(queryExecutor ?? loadDatabase());

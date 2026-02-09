@@ -13,10 +13,7 @@ import 'package:equatable/equatable.dart';
 /// This class helps to improve code readability, maintainability, and
 /// reduces the risk of errors in the UI.
 abstract class BaseUiState extends Equatable {
-  const BaseUiState({
-    required this.isLoading,
-    required this.userMessage,
-  });
+  const BaseUiState({required this.isLoading, required this.userMessage});
 
   final bool isLoading;
   final String? userMessage;

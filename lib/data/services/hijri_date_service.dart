@@ -11,7 +11,9 @@ class HijriDateService {
 
   Future<void> saveDayAdjustment(int value) async {
     await _cacheService.saveData(
-        key: CacheKeys.hijriDayAdjustment, value: value);
+      key: CacheKeys.hijriDayAdjustment,
+      value: value,
+    );
   }
 
   HijriCalendar fromDate(DateTime date) {

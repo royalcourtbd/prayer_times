@@ -38,24 +38,30 @@ class ServiceSetup implements SetupModule {
         () => WaqtCalculationServiceImpl(),
       )
       ..registerLazySingleton(() => TimezoneService())
-      ..registerLazySingleton(() => TimezoneLookupService(
-        _serviceLocator.get<CountryLocalDataSource>(),
-      ))
-      ..registerLazySingleton(() => TimeService(_serviceLocator.get<TimezoneService>()))
+      ..registerLazySingleton(
+        () => TimezoneLookupService(
+          _serviceLocator.get<CountryLocalDataSource>(),
+        ),
+      )
+      ..registerLazySingleton(
+        () => TimeService(_serviceLocator.get<TimezoneService>()),
+      )
       ..registerLazySingleton(BackendAsAService.new)
       ..registerLazySingleton(() => PrayerDatabase())
       ..registerLazySingleton(() => LocationService())
       ..registerLazySingleton(LocalCacheService.new)
-      ..registerLazySingleton(() => InAppReviewService(
-            InAppReview.instance,
-            _serviceLocator<LocalCacheService>(),
-          ))
-      ..registerLazySingleton(() => HijriDateService(
-            _serviceLocator<LocalCacheService>(),
-          ))
-      ..registerLazySingleton(() => IslamicEventService(
-            _serviceLocator<HijriDateService>(),
-          ));
+      ..registerLazySingleton(
+        () => InAppReviewService(
+          InAppReview.instance,
+          _serviceLocator<LocalCacheService>(),
+        ),
+      )
+      ..registerLazySingleton(
+        () => HijriDateService(_serviceLocator<LocalCacheService>()),
+      )
+      ..registerLazySingleton(
+        () => IslamicEventService(_serviceLocator<HijriDateService>()),
+      );
 
     await LocalCacheService.setUp();
 

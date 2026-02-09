@@ -79,7 +79,10 @@ class BackendAsAService {
     Map<String, dynamic>? appUpdateInfo = {};
     appUpdateInfo = await catchAndReturnFuture(() async {
       final DocumentSnapshot<Map<String, dynamic>> docSnapshot =
-          await _fireStore.collection(settingsCollection).doc(appUpdateDoc).get();
+          await _fireStore
+              .collection(settingsCollection)
+              .doc(appUpdateDoc)
+              .get();
       return docSnapshot.data();
     });
     return appUpdateInfo ?? {};

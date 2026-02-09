@@ -12,9 +12,11 @@ class SlideInUp extends StatefulWidget {
     this.from = 100,
   }) {
     if (manualTrigger == true && controller == null) {
-      throw FlutterError('If you want to use manualTrigger:true, \n\n'
-          'Then you must provide the controller property, that is a callback like:\n\n'
-          ' ( controller: AnimationController) => yourController = controller \n\n');
+      throw FlutterError(
+        'If you want to use manualTrigger:true, \n\n'
+        'Then you must provide the controller property, that is a callback like:\n\n'
+        ' ( controller: AnimationController) => yourController = controller \n\n',
+      );
     }
   }
 
@@ -49,8 +51,10 @@ class SlideInUpState extends State<SlideInUp>
 
     controller = AnimationController(duration: widget.duration, vsync: this);
 
-    animation = Tween<double>(begin: widget.from, end: 0)
-        .animate(CurvedAnimation(parent: controller!, curve: Curves.easeOut));
+    animation = Tween<double>(
+      begin: widget.from,
+      end: 0,
+    ).animate(CurvedAnimation(parent: controller!, curve: Curves.easeOut));
 
     if (!widget.manualTrigger && widget.animate) {
       Future.delayed(widget.delay, () {

@@ -48,10 +48,6 @@ class CustomRotationTransition extends AnimatedWidget {
   Widget build(BuildContext context) {
     final double turnsValue = turns.value;
     final Matrix4 transform = Matrix4.rotationZ(turnsValue * math.pi);
-    return Transform(
-      transform: transform,
-      alignment: alignment,
-      child: child,
-    );
+    return Transform(transform: transform, alignment: alignment, child: child);
   }
 }

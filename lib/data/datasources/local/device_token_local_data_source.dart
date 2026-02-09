@@ -13,9 +13,7 @@ class DeviceTokenLocalDataSource {
   }
 
   String? getDeviceToken() {
-    return _localCacheService.getData<String>(
-      key: CacheKeys.fcmDeviceToken,
-    );
+    return _localCacheService.getData<String>(key: CacheKeys.fcmDeviceToken);
   }
 
   Future<void> deleteDeviceToken() async {

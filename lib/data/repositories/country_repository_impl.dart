@@ -16,8 +16,9 @@ class CountryRepositoryImpl implements CountryRepository {
   Future<List<CountryNameEntity>> searchCountries(String query) async {
     final countries = await _localDataSource.getAllCountries();
     return countries
-        .where((country) =>
-            country.name.toLowerCase().contains(query.toLowerCase()))
+        .where(
+          (country) => country.name.toLowerCase().contains(query.toLowerCase()),
+        )
         .toList();
   }
 }

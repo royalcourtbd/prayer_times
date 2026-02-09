@@ -18,13 +18,11 @@ class EventLocalDataSourceImpl implements EventLocalDataSource {
 
   @override
   Future<void> cacheEvents(List<EventEntity> events) async {
-    final List<Map<String, dynamic>> jsonList =
-        events.map((event) => EventModel.fromEntity(event).toJson()).toList();
+    final List<Map<String, dynamic>> jsonList = events
+        .map((event) => EventModel.fromEntity(event).toJson())
+        .toList();
     final String jsonString = jsonEncode(jsonList);
-    await _localCacheService.saveData(
-      key: CacheKeys.events,
-      value: jsonString,
-    );
+    await _localCacheService.saveData(key: CacheKeys.events, value: jsonString);
   }
 
   @override
@@ -51,9 +49,6 @@ class EventLocalDataSourceImpl implements EventLocalDataSource {
 
   @override
   Future<void> cacheYear(int year) async {
-    await _localCacheService.saveData(
-      key: CacheKeys.eventsYear,
-      value: year,
-    );
+    await _localCacheService.saveData(key: CacheKeys.eventsYear, value: year);
   }
 }

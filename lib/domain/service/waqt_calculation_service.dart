@@ -6,18 +6,16 @@ import '../../presentation/home/models/waqt.dart';
 
 abstract class WaqtCalculationService {
   Either<String, ({WaqtType activeWaqt, WaqtType nextWaqt})>
-      calculateActiveWaqt({
+  calculateActiveWaqt({
     required PrayerTimeEntity prayerTime,
     required DateTime currentTime,
   });
 
   Either<
-      String,
-      ({
-        Duration remainingDuration,
-        Duration totalDuration,
-        double progress,
-      })> calculateRemainingTime({
+    String,
+    ({Duration remainingDuration, Duration totalDuration, double progress})
+  >
+  calculateRemainingTime({
     required DateTime currentWaqtTime,
     required DateTime nextWaqtTime,
     required DateTime currentTime,

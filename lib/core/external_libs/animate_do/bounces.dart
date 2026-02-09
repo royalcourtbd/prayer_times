@@ -12,9 +12,11 @@ class BounceInDown extends StatefulWidget {
     this.from = 75,
   }) {
     if (manualTrigger == true && controller == null) {
-      throw FlutterError('If you want to use manualTrigger:true, \n\n'
-          'Then you must provide the controller property, that is a callback like:\n\n'
-          ' ( controller: AnimationController) => yourController = controller \n\n');
+      throw FlutterError(
+        'If you want to use manualTrigger:true, \n\n'
+        'Then you must provide the controller property, that is a callback like:\n\n'
+        ' ( controller: AnimationController) => yourController = controller \n\n',
+      );
     }
   }
 
@@ -54,8 +56,10 @@ class BounceInDownState extends State<BounceInDown>
       CurvedAnimation(parent: controller!, curve: const Interval(0, 0.65)),
     );
 
-    animation = Tween<double>(begin: widget.from * -1, end: 0)
-        .animate(CurvedAnimation(parent: controller!, curve: Curves.bounceOut));
+    animation = Tween<double>(
+      begin: widget.from * -1,
+      end: 0,
+    ).animate(CurvedAnimation(parent: controller!, curve: Curves.bounceOut));
 
     if (!widget.manualTrigger && widget.animate) {
       Future.delayed(widget.delay, () {
@@ -104,9 +108,11 @@ class BounceInUp extends StatelessWidget {
     this.from = 75,
   }) {
     if (manualTrigger == true && controller == null) {
-      throw FlutterError('If you want to use manualTrigger:true, \n\n'
-          'Then you must provide the controller property, that is a callback like:\n\n'
-          ' ( controller: AnimationController) => yourController = controller \n\n');
+      throw FlutterError(
+        'If you want to use manualTrigger:true, \n\n'
+        'Then you must provide the controller property, that is a callback like:\n\n'
+        ' ( controller: AnimationController) => yourController = controller \n\n',
+      );
     }
   }
 
@@ -120,12 +126,12 @@ class BounceInUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BounceInDown(
-        duration: duration,
-        delay: delay,
-        controller: controller,
-        manualTrigger: manualTrigger,
-        animate: animate,
-        from: from * -1,
-        child: child,
-      );
+    duration: duration,
+    delay: delay,
+    controller: controller,
+    manualTrigger: manualTrigger,
+    animate: animate,
+    from: from * -1,
+    child: child,
+  );
 }

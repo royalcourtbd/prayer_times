@@ -40,8 +40,12 @@ class PrayerTimeDataSourceImpl implements PrayerTimeDataSource {
     final Either<String, String> calculationResult =
         await _calculationMethodRepository.getCalculationMethod();
 
-    return juristicResult.fold((error) => throw Exception(error), (juristicMethod) {
-      return calculationResult.fold((error) => throw Exception(error), (calculationMethodId) async {
+    return juristicResult.fold((error) => throw Exception(error), (
+      juristicMethod,
+    ) {
+      return calculationResult.fold((error) => throw Exception(error), (
+        calculationMethodId,
+      ) async {
         final Coordinates coordinates = Coordinates(latitude, longitude);
         final CalculationMethodEntity calculationMethod =
             CalculationMethodEntity.getById(calculationMethodId);
@@ -67,7 +71,9 @@ class PrayerTimeDataSourceImpl implements PrayerTimeDataSource {
           startFajr: convertToTimezone(prayerTimes.fajr),
           fajrEnd: convertToTimezone(prayerTimes.sunrise),
           sunrise: convertToTimezone(prayerTimes.sunrise),
-          duhaStart: convertToTimezone(prayerTimes.sunrise).add(const Duration(minutes: 15)),
+          duhaStart: convertToTimezone(
+            prayerTimes.sunrise,
+          ).add(const Duration(minutes: 15)),
           duhaEnd: convertToTimezone(prayerTimes.dhuhr),
           startDhuhr: convertToTimezone(prayerTimes.dhuhr),
           dhuhrEnd: convertToTimezone(prayerTimes.asr),
@@ -76,7 +82,9 @@ class PrayerTimeDataSourceImpl implements PrayerTimeDataSource {
           startMaghrib: convertToTimezone(prayerTimes.maghrib),
           maghribEnd: convertToTimezone(prayerTimes.isha),
           startIsha: convertToTimezone(prayerTimes.isha),
-          ishaEnd: convertToTimezone(prayerTimes.fajr).add(const Duration(days: 1)),
+          ishaEnd: convertToTimezone(
+            prayerTimes.fajr,
+          ).add(const Duration(days: 1)),
         );
       });
     });

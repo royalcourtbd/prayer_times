@@ -14,8 +14,8 @@ class GetAppUpdateInfoUseCase extends BaseUseCase<AppUpdateEntity> {
 
   Future<Either<String, AppUpdateEntity>> execute() async {
     return mapResultToEither(() async {
-      final Either<String, AppUpdateEntity> result =
-          await _repository.getAppUpdateInfo();
+      final Either<String, AppUpdateEntity> result = await _repository
+          .getAppUpdateInfo();
       return result.fold((l) => throw Exception(l), (r) => r);
     });
   }

@@ -12,8 +12,8 @@ class InitializeDeviceTokenUseCase extends BaseUseCase<String> {
 
   Future<Either<String, String>> execute() async {
     return mapResultToEither(() async {
-      final Either<String, String> result =
-          await _deviceTokenRepository.initializeDeviceToken();
+      final Either<String, String> result = await _deviceTokenRepository
+          .initializeDeviceToken();
       return result.getOrElse((l) => throw Exception(l));
     });
   }

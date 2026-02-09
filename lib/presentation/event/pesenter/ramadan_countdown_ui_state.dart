@@ -22,16 +22,16 @@ class RamadanCountdownUiState extends BaseUiState {
   final int? currentRamadanDay;
 
   factory RamadanCountdownUiState.empty() => const RamadanCountdownUiState(
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-        isRamadan: false,
-        shouldShow: false,
-        currentRamadanDay: null,
-        isLoading: false,
-        userMessage: null,
-      );
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isRamadan: false,
+    shouldShow: false,
+    currentRamadanDay: null,
+    isLoading: false,
+    userMessage: null,
+  );
 
   RamadanCountdownUiState copyWith({
     int? days,
@@ -59,14 +59,14 @@ class RamadanCountdownUiState extends BaseUiState {
 
   @override
   List<Object?> get props => [
-        days,
-        hours,
-        minutes,
-        seconds,
-        isRamadan,
-        shouldShow,
-        currentRamadanDay,
-        isLoading,
-        userMessage,
-      ];
+    days,
+    hours,
+    minutes,
+    seconds,
+    isRamadan,
+    shouldShow,
+    currentRamadanDay,
+    isLoading,
+    userMessage,
+  ];
 }

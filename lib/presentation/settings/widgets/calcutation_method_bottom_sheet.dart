@@ -40,7 +40,8 @@ class CalculationMethodBottomSheet extends StatelessWidget {
             CalculationMethodEntity.allMethods;
 
         // Access observable early to ensure GetX tracks it properly
-        final String selectedMethod = presenter.currentUiState.selectedCalculationMethod;
+        final String selectedMethod =
+            presenter.currentUiState.selectedCalculationMethod;
 
         return CustomModalSheet(
           theme: theme,

@@ -41,10 +41,7 @@ void _logInfoStatic<T extends Object>(T? object) {
 /// Exception: An error occurred.
 /// ```
 ///
-void logErrorStatic<T extends Object>(
-  T? exception,
-  String name,
-) {
+void logErrorStatic<T extends Object>(T? exception, String name) {
   if (!showLog) return;
 
   final String logName = "$name ERROR - ${DateTime.now()}";
@@ -66,10 +63,7 @@ void logErrorStatic<T extends Object>(
 /// Debug message.
 /// ```
 ///
-void logDebugStatic<T extends Object>(
-  T? object,
-  String name,
-) {
+void logDebugStatic<T extends Object>(T? object, String name) {
   if (!showLog) return;
 
   final String logName = "$name DEBUG - ${DateTime.now()}";

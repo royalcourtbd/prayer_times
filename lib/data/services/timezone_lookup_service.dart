@@ -45,18 +45,22 @@ class TimezoneLookupService {
       _cities = [];
       for (final country in countries) {
         for (final city in country.cities) {
-          _cities!.add(_CityWithTimezone(
-            latitude: city.latitude,
-            longitude: city.longitude,
-            timezone: city.timezone,
-          ));
+          _cities!.add(
+            _CityWithTimezone(
+              latitude: city.latitude,
+              longitude: city.longitude,
+              timezone: city.timezone,
+            ),
+          );
         }
         // Also add the country itself as a fallback
-        _cities!.add(_CityWithTimezone(
-          latitude: country.latitude,
-          longitude: country.longitude,
-          timezone: country.timezone,
-        ));
+        _cities!.add(
+          _CityWithTimezone(
+            latitude: country.latitude,
+            longitude: country.longitude,
+            timezone: country.timezone,
+          ),
+        );
       }
     } catch (e) {
       _cities = [];

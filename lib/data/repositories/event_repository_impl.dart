@@ -25,12 +25,13 @@ class EventRepositoryImpl implements EventRepository {
       final int currentYear = DateTime.now().year;
 
       // Part A: Fixed-date events (always generated)
-      final List<EventModel> fixedDateEvents =
-          _generateFixedDateEvents(currentYear);
+      final List<EventModel> fixedDateEvents = _generateFixedDateEvents(
+        currentYear,
+      );
 
       // Part B: Islamic events (always calculated from Hijri)
-      final List<EventModel> islamicEvents =
-          _islamicEventService.generateIslamicEvents(currentYear);
+      final List<EventModel> islamicEvents = _islamicEventService
+          .generateIslamicEvents(currentYear);
 
       // Part C: Firebase events (cache-first from Hive)
       final List<EventEntity> firebaseEvents = await _getFirebaseEvents(
@@ -111,16 +112,17 @@ class EventRepositoryImpl implements EventRepository {
     if (!forceRefresh) {
       final int? cachedYear = _localDataSource.getCachedYear();
       if (cachedYear != null && cachedYear == currentYear) {
-        final List<EventEntity>? cachedEvents =
-            await _localDataSource.getCachedEvents();
+        final List<EventEntity>? cachedEvents = await _localDataSource
+            .getCachedEvents();
         if (cachedEvents != null && cachedEvents.isNotEmpty) {
           return cachedEvents;
         }
       }
     }
 
-    final List<EventModel> remoteEvents =
-        await _remoteDataSource.getEvents(currentYear);
+    final List<EventModel> remoteEvents = await _remoteDataSource.getEvents(
+      currentYear,
+    );
 
     if (remoteEvents.isNotEmpty) {
       await _localDataSource.cacheEvents(remoteEvents);

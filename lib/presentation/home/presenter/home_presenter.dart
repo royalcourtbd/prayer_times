@@ -109,7 +109,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
 
         if (!isUpdateAvailable) return;
 
-        final bool isForceUpdate = appUpdate.forceUpdate ||
+        final bool isForceUpdate =
+            appUpdate.forceUpdate ||
             _isBelowMinSupported(currentVersion, appUpdate.minSupportedVersion);
 
         // force update না হলে, user আগে dismiss করে থাকলে আবার দেখাবে না

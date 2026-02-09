@@ -8,26 +8,31 @@ import '../../presentation/home/models/waqt.dart';
 class WaqtCalculationServiceImpl implements WaqtCalculationService {
   @override
   Either<String, ({WaqtType activeWaqt, WaqtType nextWaqt})>
-      calculateActiveWaqt({
+  calculateActiveWaqt({
     required PrayerTimeEntity prayerTime,
     required DateTime currentTime,
   }) {
     try {
       final List<MapEntry<WaqtType, DateTime>> prayers = [];
-      final DateTime today =
-          DateTime(currentTime.year, currentTime.month, currentTime.day);
+      final DateTime today = DateTime(
+        currentTime.year,
+        currentTime.month,
+        currentTime.day,
+      );
 
       // Add yesterday's Isha
-      final DateTime yesterdayIsha =
-          prayerTime.startIsha.subtract(const Duration(days: 1));
+      final DateTime yesterdayIsha = prayerTime.startIsha.subtract(
+        const Duration(days: 1),
+      );
       prayers.add(MapEntry(WaqtType.isha, yesterdayIsha));
 
       // Add today's prayers
       prayers.addAll(_getTodaysPrayers(prayerTime));
 
       // Add tomorrow's Fajr
-      final DateTime tomorrowFajr =
-          prayerTime.startFajr.add(const Duration(days: 1));
+      final DateTime tomorrowFajr = prayerTime.startFajr.add(
+        const Duration(days: 1),
+      );
       prayers.add(MapEntry(WaqtType.fajr, tomorrowFajr));
 
       // Calculate Isha End Time correctly
@@ -71,12 +76,10 @@ class WaqtCalculationServiceImpl implements WaqtCalculationService {
 
   @override
   Either<
-      String,
-      ({
-        Duration remainingDuration,
-        Duration totalDuration,
-        double progress
-      })> calculateRemainingTime({
+    String,
+    ({Duration remainingDuration, Duration totalDuration, double progress})
+  >
+  calculateRemainingTime({
     required DateTime currentWaqtTime,
     required DateTime nextWaqtTime,
     required DateTime currentTime,
@@ -94,20 +97,26 @@ class WaqtCalculationServiceImpl implements WaqtCalculationService {
       if (nextWaqtTime.hour < currentWaqtTime.hour &&
           currentTime.hour >= 0 &&
           currentTime.hour < 6) {
-        adjustedCurrentWaqtTime =
-            currentWaqtTime.subtract(const Duration(days: 1));
+        adjustedCurrentWaqtTime = currentWaqtTime.subtract(
+          const Duration(days: 1),
+        );
       }
 
-      final Duration totalDuration =
-          adjustedNextWaqtTime.difference(adjustedCurrentWaqtTime);
-      final Duration remainingDuration =
-          adjustedNextWaqtTime.difference(currentTime);
+      final Duration totalDuration = adjustedNextWaqtTime.difference(
+        adjustedCurrentWaqtTime,
+      );
+      final Duration remainingDuration = adjustedNextWaqtTime.difference(
+        currentTime,
+      );
 
-      final Duration validRemainingDuration =
-          remainingDuration.isNegative ? const Duration() : remainingDuration;
+      final Duration validRemainingDuration = remainingDuration.isNegative
+          ? const Duration()
+          : remainingDuration;
 
-      final double progress =
-          _calculateProgress(totalDuration, validRemainingDuration);
+      final double progress = _calculateProgress(
+        totalDuration,
+        validRemainingDuration,
+      );
 
       return right((
         remainingDuration: validRemainingDuration,
@@ -140,7 +149,8 @@ class WaqtCalculationServiceImpl implements WaqtCalculationService {
   }
 
   List<MapEntry<WaqtType, DateTime>> _getTodaysPrayers(
-      PrayerTimeEntity prayerTime) {
+    PrayerTimeEntity prayerTime,
+  ) {
     return [
       MapEntry(WaqtType.fajr, prayerTime.startFajr),
       MapEntry(WaqtType.sunrise, prayerTime.sunrise),

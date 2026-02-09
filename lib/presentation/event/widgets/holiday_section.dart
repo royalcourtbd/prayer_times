@@ -38,7 +38,11 @@ class HolidaySection extends StatelessWidget {
           ),
         ),
         gapH18,
-        GovtHolidayList(theme: theme, events: events, scrollController: scrollController),
+        GovtHolidayList(
+          theme: theme,
+          events: events,
+          scrollController: scrollController,
+        ),
       ],
     );
   }

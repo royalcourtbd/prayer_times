@@ -3,11 +3,7 @@ import 'dart:async';
 typedef EasyThrottleCallback = void Function();
 
 class _ThrottleOperation {
-  _ThrottleOperation(
-    this.callback,
-    this.timer, {
-    this.onAfter,
-  });
+  _ThrottleOperation(this.callback, this.timer, {this.onAfter});
 
   EasyThrottleCallback callback;
   EasyThrottleCallback? onAfter;

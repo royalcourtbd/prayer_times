@@ -10,10 +10,7 @@ import 'package:prayer_times/data/services/backend_as_a_service.dart';
 import 'package:prayer_times/domain/repositories/device_token_repository.dart';
 
 class DeviceTokenRepositoryImpl implements DeviceTokenRepository {
-  DeviceTokenRepositoryImpl(
-    this._backendService,
-    this._localDataSource,
-  );
+  DeviceTokenRepositoryImpl(this._backendService, this._localDataSource);
 
   final BackendAsAService _backendService;
   final DeviceTokenLocalDataSource _localDataSource;
@@ -87,10 +84,7 @@ class DeviceTokenRepositoryImpl implements DeviceTokenRepository {
         );
       } else {
         final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        return _DeviceInfo(
-          model: androidInfo.model,
-          id: androidInfo.id,
-        );
+        return _DeviceInfo(model: androidInfo.model, id: androidInfo.id);
       }
     });
   }

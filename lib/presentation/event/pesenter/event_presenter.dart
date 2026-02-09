@@ -93,9 +93,7 @@ class EventPresenter extends BasePresenter<EventUiState> {
     return filteredEvents;
   }
 
-  Map<String, List<EventEntity>> _groupEventsByMonth(
-    List<EventEntity> events,
-  ) {
+  Map<String, List<EventEntity>> _groupEventsByMonth(List<EventEntity> events) {
     final Map<String, List<EventEntity>> grouped = {};
 
     for (var event in events) {
@@ -129,7 +127,10 @@ class EventPresenter extends BasePresenter<EventUiState> {
   }
 
   /// Current বা next upcoming holiday-তে scroll করা (screen-এর center-এ)
-  void scrollToCurrentHoliday([BuildContext? context, bool forceScroll = false]) {
+  void scrollToCurrentHoliday([
+    BuildContext? context,
+    bool forceScroll = false,
+  ]) {
     try {
       if (_userScrolled && !forceScroll) return;
 
@@ -141,7 +142,11 @@ class EventPresenter extends BasePresenter<EventUiState> {
 
       int activeIndex = events.indexWhere((event) {
         final eventDate = DateTime.parse(event.date);
-        final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
+        final eventDay = DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+        );
         return !eventDay.isBefore(today);
       });
 
@@ -157,7 +162,8 @@ class EventPresenter extends BasePresenter<EventUiState> {
       final double leftPadding = twentyPx;
       final double rightMargin = twelvePx;
 
-      double activePosition = leftPadding + activeIndex * (itemWidth + rightMargin);
+      double activePosition =
+          leftPadding + activeIndex * (itemWidth + rightMargin);
       double scrollTo = activePosition - (screenWidth / 2) + (itemWidth / 2);
 
       scrollTo = scrollTo.clamp(

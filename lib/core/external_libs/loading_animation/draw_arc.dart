@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Arc extends CustomPainter {
-  Arc._(
-    this._color,
-    this._strokeWidth,
-    this._startAngle,
-    this._sweepAngle,
-  );
+  Arc._(this._color, this._strokeWidth, this._startAngle, this._sweepAngle);
   final Color _color;
   final double _strokeWidth;
   final double _sweepAngle;
@@ -18,19 +13,13 @@ class Arc extends CustomPainter {
     required double strokeWidth,
     required double startAngle,
     required double endAngle,
-  }) =>
-      SizedBox(
-        width: size,
-        height: size,
-        child: CustomPaint(
-          painter: Arc._(
-            color,
-            strokeWidth,
-            startAngle,
-            endAngle,
-          ),
-        ),
-      );
+  }) => SizedBox(
+    width: size,
+    height: size,
+    child: CustomPaint(
+      painter: Arc._(color, strokeWidth, startAngle, endAngle),
+    ),
+  );
 
   @override
   void paint(Canvas canvas, Size size) {

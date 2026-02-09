@@ -60,7 +60,9 @@ class PresenterSetup implements SetupModule {
         () => loadPresenter(SupportUsPresenter(locate(), locate())),
       )
       ..registerLazySingleton(
-        () => loadPresenter(RamadanCalendarPresenter(locate(), locate(), locate())),
+        () => loadPresenter(
+          RamadanCalendarPresenter(locate(), locate(), locate()),
+        ),
       )
       ..registerLazySingleton(
         () => loadPresenter(

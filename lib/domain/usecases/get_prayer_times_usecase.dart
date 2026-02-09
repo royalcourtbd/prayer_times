@@ -23,11 +23,11 @@ class GetPrayerTimesUseCase extends BaseUseCase<PrayerTimeEntity> {
     return mapResultToEither(() async {
       final Either<String, PrayerTimeEntity> result = await _repository
           .getPrayerTimes(
-        latitude: latitude,
-        longitude: longitude,
-        date: date,
-        timezone: timezone,
-      );
+            latitude: latitude,
+            longitude: longitude,
+            date: date,
+            timezone: timezone,
+          );
       return result.fold((l) => throw Exception(l), (r) => r);
     });
   }

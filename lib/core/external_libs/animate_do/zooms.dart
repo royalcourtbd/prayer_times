@@ -12,9 +12,11 @@ class ZoomIn extends StatefulWidget {
     this.from = 1.0,
   }) {
     if (manualTrigger == true && controller == null) {
-      throw FlutterError('If you want to use manualTrigger:true, \n\n'
-          'Then you must provide the controller property, that is a callback like:\n\n'
-          ' ( controller: AnimationController) => yourController = controller \n\n');
+      throw FlutterError(
+        'If you want to use manualTrigger:true, \n\n'
+        'Then you must provide the controller property, that is a callback like:\n\n'
+        ' ( controller: AnimationController) => yourController = controller \n\n',
+      );
     }
   }
 
@@ -48,8 +50,10 @@ class ZoomInState extends State<ZoomIn> with SingleTickerProviderStateMixin {
     super.initState();
 
     controller = AnimationController(duration: widget.duration, vsync: this);
-    fade = Tween(begin: 0.001, end: widget.from)
-        .animate(CurvedAnimation(curve: Curves.easeOut, parent: controller!));
+    fade = Tween(
+      begin: 0.001,
+      end: widget.from,
+    ).animate(CurvedAnimation(curve: Curves.easeOut, parent: controller!));
 
     opacity = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: controller!, curve: const Interval(0, 0.65)),
@@ -83,10 +87,7 @@ class ZoomInState extends State<ZoomIn> with SingleTickerProviderStateMixin {
       builder: (BuildContext context, Widget? child) {
         return Transform.scale(
           scale: fade.value,
-          child: Opacity(
-            opacity: opacity.value,
-            child: widget.child,
-          ),
+          child: Opacity(opacity: opacity.value, child: widget.child),
         );
       },
     );

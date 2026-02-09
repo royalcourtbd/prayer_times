@@ -153,9 +153,7 @@ class OnboardingPresenter extends BasePresenter<OnboardingUiState> {
     settingsPresenter.resetLocationActionFlag();
 
     // Set manual location selected flag
-    settingsPresenter.onManualLocationSelected(
-      isManualLocationSelected: true,
-    );
+    settingsPresenter.onManualLocationSelected(isManualLocationSelected: true);
 
     // Show the location selection bottomsheet
     await settingsPresenter.showSelectLocationBottomSheetAsync(context);

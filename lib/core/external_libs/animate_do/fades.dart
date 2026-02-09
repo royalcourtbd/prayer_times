@@ -11,9 +11,11 @@ class FadeIn extends StatefulWidget {
     this.animate = true,
   }) {
     if (manualTrigger == true && controller == null) {
-      throw FlutterError('If you want to use manualTrigger:true, \n\n'
-          'Then you must provide the controller property, that is a callback like:\n\n'
-          ' ( controller: AnimationController) => yourController = controller \n\n');
+      throw FlutterError(
+        'If you want to use manualTrigger:true, \n\n'
+        'Then you must provide the controller property, that is a callback like:\n\n'
+        ' ( controller: AnimationController) => yourController = controller \n\n',
+      );
     }
   }
 
@@ -75,10 +77,7 @@ class FadeInState extends State<FadeIn> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget? child) {
-        return Opacity(
-          opacity: animation.value,
-          child: widget.child,
-        );
+        return Opacity(opacity: animation.value, child: widget.child);
       },
     );
   }

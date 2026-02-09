@@ -8,8 +8,9 @@ class CountryLocalDataSource {
   Future<List<CountryNameEntity>> getAllCountries() async {
     if (_cachedCountries != null) return _cachedCountries!;
 
-    final String response =
-        await rootBundle.loadString('assets/db/country.json');
+    final String response = await rootBundle.loadString(
+      'assets/db/country.json',
+    );
     final List<dynamic> data = json.decode(response);
     _cachedCountries = data.map((e) => _mapJsonToCountry(e)).toList();
     return _cachedCountries!;
@@ -22,7 +23,8 @@ class CountryLocalDataSource {
       code: json['code'] ?? '',
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
-      cities: (json['cities'] as List<dynamic>?)
+      cities:
+          (json['cities'] as List<dynamic>?)
               ?.map((cityJson) => _mapJsonToCity(cityJson))
               .toList() ??
           [],

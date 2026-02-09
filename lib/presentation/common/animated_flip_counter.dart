@@ -51,9 +51,9 @@ class AnimatedFlipCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = DefaultTextStyle.of(context).style.merge(textStyle).merge(
-          const TextStyle(fontFeatures: [FontFeature.tabularFigures()]),
-        );
+    final style = DefaultTextStyle.of(context).style
+        .merge(textStyle)
+        .merge(const TextStyle(fontFeatures: [FontFeature.tabularFigures()]));
 
     final prototypeDigit = TextPainter(
       text: TextSpan(text: '0', style: style),

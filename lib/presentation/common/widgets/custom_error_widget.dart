@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomErrorWidget extends StatelessWidget {
-  const CustomErrorWidget({
-    super.key,
-    required this.errorDetails,
-  });
+  const CustomErrorWidget({super.key, required this.errorDetails});
 
   final FlutterErrorDetails errorDetails;
 
@@ -15,11 +12,7 @@ class CustomErrorWidget extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            color: theme.colorScheme.error,
-            size: 40,
-          ),
+          Icon(Icons.error_outline, color: theme.colorScheme.error, size: 40),
           const SizedBox(height: 16),
           Text(
             'Whoops! We hit a snag',

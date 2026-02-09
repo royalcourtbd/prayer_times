@@ -46,10 +46,7 @@ class GovtHolidayListItem extends StatelessWidget {
         children: [
           Container(
             padding: padding10,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: radius12,
-            ),
+            decoration: BoxDecoration(color: color, borderRadius: radius12),
             child: Text(
               _getDisplayDate(DateTime.parse(event.date)),
               style: theme.textTheme.bodyMedium!.copyWith(

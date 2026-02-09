@@ -70,7 +70,8 @@ class LocationLocalDataSourceImpl implements LocationLocalDataSource {
   }
 
   @override
-  ({bool isManual, String country, String city})? getCachedLocationPreference() {
+  ({bool isManual, String country, String city})?
+  getCachedLocationPreference() {
     final bool? isManual = _localCacheService.getData<bool>(
       key: CacheKeys.isManualLocation,
     );
@@ -83,10 +84,6 @@ class LocationLocalDataSourceImpl implements LocationLocalDataSource {
       key: CacheKeys.manualLocationCity,
     );
 
-    return (
-      isManual: isManual,
-      country: country ?? '',
-      city: city ?? '',
-    );
+    return (isManual: isManual, country: country ?? '', city: city ?? '');
   }
 }

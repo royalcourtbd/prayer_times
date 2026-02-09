@@ -57,13 +57,10 @@ abstract class BasePresenter<U extends BaseUiState> extends GetxController {
   }) async {
     if (showLoading) await toggleLoading(loading: true);
     final Either<String, T> result = await task();
-    result.fold(
-      (message) {
-        addUserMessage(message);
-        if (valueOnError != null) onDataLoaded(valueOnError);
-      },
-      onDataLoaded,
-    );
+    result.fold((message) {
+      addUserMessage(message);
+      if (valueOnError != null) onDataLoaded(valueOnError);
+    }, onDataLoaded);
     if (showLoading) await toggleLoading(loading: false);
   }
 

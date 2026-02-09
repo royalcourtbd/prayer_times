@@ -79,8 +79,9 @@ class HolidayListView extends StatelessWidget {
       itemCount: groupedEvents.length,
       padding: EdgeInsets.symmetric(horizontal: sixteenPx),
       itemBuilder: (context, index) {
-        final MapEntry<String, List<EventEntity>> monthEntry =
-            groupedEvents.entries.elementAt(index);
+        final MapEntry<String, List<EventEntity>> monthEntry = groupedEvents
+            .entries
+            .elementAt(index);
         return MonthEventsSection(
           month: monthEntry.key,
           events: monthEntry.value,

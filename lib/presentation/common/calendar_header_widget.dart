@@ -28,7 +28,9 @@ class CalendarHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HijriCalendar hijri = locate<HijriDateService>().fromDate(selectedDate);
+    final HijriCalendar hijri = locate<HijriDateService>().fromDate(
+      selectedDate,
+    );
 
     return GestureDetector(
       onTap: onTap,

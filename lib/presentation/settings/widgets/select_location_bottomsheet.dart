@@ -48,7 +48,8 @@ class SelectLocationBottomsheet extends StatelessWidget {
                   CustomRadioListTile(
                     title: 'Use Current Location',
                     subtitle: presenter.showLocationName(),
-                    isSelected: !presenter.currentUiState.isManualLocationSelected,
+                    isSelected:
+                        !presenter.currentUiState.isManualLocationSelected,
                     onTap: () => presenter.onManualLocationSelected(
                       isManualLocationSelected: false,
                     ),
@@ -56,7 +57,8 @@ class SelectLocationBottomsheet extends StatelessWidget {
                   gapH25,
                   CustomRadioListTile(
                     title: 'Select Location Manually',
-                    isSelected: presenter.currentUiState.isManualLocationSelected,
+                    isSelected:
+                        presenter.currentUiState.isManualLocationSelected,
                     onTap: () {
                       presenter.onManualLocationSelected(
                         isManualLocationSelected: true,
@@ -89,8 +91,13 @@ class SelectLocationBottomsheet extends StatelessWidget {
                             ? 'Select City'
                             : presenter.currentUiState.selectedCity,
                         onTap: () {
-                          if (presenter.currentUiState.selectedCountry.isEmpty) {
-                            showMessage(message: 'Please select a country first');
+                          if (presenter
+                              .currentUiState
+                              .selectedCountry
+                              .isEmpty) {
+                            showMessage(
+                              message: 'Please select a country first',
+                            );
                             return;
                           }
                           if (presenter

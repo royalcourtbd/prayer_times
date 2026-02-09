@@ -5,8 +5,15 @@ import '../service/waqt_calculation_service.dart';
 import '../service/error_message_handler.dart';
 import '../../core/base/base_use_case.dart';
 
-class GetRemainingTimeUseCase extends BaseUseCase<
-    ({Duration remainingDuration, Duration totalDuration, double progress})> {
+class GetRemainingTimeUseCase
+    extends
+        BaseUseCase<
+          ({
+            Duration remainingDuration,
+            Duration totalDuration,
+            double progress,
+          })
+        > {
   final WaqtCalculationService _waqtService;
 
   GetRemainingTimeUseCase(
@@ -15,13 +22,12 @@ class GetRemainingTimeUseCase extends BaseUseCase<
   ) : super(errorMessageHandler);
 
   Future<
-      Either<
-          String,
-          ({
-            Duration remainingDuration,
-            Duration totalDuration,
-            double progress,
-          })>> execute({
+    Either<
+      String,
+      ({Duration remainingDuration, Duration totalDuration, double progress})
+    >
+  >
+  execute({
     required DateTime currentWaqtTime,
     required DateTime nextWaqtTime,
     required DateTime currentTime,

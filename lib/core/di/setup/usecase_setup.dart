@@ -76,9 +76,7 @@ class UsecaseSetup implements SetupModule {
       ..registerLazySingleton(
         () => InitializeDeviceTokenUseCase(locate(), locate()),
       )
-      ..registerLazySingleton(
-        () => GetEventsUseCase(locate(), locate()),
-      )
+      ..registerLazySingleton(() => GetEventsUseCase(locate(), locate()))
       ..registerLazySingleton(
         () => GetAppUpdateInfoUseCase(locate(), locate()),
       );
