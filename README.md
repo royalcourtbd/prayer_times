@@ -13,6 +13,7 @@ A comprehensive Islamic prayer times and calendar application built with Flutter
 ## Features
 
 ### Prayer Times
+
 - Accurate prayer time calculations for **Fajr, Dhuhr, Asr, Maghrib, Isha** along with Sunrise and Duha
 - **14 calculation methods** including Muslim World League, Umm al-Qura, ISNA, Karachi, and more
 - **Hanafi & Shafi'i** juristic method support
@@ -20,21 +21,25 @@ A comprehensive Islamic prayer times and calendar application built with Flutter
 - GPS-based and manual location selection with timezone-aware calculations
 
 ### Prayer Tracker
+
 - Track daily prayer completion status (Completed / Missed)
 - Full **tracking history** with date-based navigation
 - Visual progress indicators for each prayer
 
 ### Islamic Calendar & Events
+
 - **Hijri calendar** with adjustable day offset for regional variations
 - **Ramadan countdown** timer and dedicated Ramadan calendar with Sehri & Iftar times
 - Islamic holidays and events including Eid ul-Fitr, Eid ul-Adha, Laylat al-Qadr, Shab e-Barat, and more
 
 ### Smart Notifications
+
 - Firebase Cloud Messaging (FCM) push notifications
 - Prayer time reminders so you never miss a prayer
 - Platform-aware permission handling for iOS and Android
 
 ### Additional
+
 - **In-app update** system via Firebase
 - **In-app review** prompts
 - Support Us page with bank & mobile payment options
@@ -82,29 +87,29 @@ lib/
 
 ### Key Architectural Decisions
 
-| Concern | Solution |
-|---|---|
-| **State Management** | GetX (`GetxController` + reactive `Obs<T>`) |
-| **Dependency Injection** | `get_it` Service Locator with modular setup |
-| **Error Handling** | Functional `Either<L, R>` from `fpdart` |
-| **Local Storage** | Hive (key-value) + Drift/SQLite (structured data) |
-| **Backend** | Firebase (Firestore, FCM, Analytics, Crashlytics) |
-| **Prayer Calculation** | `adhan_dart` — offline calculation engine |
-| **Navigation** | GetX routing |
+| Concern                  | Solution                                          |
+| ------------------------ | ------------------------------------------------- |
+| **State Management**     | GetX (`GetxController` + reactive `Obs<T>`)       |
+| **Dependency Injection** | `get_it` Service Locator with modular setup       |
+| **Error Handling**       | Functional `Either<L, R>` from `fpdart`           |
+| **Local Storage**        | Hive (key-value) + Drift/SQLite (structured data) |
+| **Backend**              | Firebase (Firestore, FCM, Analytics, Crashlytics) |
+| **Prayer Calculation**   | `adhan_dart` — offline calculation engine         |
+| **Navigation**           | GetX routing                                      |
 
 ## Tech Stack
 
-| Category | Packages |
-|---|---|
-| **Framework** | Flutter 3.9.2+ / Dart |
-| **State & DI** | `get`, `get_it`, `fpdart`, `rxdart`, `equatable` |
-| **Prayer Times** | `adhan_dart`, `hijri`, `timezone`, `intl` |
-| **Firebase** | `firebase_core`, `cloud_firestore`, `firebase_messaging`, `firebase_analytics`, `firebase_crashlytics` |
-| **Database** | `drift` + `sqlite3_flutter_libs`, `hive` |
-| **Networking** | `dio` |
-| **Location** | `geolocator`, `geocoding` |
-| **UI** | `responsive_sizer`, `flutter_svg`, `arc_progress_bar_new`, `cached_network_image` |
-| **Utilities** | `logger`, `talker_logger`, `share_plus`, `url_launcher`, `in_app_review`, `device_info_plus`, `package_info_plus` |
+| Category         | Packages                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Framework**    | Flutter 3.9.2+ / Dart                                                                                             |
+| **State & DI**   | `get`, `get_it`, `fpdart`, `rxdart`, `equatable`                                                                  |
+| **Prayer Times** | `adhan_dart`, `hijri`, `timezone`, `intl`                                                                         |
+| **Firebase**     | `firebase_core`, `cloud_firestore`, `firebase_messaging`, `firebase_analytics`, `firebase_crashlytics`            |
+| **Database**     | `drift` + `sqlite3_flutter_libs`, `hive`                                                                          |
+| **Networking**   | `dio`                                                                                                             |
+| **Location**     | `geolocator`, `geocoding`                                                                                         |
+| **UI**           | `responsive_sizer`, `flutter_svg`, `arc_progress_bar_new`, `cached_network_image`                                 |
+| **Utilities**    | `logger`, `talker_logger`, `share_plus`, `url_launcher`, `in_app_review`, `device_info_plus`, `package_info_plus` |
 
 ## Getting Started
 
@@ -113,13 +118,12 @@ lib/
 - Flutter **3.9.2** or higher
 - Dart SDK
 - Firebase project configured (add your `google-services.json` / `GoogleService-Info.plist`)
-- A `.env` file at the project root (uses `flutter_dotenv`)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/aspect-suspended/prayer_times.git
+git clone https://github.com/royalcourtbd/prayer_times.git
 cd prayer_times
 
 # Install dependencies
@@ -138,25 +142,6 @@ flutter run
 2. Enable **Cloud Firestore**, **Cloud Messaging**, **Analytics**, and **Crashlytics**
 3. Add your Android and iOS apps in Firebase console
 4. Place `google-services.json` in `android/app/` and `GoogleService-Info.plist` in `ios/Runner/`
-
-## Supported Calculation Methods
-
-| # | Method |
-|---|---|
-| 1 | Muslim World League |
-| 2 | Egyptian General Authority of Survey |
-| 3 | University of Islamic Sciences, Karachi |
-| 4 | Umm al-Qura University, Makkah |
-| 5 | Dubai |
-| 6 | Qatar |
-| 7 | Kuwait |
-| 8 | Moonsighting Committee |
-| 9 | Singapore |
-| 10 | Turkey (Diyanet) |
-| 11 | Tehran |
-| 12 | ISNA (North America) |
-| 13 | Morocco |
-| 14 | Custom / Other |
 
 ## License
 
