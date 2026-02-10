@@ -134,7 +134,12 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*🔀 Track:*\n`Alpha → Production`"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*📦 App Version:*\n`${{ steps.app_version.outputs.version || 'N/A' }}`"
@@ -142,7 +147,12 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*⚡ Update Priority:*\n`${{ github.event.inputs.update_priority }}`"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*👥 Rollout:*\n`${{ steps.rollout_check.outputs.percentage || 'N/A' }}`"
