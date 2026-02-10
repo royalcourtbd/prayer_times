@@ -1,0 +1,184 @@
+name: Promote Alpha to Open Testing (Beta)
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollout_percentage:
+        description: "Rollout percentage (0.1 to 1.0, default: 1.0 = 100%)"
+        required: false
+        type: string
+        default: "1.0"
+      update_priority:
+        description: "In-app update priority (0-5, default: 2)"
+        required: false
+        type: choice
+        options:
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+        default: "2"
+      confirmation:
+        description: 'Type "OPEN-TESTING" to confirm deployment to public testers'
+        required: true
+        type: string
+
+env:
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
+
+jobs:
+  promote-to-open-testing:
+    runs-on: ubuntu-latest
+
+    steps:
+      #---------------------------------------------------
+      # SAFETY CHECK - MUST TYPE "OPEN-TESTING"
+      #---------------------------------------------------
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "OPEN-TESTING" ]; then
+            echo "❌ Safety check failed! You must type 'OPEN-TESTING' to confirm."
+            echo "⚠️  This will make the app available to ALL public testers on Play Store!"
+            exit 1
+          fi
+          echo "✅ Confirmation validated. Proceeding to open testing deployment..."
+
+      #---------------------------------------------------
+      # CHECKOUT
+      #---------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      #---------------------------------------------------
+      # GET APP VERSION FROM PUBSPEC
+      #---------------------------------------------------
+      - name: Get app version
+        id: app_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      #---------------------------------------------------
+      # VALIDATE ROLLOUT PERCENTAGE
+      #---------------------------------------------------
+      - name: Validate rollout percentage
+        id: rollout_check
+        run: |
+          VALUE="${{ github.event.inputs.rollout_percentage || '1.0' }}"
+
+          if ! [[ "$VALUE" =~ ^0\.[0-9]+$|^1(\.0+)?$ ]]; then
+            echo "❌ Invalid rollout percentage: $VALUE"
+            exit 1
+          fi
+
+          PERCENT=$(echo "scale=1; $VALUE * 100" | bc)
+          echo "percentage=${PERCENT}%" >> $GITHUB_OUTPUT
+          echo "✅ Valid rollout percentage: $VALUE (${PERCENT}%)"
+
+      #---------------------------------------------------
+      # PROMOTE ALPHA RELEASE TO OPEN TESTING (BETA) TRACK
+      #---------------------------------------------------
+      - name: Promote Alpha → Open Testing (Beta)
+        uses: kevin-david/promote-play-release@v1.1.0
+        with:
+          service-account-json-raw: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          package-name: ${{ env.PACKAGE_NAME }}
+          from-track: alpha
+          to-track: beta
+          inapp-update-priority: ${{ github.event.inputs.update_priority }}
+          user-fraction: ${{ github.event.inputs.rollout_percentage || '1.0' }}
+
+      #---------------------------------------------------
+      # SLACK NOTIFICATION (ALWAYS RUN)
+      #---------------------------------------------------
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ job.status == 'success' && '✅ Prayer Times Open Testing Promotion Success' || '❌ Prayer Times Open Testing Promotion Failed' }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ job.status == 'success' && '🧪 *App successfully promoted to Open Testing (Beta)! Public testers can now access this build.*' || '⚠️ *Open testing promotion failed. Check workflow logs.*' }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📉 Status:*\n`${{ job.status == 'success' && 'Success' || 'Failure' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*🔀 Track:*\n`Alpha → Open Testing (Beta)`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*📦 App Version:*\n`${{ steps.app_version.outputs.version || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*⚡ Update Priority:*\n`${{ github.event.inputs.update_priority }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👥 Rollout:*\n`${{ steps.rollout_check.outputs.percentage || 'N/A' }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*👤 Triggered by:*\n`${{ github.actor }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "🧪 *Open Testing is public — anyone can join via Play Store. Monitor feedback and crash reports before promoting to production.*"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📱 Open Play Store",
+                        "emoji": true
+                      },
+                      "url": "https://play.google.com/store/apps/details?id=${{ env.PACKAGE_NAME }}",
+                      "style": "primary"
+                    }
+                  ]
+                }
+              ]
+            }
