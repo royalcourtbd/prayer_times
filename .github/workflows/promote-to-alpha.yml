@@ -21,6 +21,13 @@ on:
           - "5"
         default: "2"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-alpha
+  cancel-in-progress: false
+
 env:
   PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
 

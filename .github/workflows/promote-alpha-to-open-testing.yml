@@ -25,6 +25,13 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-open-testing
+  cancel-in-progress: false
+
 env:
   PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
 
