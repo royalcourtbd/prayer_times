@@ -113,7 +113,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": "${{ job.status == 'success' && '🚨 EMERGENCY PRODUCTION Deploy' || '❌ EMERGENCY Deploy FAILED' }}",
+                    "text": "${{ job.status == 'success' && '🚨 Prayer Times EMERGENCY Production Deploy Success' || '❌ Prayer Times EMERGENCY Production Deploy Failed' }}",
                     "emoji": true
                   }
                 },
