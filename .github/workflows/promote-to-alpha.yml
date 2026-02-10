@@ -91,6 +91,13 @@ jobs:
                 },
                 {
                   "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ job.status == 'success' && '🧪 *Build promoted from Internal to Closed Testing (Alpha). Alpha testers can now access this build.*' || '⚠️ *Alpha promotion failed. Verify the internal track has an active release.*' }}"
+                  }
+                },
+                {
+                  "type": "section",
                   "fields": [
                     {
                       "type": "mrkdwn",
@@ -99,7 +106,12 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*🔀 Track:*\n`Internal → Alpha`"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*📦 App Version:*\n`${{ steps.app_version.outputs.version || 'N/A' }}`"
@@ -107,7 +119,12 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*⚡ Update Priority:*\n`${{ github.event.inputs.update_priority }}`"
-                    },
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
                     {
                       "type": "mrkdwn",
                       "text": "*👥 Rollout:*\n`${{ github.event.inputs.rollout_percentage || '1.0' }}` (100% = 1.0)"
