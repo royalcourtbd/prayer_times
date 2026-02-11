@@ -154,6 +154,15 @@ jobs:
                       },
                       "url": "https://play.google.com/store/apps/details?id=${{ env.PACKAGE_NAME }}",
                       "style": "primary"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "👥 Join Review Group",
+                        "emoji": true
+                      },
+                      "url": "https://groups.google.com/g/amatullah-app-review-group"
                     }
                   ]
                 }
