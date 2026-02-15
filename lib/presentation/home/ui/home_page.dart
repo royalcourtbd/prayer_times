@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
+import 'package:prayer_times/core/external_libs/svg_image.dart';
 import 'package:prayer_times/core/static/svg_path.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
@@ -11,6 +12,7 @@ import 'package:prayer_times/presentation/home/widgets/home_page_app_bar.dart';
 import 'package:prayer_times/presentation/home/widgets/clock_section.dart';
 import 'package:prayer_times/presentation/home/widgets/home_prayer_tracker.dart';
 import 'package:prayer_times/presentation/home/widgets/location_section.dart';
+import 'package:prayer_times/presentation/home/widgets/prayer_time_adjustment_bottom_sheet.dart';
 import 'package:prayer_times/presentation/home/widgets/prayer_time_list.dart';
 import 'package:prayer_times/presentation/home/widgets/ramadan_tracker_section.dart';
 import 'package:prayer_times/presentation/home/widgets/remaining_prayer_section.dart';
@@ -92,6 +94,41 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 gapH20,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: twentyPx),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Prayer Times',
+                        style: theme.textTheme.bodyMedium!.copyWith(
+                          fontSize: sixteenPx,
+                          fontWeight: FontWeight.w600,
+                          color: context.color.titleColor,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => PrayerTimeAdjustmentBottomSheet.show(
+                          context: context,
+                        ),
+                        borderRadius: radius8,
+                        child: Container(
+                          padding: padding6,
+                          decoration: BoxDecoration(
+                            color: context.color.whiteColor.withOpacityInt(0.7),
+                            borderRadius: radius8,
+                          ),
+                          child: SvgImage(
+                            SvgPath.icSettingsOutline,
+                            width: twentyPx,
+                            height: twentyPx,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                gapH10,
                 PrayerTimeList(
                   key: Key('prayer_time_list'),
                   theme: theme,
