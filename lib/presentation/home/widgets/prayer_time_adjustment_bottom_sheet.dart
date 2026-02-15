@@ -149,26 +149,28 @@ class _PrayerTimeAdjustmentBottomSheetState
                   trackHeight: 6,
                   activeTrackColor: context.color.primaryColor,
                   inactiveTrackColor: context.color.primaryColor200,
-                  thumbColor: context.color.primaryColor,
-                  overlayColor: context.color.primaryColor.withOpacityInt(0.2),
 
-                  thumbShape: const RoundSliderThumbShape(
-                    enabledThumbRadius: 10,
+                  overlayColor: Colors.transparent,
+                  thumbShape: CleanBorderThumb(
+                    radius: 12,
+                    borderColor: context.color.primaryColor,
                   ),
+
                   overlayShape: const RoundSliderOverlayShape(
                     overlayRadius: 20,
                   ),
+
                   trackShape: const RoundedRectSliderTrackShape(),
                 ),
                 child: Slider(
                   value: _adjustmentMinutes,
                   min: -15,
                   max: 15,
-                  divisions: 30,
                   onChanged: _isAdjustmentEnabled ? _onSliderChanged : null,
                 ),
               ),
             ),
+
             Text(
               '+15',
               style: theme.textTheme.bodySmall!.copyWith(
@@ -180,5 +182,55 @@ class _PrayerTimeAdjustmentBottomSheetState
         ),
       ],
     );
+  }
+}
+
+class CleanBorderThumb extends SliderComponentShape {
+  final double radius;
+  final Color borderColor;
+
+  const CleanBorderThumb({this.radius = 12, required this.borderColor});
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(radius);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
+  }) {
+    final Canvas canvas = context.canvas;
+
+    // Smooth press animation scale
+    final double scale = 1 + activationAnimation.value * 0.05;
+
+    final double adjustedRadius = radius * scale;
+
+    // White fill
+    final Paint fillPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(center, adjustedRadius, fillPaint);
+
+    // 0.5px border
+    final Paint borderPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    canvas.drawCircle(center, adjustedRadius, borderPaint);
   }
 }
