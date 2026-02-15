@@ -160,7 +160,7 @@ class _PrayerTimeAdjustmentBottomSheetState
                     overlayRadius: 20,
                   ),
 
-                  trackShape: const RoundedRectSliderTrackShape(),
+                  trackShape: const CenterOriginSliderTrackShape(),
                 ),
                 child: Slider(
                   value: _adjustmentMinutes,
@@ -182,6 +182,92 @@ class _PrayerTimeAdjustmentBottomSheetState
         ),
       ],
     );
+  }
+}
+
+/// Custom track shape that draws active track from center to thumb position
+/// - When value > 0: active track from center to right (towards thumb)
+/// - When value < 0: active track from center to left (towards thumb)
+class CenterOriginSliderTrackShape extends SliderTrackShape {
+  const CenterOriginSliderTrackShape();
+
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final double trackHeight = sliderTheme.trackHeight ?? 4;
+    final double trackLeft = offset.dx;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+    required TextDirection textDirection,
+  }) {
+    final double trackHeight = sliderTheme.trackHeight ?? 4;
+    final double trackRadius = trackHeight / 2;
+
+    final Rect trackRect = getPreferredRect(
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+      isEnabled: isEnabled,
+      isDiscrete: isDiscrete,
+    );
+
+    final Paint inactivePaint = Paint()
+      ..color = sliderTheme.inactiveTrackColor ?? Colors.grey;
+
+    final Paint activePaint = Paint()
+      ..color = sliderTheme.activeTrackColor ?? Colors.blue;
+
+    // Calculate center position of the track
+    final double centerX = trackRect.left + trackRect.width / 2;
+
+    // Draw the full inactive track first (background)
+    final RRect fullTrack = RRect.fromRectAndRadius(
+      trackRect,
+      Radius.circular(trackRadius),
+    );
+    context.canvas.drawRRect(fullTrack, inactivePaint);
+
+    // Draw active track from center to thumb position
+    final double thumbX = thumbCenter.dx;
+
+    if ((thumbX - centerX).abs() > 1) {
+      // Only draw if thumb is not at center
+      final double activeLeft = thumbX < centerX ? thumbX : centerX;
+      final double activeRight = thumbX > centerX ? thumbX : centerX;
+
+      final Rect activeRect = Rect.fromLTRB(
+        activeLeft,
+        trackRect.top,
+        activeRight,
+        trackRect.bottom,
+      );
+
+      final RRect activeTrack = RRect.fromRectAndRadius(
+        activeRect,
+        Radius.circular(trackRadius),
+      );
+      context.canvas.drawRRect(activeTrack, activePaint);
+    }
   }
 }
 
