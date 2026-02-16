@@ -136,17 +136,10 @@ class _PrayerTimeAdjustmentBottomSheetState
         // Slider with labels
         Row(
           children: [
-            Text(
-              '-15',
-              style: theme.textTheme.bodySmall!.copyWith(
-                fontSize: twelvePx,
-                color: context.color.subTitleColor,
-              ),
-            ),
             Expanded(
               child: SliderTheme(
                 data: SliderThemeData(
-                  trackHeight: 6,
+                  trackHeight: 9,
                   activeTrackColor: context.color.primaryColor,
                   inactiveTrackColor: context.color.primaryColor200,
 
@@ -168,14 +161,6 @@ class _PrayerTimeAdjustmentBottomSheetState
                   max: 15,
                   onChanged: _isAdjustmentEnabled ? _onSliderChanged : null,
                 ),
-              ),
-            ),
-
-            Text(
-              '+15',
-              style: theme.textTheme.bodySmall!.copyWith(
-                fontSize: twelvePx,
-                color: context.color.subTitleColor,
               ),
             ),
           ],
