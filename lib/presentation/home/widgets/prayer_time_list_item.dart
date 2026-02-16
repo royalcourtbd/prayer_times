@@ -13,12 +13,14 @@ class PrayerTimeListItem extends StatelessWidget {
     required this.waqt,
     this.isLastItem = false,
     this.onTapVolume,
+    this.isAdjustmentEnabled = false,
   });
 
   final ThemeData theme;
   final bool isLastItem;
   final WaqtViewModel waqt;
   final VoidCallback? onTapVolume;
+  final bool isAdjustmentEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class PrayerTimeListItem extends StatelessWidget {
                   GestureDetector(
                     onTap: onTapVolume,
                     child: SvgImage(
-                      SvgPath.icVolumeMute,
+                      isAdjustmentEnabled ? SvgPath.icVolumeHigh : SvgPath.icVolumeMute,
                       height: twentyPx,
                       width: twentyPx,
                       color: waqt.isActive

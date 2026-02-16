@@ -137,6 +137,7 @@ class HomePage extends StatelessWidget {
                   theme: theme,
                   waqtList: _homePresenter.waqtList,
                   scrollController: _homePresenter.prayerTimesScrollController,
+                  adjustmentEnabledMap: _homePresenter.currentUiState.adjustmentEnabledMap,
                   onTapVolume: (WaqtViewModel waqt) {
                     final String title =
                         '${waqt.displayName} (${waqt.formattedTime} ${waqt.amPm.toUpperCase()})';
