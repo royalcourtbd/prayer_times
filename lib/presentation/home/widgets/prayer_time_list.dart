@@ -9,11 +9,13 @@ class PrayerTimeList extends StatelessWidget {
     required this.theme,
     required this.waqtList,
     required this.scrollController,
+    this.onTapVolume,
   });
 
   final ThemeData theme;
   final List<WaqtViewModel> waqtList;
   final ScrollController scrollController;
+  final void Function(WaqtViewModel waqt)? onTapVolume;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,9 @@ class PrayerTimeList extends StatelessWidget {
             theme: theme,
             waqt: waqt,
             isLastItem: index == waqtList.length - 1,
+            onTapVolume: onTapVolume != null
+                ? () => onTapVolume!(waqt)
+                : null,
           );
         },
       ),

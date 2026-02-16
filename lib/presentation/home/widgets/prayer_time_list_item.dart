@@ -12,11 +12,13 @@ class PrayerTimeListItem extends StatelessWidget {
     required this.theme,
     required this.waqt,
     this.isLastItem = false,
+    this.onTapVolume,
   });
 
   final ThemeData theme;
   final bool isLastItem;
   final WaqtViewModel waqt;
+  final VoidCallback? onTapVolume;
   String _getAmPm() {
     if (waqt.time == null) return '';
     return waqt.time!.hour < 12 ? 'am' : 'pm';
@@ -70,13 +72,16 @@ class PrayerTimeListItem extends StatelessWidget {
                       : context.color.titleColor,
                 ),
                 if (!isSpecialIndex)
-                  SvgImage(
-                    SvgPath.icVolumeMute,
-                    height: twentyPx,
-                    width: twentyPx,
-                    color: waqt.isActive
-                        ? context.color.whiteColor
-                        : context.color.titleColor,
+                  GestureDetector(
+                    onTap: onTapVolume,
+                    child: SvgImage(
+                      SvgPath.icVolumeMute,
+                      height: twentyPx,
+                      width: twentyPx,
+                      color: waqt.isActive
+                          ? context.color.whiteColor
+                          : context.color.titleColor,
+                    ),
                   ),
               ],
             ),

@@ -7,6 +7,7 @@ import 'package:prayer_times/core/static/svg_path.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/presentation/common/rounded_top_container.dart';
+import 'package:prayer_times/presentation/home/models/waqt.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/home/widgets/home_page_app_bar.dart';
 import 'package:prayer_times/presentation/home/widgets/clock_section.dart';
@@ -135,6 +136,18 @@ class HomePage extends StatelessWidget {
                   theme: theme,
                   waqtList: _homePresenter.waqtList,
                   scrollController: _homePresenter.prayerTimesScrollController,
+                  onTapVolume: (WaqtViewModel waqt) {
+                    final String amPm = waqt.time != null
+                        ? (waqt.time!.hour < 12 ? 'AM' : 'PM')
+                        : '';
+                    final String title =
+                        '${waqt.displayName} (${waqt.formattedTime} $amPm)';
+                    PrayerTimeAdjustmentBottomSheet.show(
+                      context: context,
+                      presenter: _homePresenter,
+                      bottomSheetTitle: title,
+                    );
+                  },
                 ),
                 gapH30,
                 RoundedTopContainer(

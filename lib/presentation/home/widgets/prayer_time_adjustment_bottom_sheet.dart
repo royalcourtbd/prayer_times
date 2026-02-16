@@ -11,16 +11,22 @@ class PrayerTimeAdjustmentBottomSheet extends StatelessWidget {
   const PrayerTimeAdjustmentBottomSheet({
     super.key,
     required this.presenter,
+    this.bottomSheetTitle = 'Prayer Time Adjustment',
   });
 
   final HomePresenter presenter;
+  final String bottomSheetTitle;
 
   static Future<void> show({
     required BuildContext context,
     required HomePresenter presenter,
+    String bottomSheetTitle = 'Prayer Time Adjustment',
   }) async {
     final PrayerTimeAdjustmentBottomSheet bottomSheet = await Future.microtask(
-      () => PrayerTimeAdjustmentBottomSheet(presenter: presenter),
+      () => PrayerTimeAdjustmentBottomSheet(
+        presenter: presenter,
+        bottomSheetTitle: bottomSheetTitle,
+      ),
     );
 
     if (context.mounted) {
@@ -37,7 +43,7 @@ class PrayerTimeAdjustmentBottomSheet extends StatelessWidget {
       builder: () {
         return CustomModalSheet(
           theme: theme,
-          bottomSheetTitle: 'Prayer Time Adjustment',
+          bottomSheetTitle: bottomSheetTitle,
           children: [
             gapH10,
             _buildSwitchRow(context, theme),

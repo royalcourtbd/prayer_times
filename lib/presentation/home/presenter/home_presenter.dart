@@ -80,6 +80,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   void onInit() {
     super.onInit();
     _startTimer();
+    _loadAdjustmentEnabled();
     checkNotificationPermission();
     _syncEventsInBackground();
     _trackLaunchAndRequestReview();
@@ -273,8 +274,21 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     }
   }
 
+  void _loadAdjustmentEnabled() {
+    final bool? saved = _cacheService.getData<bool>(
+      key: CacheKeys.adjustmentEnabled,
+    );
+    if (saved != null) {
+      uiState.value = currentUiState.copyWith(isAdjustmentEnabled: saved);
+    }
+  }
+
   void onAdjustmentEnabledChanged(bool value) {
     uiState.value = currentUiState.copyWith(isAdjustmentEnabled: value);
+    _cacheService.saveData<bool>(
+      key: CacheKeys.adjustmentEnabled,
+      value: value,
+    );
   }
 
   void onAdjustmentMinutesChanged(double value) {
