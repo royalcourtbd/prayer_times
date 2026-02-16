@@ -23,6 +23,8 @@ class HomeUiState extends BaseUiState {
     required this.fastingState,
     required this.location,
     required this.hijriDate,
+    required this.isAdjustmentEnabled,
+    required this.adjustmentMinutes,
   });
 
   factory HomeUiState.empty() {
@@ -43,6 +45,8 @@ class HomeUiState extends BaseUiState {
       fastingState: FastingState.none,
       location: null,
       hijriDate: '',
+      isAdjustmentEnabled: false,
+      adjustmentMinutes: 0,
     );
   }
 
@@ -60,6 +64,8 @@ class HomeUiState extends BaseUiState {
   final FastingState fastingState;
   final LocationEntity? location;
   final String? hijriDate;
+  final bool isAdjustmentEnabled;
+  final int adjustmentMinutes;
 
   @override
   List<Object?> get props => [
@@ -79,6 +85,8 @@ class HomeUiState extends BaseUiState {
     fastingState,
     location,
     hijriDate,
+    isAdjustmentEnabled,
+    adjustmentMinutes,
   ];
 
   HomeUiState copyWith({
@@ -98,6 +106,8 @@ class HomeUiState extends BaseUiState {
     FastingState? fastingState,
     LocationEntity? location,
     String? hijriDate,
+    bool? isAdjustmentEnabled,
+    int? adjustmentMinutes,
   }) {
     return HomeUiState(
       isLoading: isLoading ?? this.isLoading,
@@ -118,6 +128,9 @@ class HomeUiState extends BaseUiState {
       fastingState: fastingState ?? this.fastingState,
       location: location ?? this.location,
       hijriDate: hijriDate ?? this.hijriDate,
+      isAdjustmentEnabled:
+          isAdjustmentEnabled ?? this.isAdjustmentEnabled,
+      adjustmentMinutes: adjustmentMinutes ?? this.adjustmentMinutes,
     );
   }
 }

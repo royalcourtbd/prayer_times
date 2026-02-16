@@ -1,38 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
+import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/presentation/common/custom_modal_sheet.dart';
 import 'package:prayer_times/presentation/common/custom_switch.dart';
+import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 
-class PrayerTimeAdjustmentBottomSheet extends StatefulWidget {
+class PrayerTimeAdjustmentBottomSheet extends StatelessWidget {
   const PrayerTimeAdjustmentBottomSheet({
     super.key,
-    this.isAdjustmentEnabled = false,
-    this.adjustmentMinutes = 0,
-    this.onAdjustmentEnabledChanged,
-    this.onAdjustmentMinutesChanged,
+    required this.presenter,
   });
 
-  final bool isAdjustmentEnabled;
-  final int adjustmentMinutes;
-  final ValueChanged<bool>? onAdjustmentEnabledChanged;
-  final ValueChanged<int>? onAdjustmentMinutesChanged;
+  final HomePresenter presenter;
 
   static Future<void> show({
     required BuildContext context,
-    bool isAdjustmentEnabled = false,
-    int adjustmentMinutes = 0,
-    ValueChanged<bool>? onAdjustmentEnabledChanged,
-    ValueChanged<int>? onAdjustmentMinutesChanged,
+    required HomePresenter presenter,
   }) async {
     final PrayerTimeAdjustmentBottomSheet bottomSheet = await Future.microtask(
-      () => PrayerTimeAdjustmentBottomSheet(
-        isAdjustmentEnabled: isAdjustmentEnabled,
-        adjustmentMinutes: adjustmentMinutes,
-        onAdjustmentEnabledChanged: onAdjustmentEnabledChanged,
-        onAdjustmentMinutesChanged: onAdjustmentMinutesChanged,
-      ),
+      () => PrayerTimeAdjustmentBottomSheet(presenter: presenter),
     );
 
     if (context.mounted) {
@@ -41,52 +29,24 @@ class PrayerTimeAdjustmentBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<PrayerTimeAdjustmentBottomSheet> createState() =>
-      _PrayerTimeAdjustmentBottomSheetState();
-}
-
-class _PrayerTimeAdjustmentBottomSheetState
-    extends State<PrayerTimeAdjustmentBottomSheet> {
-  late bool _isAdjustmentEnabled;
-  late double _adjustmentMinutes;
-
-  @override
-  void initState() {
-    super.initState();
-    _isAdjustmentEnabled = widget.isAdjustmentEnabled;
-    _adjustmentMinutes = widget.adjustmentMinutes.toDouble();
-  }
-
-  void _onSwitchChanged(bool value) {
-    setState(() {
-      _isAdjustmentEnabled = value;
-    });
-    widget.onAdjustmentEnabledChanged?.call(value);
-  }
-
-  void _onSliderChanged(double value) {
-    setState(() {
-      _adjustmentMinutes = value;
-    });
-    widget.onAdjustmentMinutesChanged?.call(value.toInt());
-  }
-
-  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    return CustomModalSheet(
-      theme: theme,
-      bottomSheetTitle: 'Prayer Time Adjustment',
-      children: [
-        gapH10,
-        // Switch Row
-        _buildSwitchRow(context, theme),
-        gapH20,
-        // Slider Row
-        _buildSliderRow(context, theme),
-        gapH20,
-      ],
+    return PresentableWidgetBuilder(
+      presenter: presenter,
+      builder: () {
+        return CustomModalSheet(
+          theme: theme,
+          bottomSheetTitle: 'Prayer Time Adjustment',
+          children: [
+            gapH10,
+            _buildSwitchRow(context, theme),
+            gapH20,
+            _buildSliderRow(context, theme),
+            gapH20,
+          ],
+        );
+      },
     );
   }
 
@@ -102,12 +62,18 @@ class _PrayerTimeAdjustmentBottomSheetState
             color: context.color.titleColor,
           ),
         ),
-        CustomSwitch(value: _isAdjustmentEnabled, onChanged: _onSwitchChanged),
+        CustomSwitch(
+          value: presenter.currentUiState.isAdjustmentEnabled,
+          onChanged: presenter.onAdjustmentEnabledChanged,
+        ),
       ],
     );
   }
 
   Widget _buildSliderRow(BuildContext context, ThemeData theme) {
+    final bool isEnabled = presenter.currentUiState.isAdjustmentEnabled;
+    final int adjustmentMinutes = presenter.currentUiState.adjustmentMinutes;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -123,7 +89,7 @@ class _PrayerTimeAdjustmentBottomSheetState
               ),
             ),
             Text(
-              '${_adjustmentMinutes.toInt()} min',
+              '$adjustmentMinutes min',
               style: theme.textTheme.bodyMedium!.copyWith(
                 fontSize: fourteenPx,
                 fontWeight: FontWeight.w400,
@@ -133,7 +99,6 @@ class _PrayerTimeAdjustmentBottomSheetState
           ],
         ),
         gapH12,
-        // Slider with labels
         Row(
           children: [
             Expanded(
@@ -142,24 +107,23 @@ class _PrayerTimeAdjustmentBottomSheetState
                   trackHeight: 9,
                   activeTrackColor: context.color.primaryColor,
                   inactiveTrackColor: context.color.primaryColor200,
-
                   overlayColor: Colors.transparent,
                   thumbShape: CleanBorderThumb(
                     radius: 12,
                     borderColor: context.color.primaryColor,
                   ),
-
                   overlayShape: const RoundSliderOverlayShape(
                     overlayRadius: 20,
                   ),
-
                   trackShape: const CenterOriginSliderTrackShape(),
                 ),
                 child: Slider(
-                  value: _adjustmentMinutes,
+                  value: adjustmentMinutes.toDouble(),
                   min: -15,
                   max: 15,
-                  onChanged: _isAdjustmentEnabled ? _onSliderChanged : null,
+                  onChanged: isEnabled
+                      ? presenter.onAdjustmentMinutesChanged
+                      : null,
                 ),
               ),
             ),

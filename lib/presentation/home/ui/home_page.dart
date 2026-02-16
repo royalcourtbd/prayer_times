@@ -110,6 +110,7 @@ class HomePage extends StatelessWidget {
                       InkWell(
                         onTap: () => PrayerTimeAdjustmentBottomSheet.show(
                           context: context,
+                          presenter: _homePresenter,
                         ),
                         borderRadius: radius8,
                         child: Container(

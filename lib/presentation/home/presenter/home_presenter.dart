@@ -273,6 +273,14 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     }
   }
 
+  void onAdjustmentEnabledChanged(bool value) {
+    uiState.value = currentUiState.copyWith(isAdjustmentEnabled: value);
+  }
+
+  void onAdjustmentMinutesChanged(double value) {
+    uiState.value = currentUiState.copyWith(adjustmentMinutes: value.toInt());
+  }
+
   /// Shows the select location bottom sheet
   void showSelectLocationBottomSheet(BuildContext context) {
     SelectLocationBottomsheet.show(context: context);
