@@ -112,6 +112,7 @@ class HomePage extends StatelessWidget {
                         onTap: () => PrayerTimeAdjustmentBottomSheet.show(
                           context: context,
                           presenter: _homePresenter,
+                          waqtType: _homePresenter.currentUiState.activeWaqtType ?? WaqtType.fajr,
                         ),
                         borderRadius: radius8,
                         child: Container(
@@ -137,15 +138,13 @@ class HomePage extends StatelessWidget {
                   waqtList: _homePresenter.waqtList,
                   scrollController: _homePresenter.prayerTimesScrollController,
                   onTapVolume: (WaqtViewModel waqt) {
-                    final String amPm = waqt.time != null
-                        ? (waqt.time!.hour < 12 ? 'AM' : 'PM')
-                        : '';
                     final String title =
-                        '${waqt.displayName} (${waqt.formattedTime} $amPm)';
+                        '${waqt.displayName} (${waqt.formattedTime} ${waqt.amPm.toUpperCase()})';
                     PrayerTimeAdjustmentBottomSheet.show(
                       context: context,
                       presenter: _homePresenter,
                       bottomSheetTitle: title,
+                      waqtType: waqt.type,
                     );
                   },
                 ),

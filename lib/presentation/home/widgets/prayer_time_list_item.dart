@@ -19,10 +19,6 @@ class PrayerTimeListItem extends StatelessWidget {
   final bool isLastItem;
   final WaqtViewModel waqt;
   final VoidCallback? onTapVolume;
-  String _getAmPm() {
-    if (waqt.time == null) return '';
-    return waqt.time!.hour < 12 ? 'am' : 'pm';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +107,7 @@ class PrayerTimeListItem extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: ' ${_getAmPm()}',
+                    text: ' ${waqt.amPm}',
                     style: baseTextStyle.copyWith(
                       fontSize: elevenPx,
                       color: waqt.isActive

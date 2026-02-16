@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   void onInit() {
     super.onInit();
     _startTimer();
-    _loadAdjustmentEnabled();
+    _loadAdjustmentSettings();
     checkNotificationPermission();
     _syncEventsInBackground();
     _trackLaunchAndRequestReview();
@@ -274,25 +275,67 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     }
   }
 
-  void _loadAdjustmentEnabled() {
-    final bool? saved = _cacheService.getData<bool>(
+  void _loadAdjustmentSettings() {
+    final String? enabledJson = _cacheService.getData<String>(
       key: CacheKeys.adjustmentEnabled,
     );
-    if (saved != null) {
-      uiState.value = currentUiState.copyWith(isAdjustmentEnabled: saved);
+    final String? minutesJson = _cacheService.getData<String>(
+      key: CacheKeys.adjustmentMinutes,
+    );
+
+    if (enabledJson != null) {
+      final Map<String, dynamic> decoded = jsonDecode(enabledJson);
+      final Map<WaqtType, bool> map = {};
+      for (final entry in decoded.entries) {
+        final waqtType = WaqtType.values.firstWhereOrNull(
+          (e) => e.name == entry.key,
+        );
+        if (waqtType != null) map[waqtType] = entry.value as bool;
+      }
+      uiState.value = currentUiState.copyWith(adjustmentEnabledMap: map);
+    }
+
+    if (minutesJson != null) {
+      final Map<String, dynamic> decoded = jsonDecode(minutesJson);
+      final Map<WaqtType, int> map = {};
+      for (final entry in decoded.entries) {
+        final waqtType = WaqtType.values.firstWhereOrNull(
+          (e) => e.name == entry.key,
+        );
+        if (waqtType != null) map[waqtType] = entry.value as int;
+      }
+      uiState.value = currentUiState.copyWith(adjustmentMinutesMap: map);
     }
   }
 
-  void onAdjustmentEnabledChanged(bool value) {
-    uiState.value = currentUiState.copyWith(isAdjustmentEnabled: value);
-    _cacheService.saveData<bool>(
+  void _saveAdjustmentEnabledMap(Map<WaqtType, bool> map) {
+    final jsonMap = map.map((key, value) => MapEntry(key.name, value));
+    _cacheService.saveData<String>(
       key: CacheKeys.adjustmentEnabled,
-      value: value,
+      value: jsonEncode(jsonMap),
     );
   }
 
-  void onAdjustmentMinutesChanged(double value) {
-    uiState.value = currentUiState.copyWith(adjustmentMinutes: value.toInt());
+  void _saveAdjustmentMinutesMap(Map<WaqtType, int> map) {
+    final jsonMap = map.map((key, value) => MapEntry(key.name, value));
+    _cacheService.saveData<String>(
+      key: CacheKeys.adjustmentMinutes,
+      value: jsonEncode(jsonMap),
+    );
+  }
+
+  void onAdjustmentEnabledChanged(WaqtType type, bool value) {
+    final map = Map<WaqtType, bool>.from(currentUiState.adjustmentEnabledMap);
+    map[type] = value;
+    uiState.value = currentUiState.copyWith(adjustmentEnabledMap: map);
+    _saveAdjustmentEnabledMap(map);
+  }
+
+  void onAdjustmentMinutesChanged(WaqtType type, double value) {
+    final map = Map<WaqtType, int>.from(currentUiState.adjustmentMinutesMap);
+    map[type] = value.toInt();
+    uiState.value = currentUiState.copyWith(adjustmentMinutesMap: map);
+    _saveAdjustmentMinutesMap(map);
   }
 
   /// Shows the select location bottom sheet

@@ -70,4 +70,8 @@ class WaqtViewModel {
   String get displayName => type.displayName;
   String get icon => type.icon;
   String get formattedTime => getFormattedTimeForWaqtView(time);
+  String get amPm {
+    if (time == null) return '';
+    return time!.hour < 12 ? 'am' : 'pm';
+  }
 }

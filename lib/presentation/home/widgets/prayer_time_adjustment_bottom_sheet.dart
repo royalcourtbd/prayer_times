@@ -5,26 +5,31 @@ import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/presentation/common/custom_modal_sheet.dart';
 import 'package:prayer_times/presentation/common/custom_switch.dart';
+import 'package:prayer_times/presentation/home/models/waqt.dart';
 import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 
 class PrayerTimeAdjustmentBottomSheet extends StatelessWidget {
   const PrayerTimeAdjustmentBottomSheet({
     super.key,
     required this.presenter,
+    required this.waqtType,
     this.bottomSheetTitle = 'Prayer Time Adjustment',
   });
 
   final HomePresenter presenter;
+  final WaqtType waqtType;
   final String bottomSheetTitle;
 
   static Future<void> show({
     required BuildContext context,
     required HomePresenter presenter,
+    required WaqtType waqtType,
     String bottomSheetTitle = 'Prayer Time Adjustment',
   }) async {
     final PrayerTimeAdjustmentBottomSheet bottomSheet = await Future.microtask(
       () => PrayerTimeAdjustmentBottomSheet(
         presenter: presenter,
+        waqtType: waqtType,
         bottomSheetTitle: bottomSheetTitle,
       ),
     );
@@ -69,16 +74,18 @@ class PrayerTimeAdjustmentBottomSheet extends StatelessWidget {
           ),
         ),
         CustomSwitch(
-          value: presenter.currentUiState.isAdjustmentEnabled,
-          onChanged: presenter.onAdjustmentEnabledChanged,
+          value: presenter.currentUiState.adjustmentEnabledMap[waqtType] ?? false,
+          onChanged: (value) => presenter.onAdjustmentEnabledChanged(waqtType, value),
         ),
       ],
     );
   }
 
   Widget _buildSliderRow(BuildContext context, ThemeData theme) {
-    final bool isEnabled = presenter.currentUiState.isAdjustmentEnabled;
-    final int adjustmentMinutes = presenter.currentUiState.adjustmentMinutes;
+    final bool isEnabled =
+        presenter.currentUiState.adjustmentEnabledMap[waqtType] ?? false;
+    final int adjustmentMinutes =
+        presenter.currentUiState.adjustmentMinutesMap[waqtType] ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +135,7 @@ class PrayerTimeAdjustmentBottomSheet extends StatelessWidget {
                   min: -15,
                   max: 15,
                   onChanged: isEnabled
-                      ? presenter.onAdjustmentMinutesChanged
+                      ? (value) => presenter.onAdjustmentMinutesChanged(waqtType, value)
                       : null,
                 ),
               ),

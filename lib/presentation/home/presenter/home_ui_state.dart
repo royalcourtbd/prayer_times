@@ -23,8 +23,8 @@ class HomeUiState extends BaseUiState {
     required this.fastingState,
     required this.location,
     required this.hijriDate,
-    required this.isAdjustmentEnabled,
-    required this.adjustmentMinutes,
+    required this.adjustmentEnabledMap,
+    required this.adjustmentMinutesMap,
   });
 
   factory HomeUiState.empty() {
@@ -45,8 +45,8 @@ class HomeUiState extends BaseUiState {
       fastingState: FastingState.none,
       location: null,
       hijriDate: '',
-      isAdjustmentEnabled: false,
-      adjustmentMinutes: 0,
+      adjustmentEnabledMap: const {},
+      adjustmentMinutesMap: const {},
     );
   }
 
@@ -64,8 +64,8 @@ class HomeUiState extends BaseUiState {
   final FastingState fastingState;
   final LocationEntity? location;
   final String? hijriDate;
-  final bool isAdjustmentEnabled;
-  final int adjustmentMinutes;
+  final Map<WaqtType, bool> adjustmentEnabledMap;
+  final Map<WaqtType, int> adjustmentMinutesMap;
 
   @override
   List<Object?> get props => [
@@ -85,8 +85,8 @@ class HomeUiState extends BaseUiState {
     fastingState,
     location,
     hijriDate,
-    isAdjustmentEnabled,
-    adjustmentMinutes,
+    adjustmentEnabledMap,
+    adjustmentMinutesMap,
   ];
 
   HomeUiState copyWith({
@@ -106,8 +106,8 @@ class HomeUiState extends BaseUiState {
     FastingState? fastingState,
     LocationEntity? location,
     String? hijriDate,
-    bool? isAdjustmentEnabled,
-    int? adjustmentMinutes,
+    Map<WaqtType, bool>? adjustmentEnabledMap,
+    Map<WaqtType, int>? adjustmentMinutesMap,
   }) {
     return HomeUiState(
       isLoading: isLoading ?? this.isLoading,
@@ -128,9 +128,10 @@ class HomeUiState extends BaseUiState {
       fastingState: fastingState ?? this.fastingState,
       location: location ?? this.location,
       hijriDate: hijriDate ?? this.hijriDate,
-      isAdjustmentEnabled:
-          isAdjustmentEnabled ?? this.isAdjustmentEnabled,
-      adjustmentMinutes: adjustmentMinutes ?? this.adjustmentMinutes,
+      adjustmentEnabledMap:
+          adjustmentEnabledMap ?? this.adjustmentEnabledMap,
+      adjustmentMinutesMap:
+          adjustmentMinutesMap ?? this.adjustmentMinutesMap,
     );
   }
 }

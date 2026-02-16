@@ -125,4 +125,5 @@ class CacheKeys {
   static const String dismissedUpdateVersion = "dismissed_update_version_key";
   static const String hijriDayAdjustment = "hijri_day_adjustment_key";
   static const String adjustmentEnabled = "adjustment_enabled_key";
+  static const String adjustmentMinutes = "adjustment_minutes_key";
 }
