@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
 import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
-import 'package:prayer_times/core/external_libs/svg_image.dart';
 import 'package:prayer_times/core/static/svg_path.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
