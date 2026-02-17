@@ -95,49 +95,14 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 gapH20,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: twentyPx),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Prayer Times',
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          fontSize: sixteenPx,
-                          fontWeight: FontWeight.w600,
-                          color: context.color.titleColor,
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () => PrayerTimeAdjustmentBottomSheet.show(
-                          context: context,
-                          presenter: _homePresenter,
-                          waqtType: _homePresenter.currentUiState.activeWaqtType ?? WaqtType.fajr,
-                        ),
-                        borderRadius: radius8,
-                        child: Container(
-                          padding: padding6,
-                          decoration: BoxDecoration(
-                            color: context.color.whiteColor.withOpacityInt(0.7),
-                            borderRadius: radius8,
-                          ),
-                          child: SvgImage(
-                            SvgPath.icSettingsOutline,
-                            width: twentyPx,
-                            height: twentyPx,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                gapH10,
+
                 PrayerTimeList(
                   key: Key('prayer_time_list'),
                   theme: theme,
                   waqtList: _homePresenter.waqtList,
                   scrollController: _homePresenter.prayerTimesScrollController,
-                  adjustmentEnabledMap: _homePresenter.currentUiState.adjustmentEnabledMap,
+                  adjustmentEnabledMap:
+                      _homePresenter.currentUiState.adjustmentEnabledMap,
                   onTapVolume: (WaqtViewModel waqt) {
                     final String title =
                         '${waqt.displayName} (${waqt.formattedTime} ${waqt.amPm.toUpperCase()})';
