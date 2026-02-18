@@ -374,6 +374,9 @@ class HomePresenter extends BasePresenter<HomeUiState> {
           // Update TimeService timezone
           _timeService.setTimezone(location.timezone);
 
+          // Update Maghrib time so Hijri date transitions at Maghrib
+          _hijriDateService.updateMaghribTime(data.startMaghrib);
+
           _updateAllStates();
           initializeTracker();
         },
@@ -398,7 +401,10 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   }
 
   String _getHijriDate(DateTime date) {
-    final hijri = _hijriDateService.fromDate(date);
+    final maghribTime = currentUiState.prayerTime?.startMaghrib;
+    final hijri = maghribTime != null
+        ? _hijriDateService.fromDateConsideringMaghrib(date, maghribTime)
+        : _hijriDateService.fromDate(date);
     return '${hijri.format(hijri.hYear, hijri.hMonth, hijri.hDay, 'dd MMMM yyyy')} H';
   }
 

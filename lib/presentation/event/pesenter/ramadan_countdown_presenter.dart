@@ -89,7 +89,10 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
       targetYear++;
     }
 
-    return _hijriDateService.hijriToGregorian(targetYear, 9, 1);
+    final gregorianDate =
+        _hijriDateService.hijriToGregorian(targetYear, 9, 1);
+    // Islamic day starts at Maghrib of the previous evening
+    return _hijriDateService.adjustToMaghribStart(gregorianDate);
   }
 
   DateTime _getRamadanEndDate(dynamic hijri) {
@@ -100,13 +103,16 @@ class RamadanCountdownPresenter extends BasePresenter<RamadanCountdownUiState> {
       targetYear++;
     }
 
-    // Ramadan is typically 29 or 30 days, use start of Shawwal minus 1
-    final shawwalStart = _hijriDateService.hijriToGregorian(targetYear, 10, 1);
-    return shawwalStart.subtract(const Duration(days: 1));
+    // Shawwal 1 starts at Maghrib → that's when Ramadan ends
+    final shawwalStart =
+        _hijriDateService.hijriToGregorian(targetYear, 10, 1);
+    return _hijriDateService.adjustToMaghribStart(shawwalStart);
   }
 
   DateTime _getNextRamadanStartDate(dynamic hijri) {
-    return _hijriDateService.hijriToGregorian(hijri.hYear + 1, 9, 1);
+    final gregorianDate =
+        _hijriDateService.hijriToGregorian(hijri.hYear + 1, 9, 1);
+    return _hijriDateService.adjustToMaghribStart(gregorianDate);
   }
 
   @override
