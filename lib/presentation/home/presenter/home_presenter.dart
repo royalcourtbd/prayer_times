@@ -11,6 +11,7 @@ import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
+import 'package:prayer_times/domain/service/prayer_notification_service.dart';
 import 'package:prayer_times/domain/service/time_service.dart';
 import 'package:prayer_times/domain/service/waqt_calculation_service.dart';
 import 'package:prayer_times/domain/usecases/check_notification_permission_usecase.dart';
@@ -48,6 +49,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   final GetAppUpdateInfoUseCase _getAppUpdateInfoUseCase;
   final LocalCacheService _cacheService;
   final HijriDateService _hijriDateService;
+  final PrayerNotificationService _prayerNotificationService;
   StreamSubscription<DateTime>? _timeSubscription;
 
   final ScrollController prayerTimesScrollController = ScrollController();
@@ -67,6 +69,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     this._getAppUpdateInfoUseCase,
     this._cacheService,
     this._hijriDateService,
+    this._prayerNotificationService,
   );
 
   final Obs<HomeUiState> uiState = Obs<HomeUiState>(HomeUiState.empty());
@@ -86,6 +89,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     _syncEventsInBackground();
     _trackLaunchAndRequestReview();
     _checkForAppUpdate();
+    _prayerNotificationService.scheduleMidnightReset();
 
     prayerTimesScrollController.addListener(_onUserScroll);
   }
@@ -329,6 +333,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     map[type] = value;
     uiState.value = currentUiState.copyWith(adjustmentEnabledMap: map);
     _saveAdjustmentEnabledMap(map);
+    _updateNotificationForPrayer(type);
+    _showNotificationToast(type, value);
   }
 
   void onAdjustmentMinutesChanged(WaqtType type, double value) {
@@ -336,6 +342,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     map[type] = value.toInt();
     uiState.value = currentUiState.copyWith(adjustmentMinutesMap: map);
     _saveAdjustmentMinutesMap(map);
+    _updateNotificationForPrayer(type);
   }
 
   /// Shows the select location bottom sheet
@@ -379,9 +386,64 @@ class HomePresenter extends BasePresenter<HomeUiState> {
 
           _updateAllStates();
           initializeTracker();
+          _rescheduleAllNotifications(data);
         },
       );
     });
+  }
+
+  void _updateNotificationForPrayer(WaqtType type) {
+    final bool isEnabled =
+        currentUiState.adjustmentEnabledMap[type] ?? false;
+    final prayerTime = currentUiState.prayerTime;
+
+    if (!isEnabled || prayerTime == null) {
+      _prayerNotificationService.cancelForPrayer(type);
+      return;
+    }
+
+    final int minutes = currentUiState.adjustmentMinutesMap[type] ?? 0;
+    final DateTime? time =
+        _waqtCalculationService.getWaqtTime(type, prayerTime);
+
+    if (time != null) {
+      _prayerNotificationService.scheduleForPrayer(
+        waqtType: type,
+        prayerTime: time,
+        adjustmentMinutes: minutes,
+      );
+    }
+  }
+
+  void _showNotificationToast(WaqtType type, bool isEnabled) {
+    if (!isEnabled) {
+      showMessage(message: '${type.displayName} notification off');
+      return;
+    }
+
+    final prayerTime = currentUiState.prayerTime;
+    if (prayerTime == null) return;
+
+    final DateTime? time =
+        _waqtCalculationService.getWaqtTime(type, prayerTime);
+    if (time == null) return;
+
+    final int minutes = currentUiState.adjustmentMinutesMap[type] ?? 0;
+    final DateTime scheduledTime = time.add(Duration(minutes: minutes));
+    final String formattedTime = getFormattedTime(scheduledTime);
+    final String amPm = scheduledTime.hour < 12 ? 'AM' : 'PM';
+
+    showMessage(
+      message: '${type.displayName} notification set at $formattedTime $amPm',
+    );
+  }
+
+  void _rescheduleAllNotifications(PrayerTimeEntity prayerTime) {
+    _prayerNotificationService.rescheduleAll(
+      prayerTimeEntity: prayerTime,
+      enabledMap: currentUiState.adjustmentEnabledMap,
+      minutesMap: currentUiState.adjustmentMinutesMap,
+    );
   }
 
   void _updateAllStates() {

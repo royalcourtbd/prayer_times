@@ -79,6 +79,7 @@ class PresenterSetup implements SetupModule {
             locate(),
             locate(),
             locate(),
+            locate(),
           ),
         ),
       )

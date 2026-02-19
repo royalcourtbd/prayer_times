@@ -6,6 +6,6 @@ const String pushNotificationChannelDescription = "Push Notification Channel";
 
 const int pushNotificationId = 3847;
 
-const String notificationIconSource = 'resource://drawable/notification_icon';
-const String notificationSoundSource = 'resource://raw/siren';
-const String localNotificationSoundSource = 'resource://raw/siren';
+const String notificationIconSource = 'resource://mipmap/ic_launcher';
+const String notificationSoundSource = 'resource://raw/custom_notification';
+const String localNotificationSoundSource = 'resource://raw/custom_notification';

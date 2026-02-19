@@ -19,9 +19,11 @@ import 'package:prayer_times/data/services/islamic_event_service.dart';
 import 'package:prayer_times/data/services/waqt_calculation_service_impl.dart';
 import 'package:prayer_times/domain/service/error_message_handler.dart';
 import 'package:prayer_times/domain/service/notification_service.dart';
+import 'package:prayer_times/domain/service/prayer_notification_service.dart';
 import 'package:prayer_times/domain/service/time_service.dart';
 import 'package:prayer_times/domain/service/timezone_service.dart';
 import 'package:prayer_times/domain/service/waqt_calculation_service.dart';
+import 'package:prayer_times/data/services/notification/prayer_notification_service_impl.dart';
 import 'package:prayer_times/firebase_options.dart';
 
 class ServiceSetup implements SetupModule {
@@ -34,6 +36,9 @@ class ServiceSetup implements SetupModule {
     _serviceLocator
       ..registerLazySingleton<ErrorMessageHandler>(ErrorMessageHandlerImpl.new)
       ..registerLazySingleton<NotificationService>(NotificationServiceImpl.new)
+      ..registerLazySingleton<PrayerNotificationService>(
+        PrayerNotificationServiceImpl.new,
+      )
       ..registerLazySingleton<WaqtCalculationService>(
         () => WaqtCalculationServiceImpl(),
       )
@@ -64,6 +69,8 @@ class ServiceSetup implements SetupModule {
       );
 
     await LocalCacheService.setUp();
+
+    await _serviceLocator<PrayerNotificationService>().initialize();
 
     await _setUpAudioService();
   }

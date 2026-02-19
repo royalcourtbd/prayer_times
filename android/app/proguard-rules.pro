@@ -157,6 +157,10 @@
     public static *** i(...);
 }
 
+# ==================== AWESOME NOTIFICATIONS ====================
+-keep class me.carda.awesome_notifications.** { *; }
+-keep class me.carda.awesome_notifications_core.** { *; }
+
 # ==================== SUPPRESS WARNINGS ====================
 -dontwarn com.google.android.gms.**
 -dontwarn com.google.firebase.**
