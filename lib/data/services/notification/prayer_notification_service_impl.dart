@@ -47,7 +47,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   Future<void> initialize() async {
     await catchFutureOrVoid(() async {
       await AwesomeNotifications().initialize(
-        'resource://drawable/notification',
+        'resource://mipmap/ic_launcher_monochrome',
         [
           NotificationChannel(
             channelKey: _channelKey,
@@ -58,7 +58,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
             soundSource: _soundSource,
             playSound: true,
             enableVibration: true,
-            defaultColor: const Color(0xFF00796B),
+            defaultColor: const Color(0xFF4D7AEB),
           ),
         ],
         debug: false,
@@ -115,6 +115,8 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
           wakeUpScreen: true,
           payload: {'waqtType': waqtType.name},
           autoDismissible: true,
+          color: const Color(0xFF4D7AEB),
+          largeIcon: 'resource://mipmap/ic_launcher',
         ),
         schedule: NotificationCalendar.fromDate(
           date: scheduledTime,

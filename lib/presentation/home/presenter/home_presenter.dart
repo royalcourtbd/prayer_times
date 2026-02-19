@@ -334,7 +334,6 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     uiState.value = currentUiState.copyWith(adjustmentEnabledMap: map);
     _saveAdjustmentEnabledMap(map);
     _updateNotificationForPrayer(type);
-    _showNotificationToast(type, value);
   }
 
   void onAdjustmentMinutesChanged(WaqtType type, double value) {
@@ -415,11 +414,11 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     }
   }
 
-  void _showNotificationToast(WaqtType type, bool isEnabled) {
-    if (!isEnabled) {
-      showMessage(message: '${type.displayName} notification off');
-      return;
-    }
+  void onAdjustmentBottomSheetDismissed(WaqtType type) {
+    final bool isEnabled =
+        currentUiState.adjustmentEnabledMap[type] ?? false;
+
+    if (!isEnabled) return;
 
     final prayerTime = currentUiState.prayerTime;
     if (prayerTime == null) return;

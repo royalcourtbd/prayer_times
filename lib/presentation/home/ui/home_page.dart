@@ -102,15 +102,16 @@ class HomePage extends StatelessWidget {
                   scrollController: _homePresenter.prayerTimesScrollController,
                   adjustmentEnabledMap:
                       _homePresenter.currentUiState.adjustmentEnabledMap,
-                  onTapVolume: (WaqtViewModel waqt) {
+                  onTapVolume: (WaqtViewModel waqt) async {
                     final String title =
                         '${waqt.displayName} (${waqt.formattedTime} ${waqt.amPm.toUpperCase()})';
-                    PrayerTimeAdjustmentBottomSheet.show(
+                    await PrayerTimeAdjustmentBottomSheet.show(
                       context: context,
                       presenter: _homePresenter,
                       bottomSheetTitle: title,
                       waqtType: waqt.type,
                     );
+                    _homePresenter.onAdjustmentBottomSheetDismissed(waqt.type);
                   },
                 ),
                 gapH30,
