@@ -9,7 +9,7 @@ import 'package:prayer_times/presentation/home/models/waqt.dart';
 const String _channelKey = 'prayer_time_channel';
 const String _channelName = 'Prayer Time Notifications';
 const String _channelDescription = 'Adhan notifications for daily prayer times';
-const String _soundSource = 'resource://raw/custom_notification';
+const String _soundSource = 'resource://raw/hayya_ala_salah';
 
 const int _midnightResetId = 1000;
 
@@ -46,23 +46,20 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   @override
   Future<void> initialize() async {
     await catchFutureOrVoid(() async {
-      await AwesomeNotifications().initialize(
-        'resource://drawable/notification',
-        [
-          NotificationChannel(
-            channelKey: _channelKey,
-            channelName: _channelName,
-            channelDescription: _channelDescription,
-            importance: NotificationImportance.High,
-            defaultPrivacy: NotificationPrivacy.Public,
-            soundSource: _soundSource,
-            playSound: true,
-            enableVibration: true,
-            defaultColor: const Color(0xFF4D7AEB),
-          ),
-        ],
-        debug: false,
-      );
+      await AwesomeNotifications()
+          .initialize('resource://drawable/notification', [
+            NotificationChannel(
+              channelKey: _channelKey,
+              channelName: _channelName,
+              channelDescription: _channelDescription,
+              importance: NotificationImportance.High,
+              defaultPrivacy: NotificationPrivacy.Public,
+              soundSource: _soundSource,
+              playSound: true,
+              enableVibration: true,
+              defaultColor: const Color(0xFF4D7AEB),
+            ),
+          ], debug: false);
 
       // Listeners সেট করা — static methods দরকার
       await AwesomeNotifications().setListeners(
@@ -140,7 +137,9 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
 
       // Cancel today + future days (7 days worth)
       for (int day = 0; day < 7; day++) {
-        await AwesomeNotifications().cancel(_notificationId(waqtType, dayOffset: day));
+        await AwesomeNotifications().cancel(
+          _notificationId(waqtType, dayOffset: day),
+        );
       }
       logDebug('Cancelled ${waqtType.displayName} notifications');
     });
