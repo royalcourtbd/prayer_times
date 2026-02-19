@@ -47,7 +47,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   Future<void> initialize() async {
     await catchFutureOrVoid(() async {
       await AwesomeNotifications().initialize(
-        'resource://mipmap/ic_launcher_monochrome',
+        'resource://drawable/notification',
         [
           NotificationChannel(
             channelKey: _channelKey,
