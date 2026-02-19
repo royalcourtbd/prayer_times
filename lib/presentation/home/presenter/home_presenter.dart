@@ -86,6 +86,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     _startTimer();
     _loadAdjustmentSettings();
     checkNotificationPermission();
+    _prayerNotificationService.checkAndRequestExactAlarmPermission();
     _syncEventsInBackground();
     _trackLaunchAndRequestReview();
     _checkForAppUpdate();

@@ -29,4 +29,8 @@ abstract class PrayerNotificationService {
 
   /// Schedule a daily midnight reset trigger.
   Future<void> scheduleMidnightReset();
+
+  /// Check and request precise alarm permission (Android 12+).
+  /// Required for SCHEDULE_EXACT_ALARM to work correctly.
+  Future<void> checkAndRequestExactAlarmPermission();
 }

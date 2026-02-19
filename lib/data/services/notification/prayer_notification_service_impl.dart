@@ -216,6 +216,27 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     });
   }
 
+  @override
+  Future<void> checkAndRequestExactAlarmPermission() async {
+    await catchFutureOrVoid(() async {
+      final List<NotificationPermission> allowed =
+          await AwesomeNotifications().checkPermissionList(
+            permissions: [NotificationPermission.PreciseAlarms],
+          );
+
+      if (allowed.contains(NotificationPermission.PreciseAlarms)) {
+        logDebug('Precise alarm permission already granted');
+        return;
+      }
+
+      // Android 12+ এ এটি "Alarms & Reminders" settings-এ নিয়ে যাবে
+      await AwesomeNotifications().requestPermissionToSendNotifications(
+        permissions: [NotificationPermission.PreciseAlarms],
+      );
+      logDebug('Requested precise alarm permission');
+    });
+  }
+
   /// Prayer time entity থেকে নির্দিষ্ট prayer-এর সময় বের করা
   DateTime? _getTimeForType(WaqtType type, PrayerTimeEntity entity) {
     switch (type) {

@@ -420,7 +420,7 @@ jobs:
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: artifacts/app-release.aab
           track: internal
-          status: draft
+          status: completed
 
   #=============================================================
   # JOB 3: GITHUB RELEASE
