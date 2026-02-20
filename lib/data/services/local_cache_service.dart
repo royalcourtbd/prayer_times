@@ -16,6 +16,9 @@ class LocalCacheService {
   }
 
   static String get _storageFileName => '${_secretVaultName}_239090';
+
+  /// Background isolate-এ Hive manually খোলার জন্য box name expose
+  static String get boxName => _storageFileName;
   late final Box<dynamic> _hiveBox = Hive.box(_storageFileName);
 
   /// Saves the provided `value` to the persistent storage using the specified `key`.
@@ -126,4 +129,5 @@ class CacheKeys {
   static const String hijriDayAdjustment = "hijri_day_adjustment_key";
   static const String adjustmentEnabled = "adjustment_enabled_key";
   static const String adjustmentMinutes = "adjustment_minutes_key";
+  static const String prayerTimeJson = "prayer_time_json_key";
 }

@@ -1,16 +1,28 @@
+import 'dart:convert';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:prayer_times/core/config/prayer_time_app_color.dart';
 import 'package:prayer_times/core/utility/logger_utility.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
+import 'package:prayer_times/data/services/local_cache_service.dart';
 import 'package:prayer_times/data/services/notification/notification_service_information.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
 import 'package:prayer_times/domain/service/prayer_notification_service.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
 
+// Prayer notification channel (Adhan sound, high importance)
 const String _channelKey = 'prayer_time_channel';
 const String _channelName = 'Prayer Time Notifications';
 const String _channelDescription = 'Adhan notifications for daily prayer times';
 const String _soundSource = 'resource://raw/hayya_ala_salah';
+
+// Silent channel — midnight reset trigger (user দেখবে না/শুনবে না)
+const String _silentChannelKey = 'midnight_reset_channel';
+const String _silentChannelName = 'Background Updates';
+const String _silentChannelDescription = 'Silent background task — no user visibility';
 
 const int _midnightResetId = 1000;
 
@@ -47,20 +59,31 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   @override
   Future<void> initialize() async {
     await catchFutureOrVoid(() async {
-      await AwesomeNotifications()
-          .initialize('resource://drawable/notification', [
-            NotificationChannel(
-              channelKey: _channelKey,
-              channelName: _channelName,
-              channelDescription: _channelDescription,
-              importance: NotificationImportance.High,
-              defaultPrivacy: NotificationPrivacy.Public,
-              soundSource: _soundSource,
-              playSound: true,
-              enableVibration: true,
-              defaultColor: const Color(0xFF4D7AEB),
-            ),
-          ], debug: false);
+      await AwesomeNotifications().initialize(notificationIconSource, [
+        // Prayer notification channel — Adhan sound + vibration
+        NotificationChannel(
+          channelKey: _channelKey,
+          channelName: _channelName,
+          channelDescription: _channelDescription,
+          importance: NotificationImportance.High,
+          defaultPrivacy: NotificationPrivacy.Public,
+          soundSource: _soundSource,
+          playSound: true,
+          enableVibration: true,
+          defaultColor: PrayerTimeAppColor.primaryColor500,
+        ),
+        // Silent channel — midnight reset trigger, user দেখবে না
+        NotificationChannel(
+          channelKey: _silentChannelKey,
+          channelName: _silentChannelName,
+          channelDescription: _silentChannelDescription,
+          importance: NotificationImportance.Min,
+          playSound: false,
+          enableVibration: false,
+          enableLights: false,
+          defaultPrivacy: NotificationPrivacy.Private,
+        ),
+      ], debug: false);
 
       // Listeners সেট করা — static methods দরকার
       await AwesomeNotifications().setListeners(
@@ -78,12 +101,120 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     // Notification এ tap করলে app open হবে (default behavior)
   }
 
-  /// Notification display handler
+  /// Notification display handler — midnight reset এ prayer notifications reschedule
   @pragma('vm:entry-point')
   static Future<void> _onNotificationDisplayed(
     ReceivedNotification notification,
   ) async {
-    // Notification display হলে log করা
+    if (notification.id != _midnightResetId) return;
+
+    // Silent notification তাৎক্ষণিক dismiss — user notification drawer-এ দেখবে না
+    await AwesomeNotifications().dismiss(_midnightResetId);
+
+    // Cache থেকে prayer times ও settings লোড করে reschedule
+    await _rescheduleFromCache();
+  }
+
+  /// Cache থেকে prayer time ও adjustment settings লোড করে সব notification reschedule করে।
+  /// App foreground/background উভয় ক্ষেত্রে কাজ করে।
+  static Future<void> _rescheduleFromCache() async {
+    try {
+      LocalCacheService cacheService;
+
+      if (GetIt.instance.isRegistered<LocalCacheService>()) {
+        // App চালু আছে — service locator থেকে সরাসরি নাও
+        cacheService = GetIt.instance.get<LocalCacheService>();
+      } else {
+        // Background isolate — Hive manually initialize করো
+        final dir = await getApplicationDocumentsDirectory();
+        Hive.init(dir.path);
+        if (!Hive.isBoxOpen(LocalCacheService.boxName)) {
+          await Hive.openBox<dynamic>(LocalCacheService.boxName);
+        }
+        cacheService = LocalCacheService();
+      }
+
+      final String? enabledJson = cacheService.getData<String>(
+        key: CacheKeys.adjustmentEnabled,
+      );
+      final String? minutesJson = cacheService.getData<String>(
+        key: CacheKeys.adjustmentMinutes,
+      );
+      final String? prayerJson = cacheService.getData<String>(
+        key: CacheKeys.prayerTimeJson,
+      );
+
+      if (enabledJson == null || prayerJson == null) {
+        logDebugStatic('Midnight reset: cache-এ data নেই, skip', 'MidnightReset');
+        return;
+      }
+
+      final Map<WaqtType, bool> enabledMap = _parseEnabledMap(enabledJson);
+      final Map<WaqtType, int> minutesMap =
+          minutesJson != null ? _parseMinutesMap(minutesJson) : {};
+      final PrayerTimeEntity? entity = _parsePrayerEntity(prayerJson);
+
+      if (entity == null) {
+        logDebugStatic('Midnight reset: prayer entity parse হয়নি, skip', 'MidnightReset');
+        return;
+      }
+
+      final service = PrayerNotificationServiceImpl();
+      await service.rescheduleAll(
+        prayerTimeEntity: entity,
+        enabledMap: enabledMap,
+        minutesMap: minutesMap,
+      );
+
+      logDebugStatic('Midnight reset: সব prayer notification reschedule হয়েছে', 'MidnightReset');
+    } catch (e) {
+      logErrorStatic('Midnight reset reschedule error: $e', 'MidnightReset');
+    }
+  }
+
+  static Map<WaqtType, bool> _parseEnabledMap(String json) {
+    final Map<String, dynamic> decoded = jsonDecode(json);
+    final Map<WaqtType, bool> map = {};
+    for (final entry in decoded.entries) {
+      final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
+      if (idx == -1) continue;
+      map[WaqtType.values[idx]] = entry.value as bool;
+    }
+    return map;
+  }
+
+  static Map<WaqtType, int> _parseMinutesMap(String json) {
+    final Map<String, dynamic> decoded = jsonDecode(json);
+    final Map<WaqtType, int> map = {};
+    for (final entry in decoded.entries) {
+      final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
+      if (idx == -1) continue;
+      map[WaqtType.values[idx]] = entry.value as int;
+    }
+    return map;
+  }
+
+  static PrayerTimeEntity? _parsePrayerEntity(String json) {
+    try {
+      final Map<String, dynamic> m = jsonDecode(json);
+      return PrayerTimeEntity(
+        startFajr: DateTime.parse(m['startFajr']),
+        fajrEnd: DateTime.parse(m['fajrEnd']),
+        sunrise: DateTime.parse(m['sunrise']),
+        duhaStart: DateTime.parse(m['duhaStart']),
+        duhaEnd: DateTime.parse(m['duhaEnd']),
+        startDhuhr: DateTime.parse(m['startDhuhr']),
+        dhuhrEnd: DateTime.parse(m['dhuhrEnd']),
+        startAsr: DateTime.parse(m['startAsr']),
+        asrEnd: DateTime.parse(m['asrEnd']),
+        startMaghrib: DateTime.parse(m['startMaghrib']),
+        maghribEnd: DateTime.parse(m['maghribEnd']),
+        startIsha: DateTime.parse(m['startIsha']),
+        ishaEnd: DateTime.parse(m['ishaEnd']),
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -111,7 +242,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
           wakeUpScreen: true,
           payload: {'waqtType': waqtType.name},
           autoDismissible: true,
-          color: const Color(0xFF4D7AEB),
+          color: PrayerTimeAppColor.primaryColor500,
           largeIcon: notificationIconSource,
         ),
         schedule: NotificationCalendar.fromDate(
@@ -191,15 +322,15 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       // আগের midnight reset cancel
       await AwesomeNotifications().cancel(_midnightResetId);
 
-      // রাত ১২:০১ AM-এ daily repeating notification
+      // রাত ১২:০১ AM-এ silent trigger — user দেখবে না, শুনবে না
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: _midnightResetId,
-          channelKey: _channelKey,
-          title: 'Prayer Times Updated',
-          body: 'Your prayer notifications have been refreshed for today.',
+          channelKey: _silentChannelKey,
+          title: '',
+          body: '',
           notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Reminder,
+          category: NotificationCategory.Service,
         ),
         schedule: NotificationCalendar(
           hour: 0,
@@ -211,7 +342,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
         ),
       );
 
-      logDebug('Midnight reset notification scheduled at 00:01');
+      logDebug('Silent midnight reset scheduled at 00:01');
     });
   }
 

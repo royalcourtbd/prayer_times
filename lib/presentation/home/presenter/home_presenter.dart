@@ -387,6 +387,7 @@ class HomePresenter extends BasePresenter<HomeUiState> {
           _updateAllStates();
           initializeTracker();
           _rescheduleAllNotifications(data);
+          _savePrayerTimesToCache(data);
         },
       );
     });
@@ -444,6 +445,25 @@ class HomePresenter extends BasePresenter<HomeUiState> {
       enabledMap: currentUiState.adjustmentEnabledMap,
       minutesMap: currentUiState.adjustmentMinutesMap,
     );
+  }
+
+  void _savePrayerTimesToCache(PrayerTimeEntity entity) {
+    final String json = jsonEncode({
+      'startFajr': entity.startFajr.toIso8601String(),
+      'fajrEnd': entity.fajrEnd.toIso8601String(),
+      'sunrise': entity.sunrise.toIso8601String(),
+      'duhaStart': entity.duhaStart.toIso8601String(),
+      'duhaEnd': entity.duhaEnd.toIso8601String(),
+      'startDhuhr': entity.startDhuhr.toIso8601String(),
+      'dhuhrEnd': entity.dhuhrEnd.toIso8601String(),
+      'startAsr': entity.startAsr.toIso8601String(),
+      'asrEnd': entity.asrEnd.toIso8601String(),
+      'startMaghrib': entity.startMaghrib.toIso8601String(),
+      'maghribEnd': entity.maghribEnd.toIso8601String(),
+      'startIsha': entity.startIsha.toIso8601String(),
+      'ishaEnd': entity.ishaEnd.toIso8601String(),
+    });
+    _cacheService.saveData<String>(key: CacheKeys.prayerTimeJson, value: json);
   }
 
   void _updateAllStates() {
