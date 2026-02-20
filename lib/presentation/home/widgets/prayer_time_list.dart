@@ -9,6 +9,7 @@ class PrayerTimeList extends StatelessWidget {
     required this.theme,
     required this.waqtList,
     required this.scrollController,
+    this.onTap,
     this.onTapVolume,
     this.adjustmentEnabledMap = const {},
   });
@@ -16,6 +17,7 @@ class PrayerTimeList extends StatelessWidget {
   final ThemeData theme;
   final List<WaqtViewModel> waqtList;
   final ScrollController scrollController;
+  final void Function(WaqtViewModel waqt)? onTap;
   final void Function(WaqtViewModel waqt)? onTapVolume;
   final Map<WaqtType, bool> adjustmentEnabledMap;
 
@@ -40,6 +42,7 @@ class PrayerTimeList extends StatelessWidget {
             waqt: waqt,
             isLastItem: index == waqtList.length - 1,
             isAdjustmentEnabled: adjustmentEnabledMap[waqt.type] ?? false,
+            onTap: onTap != null ? () => onTap!(waqt) : null,
             onTapVolume: onTapVolume != null
                 ? () => onTapVolume!(waqt)
                 : null,

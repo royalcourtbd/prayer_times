@@ -12,6 +12,7 @@ class PrayerTimeListItem extends StatelessWidget {
     required this.theme,
     required this.waqt,
     this.isLastItem = false,
+    this.onTap,
     this.onTapVolume,
     this.isAdjustmentEnabled = false,
   });
@@ -19,6 +20,7 @@ class PrayerTimeListItem extends StatelessWidget {
   final ThemeData theme;
   final bool isLastItem;
   final WaqtViewModel waqt;
+  final VoidCallback? onTap;
   final VoidCallback? onTapVolume;
   final bool isAdjustmentEnabled;
 
@@ -28,7 +30,9 @@ class PrayerTimeListItem extends StatelessWidget {
     final TextStyle baseTextStyle = theme.textTheme.bodyMedium!;
     return RepaintBoundary(
       key: Key(waqt.type.name),
-      child: Container(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
         alignment: Alignment.center,
         width: isSpecialIndex ? 25.percentWidth : 43.percentWidth,
         padding: EdgeInsets.only(
@@ -124,6 +128,7 @@ class PrayerTimeListItem extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

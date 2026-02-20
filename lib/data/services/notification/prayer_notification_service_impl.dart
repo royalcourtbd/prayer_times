@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:prayer_times/core/utility/logger_utility.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
+import 'package:prayer_times/data/services/notification/notification_service_information.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
 import 'package:prayer_times/domain/service/prayer_notification_service.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
@@ -97,8 +98,6 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       final DateTime scheduledTime = prayerTime.add(
         Duration(minutes: adjustmentMinutes),
       );
-
-      // সময় পার হয়ে গেলে schedule করার দরকার নেই
       if (scheduledTime.isBefore(DateTime.now())) return;
 
       await AwesomeNotifications().createNotification(
@@ -113,7 +112,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
           payload: {'waqtType': waqtType.name},
           autoDismissible: true,
           color: const Color(0xFF4D7AEB),
-          largeIcon: 'resource://mipmap/ic_launcher',
+          largeIcon: notificationIconSource,
         ),
         schedule: NotificationCalendar.fromDate(
           date: scheduledTime,
@@ -219,8 +218,8 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   @override
   Future<void> checkAndRequestExactAlarmPermission() async {
     await catchFutureOrVoid(() async {
-      final List<NotificationPermission> allowed =
-          await AwesomeNotifications().checkPermissionList(
+      final List<NotificationPermission> allowed = await AwesomeNotifications()
+          .checkPermissionList(
             permissions: [NotificationPermission.PreciseAlarms],
           );
 
