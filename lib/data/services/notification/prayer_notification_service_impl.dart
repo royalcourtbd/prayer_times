@@ -98,7 +98,9 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   /// Notification tap action handler
   @pragma('vm:entry-point')
   static Future<void> _onActionReceived(ReceivedAction action) async {
-    // Notification এ tap করলে app open হবে (default behavior)
+    await catchFutureOrVoid(() async {
+      // Notification এ tap করলে app open হবে (default behavior)
+    });
   }
 
   /// Notification display handler — midnight reset এ prayer notifications reschedule
@@ -106,19 +108,21 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   static Future<void> _onNotificationDisplayed(
     ReceivedNotification notification,
   ) async {
-    if (notification.id != _midnightResetId) return;
+    await catchFutureOrVoid(() async {
+      if (notification.id != _midnightResetId) return;
 
-    // Silent notification তাৎক্ষণিক dismiss — user notification drawer-এ দেখবে না
-    await AwesomeNotifications().dismiss(_midnightResetId);
+      // Silent notification তাৎক্ষণিক dismiss — user notification drawer-এ দেখবে না
+      await AwesomeNotifications().dismiss(_midnightResetId);
 
-    // Cache থেকে prayer times ও settings লোড করে reschedule
-    await _rescheduleFromCache();
+      // Cache থেকে prayer times ও settings লোড করে reschedule
+      await _rescheduleFromCache();
+    });
   }
 
   /// Cache থেকে prayer time ও adjustment settings লোড করে সব notification reschedule করে।
   /// App foreground/background উভয় ক্ষেত্রে কাজ করে।
   static Future<void> _rescheduleFromCache() async {
-    try {
+    await catchFutureOrVoid(() async {
       LocalCacheService cacheService;
 
       if (GetIt.instance.isRegistered<LocalCacheService>()) {
@@ -167,35 +171,37 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       );
 
       logDebugStatic('Midnight reset: সব prayer notification reschedule হয়েছে', 'MidnightReset');
-    } catch (e) {
-      logErrorStatic('Midnight reset reschedule error: $e', 'MidnightReset');
-    }
+    });
   }
 
   static Map<WaqtType, bool> _parseEnabledMap(String json) {
-    final Map<String, dynamic> decoded = jsonDecode(json);
-    final Map<WaqtType, bool> map = {};
-    for (final entry in decoded.entries) {
-      final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
-      if (idx == -1) continue;
-      map[WaqtType.values[idx]] = entry.value as bool;
-    }
-    return map;
+    return catchAndReturn<Map<WaqtType, bool>>(() {
+      final Map<String, dynamic> decoded = jsonDecode(json);
+      final Map<WaqtType, bool> map = {};
+      for (final entry in decoded.entries) {
+        final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
+        if (idx == -1) continue;
+        map[WaqtType.values[idx]] = entry.value as bool;
+      }
+      return map;
+    }) ?? {};
   }
 
   static Map<WaqtType, int> _parseMinutesMap(String json) {
-    final Map<String, dynamic> decoded = jsonDecode(json);
-    final Map<WaqtType, int> map = {};
-    for (final entry in decoded.entries) {
-      final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
-      if (idx == -1) continue;
-      map[WaqtType.values[idx]] = entry.value as int;
-    }
-    return map;
+    return catchAndReturn<Map<WaqtType, int>>(() {
+      final Map<String, dynamic> decoded = jsonDecode(json);
+      final Map<WaqtType, int> map = {};
+      for (final entry in decoded.entries) {
+        final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
+        if (idx == -1) continue;
+        map[WaqtType.values[idx]] = entry.value as int;
+      }
+      return map;
+    }) ?? {};
   }
 
   static PrayerTimeEntity? _parsePrayerEntity(String json) {
-    try {
+    return catchAndReturn<PrayerTimeEntity>(() {
       final Map<String, dynamic> m = jsonDecode(json);
       return PrayerTimeEntity(
         startFajr: DateTime.parse(m['startFajr']),
@@ -212,9 +218,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
         startIsha: DateTime.parse(m['startIsha']),
         ishaEnd: DateTime.parse(m['ishaEnd']),
       );
-    } catch (_) {
-      return null;
-    }
+    });
   }
 
   @override
@@ -369,30 +373,34 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
 
   /// Prayer time entity থেকে নির্দিষ্ট prayer-এর সময় বের করা
   DateTime? _getTimeForType(WaqtType type, PrayerTimeEntity entity) {
-    switch (type) {
-      case WaqtType.fajr:
-        return entity.startFajr;
-      case WaqtType.dhuhr:
-        return entity.startDhuhr;
-      case WaqtType.asr:
-        return entity.startAsr;
-      case WaqtType.maghrib:
-        return entity.startMaghrib;
-      case WaqtType.isha:
-        return entity.startIsha;
-      default:
-        return null;
-    }
+    return catchAndReturn<DateTime?>(() {
+      switch (type) {
+        case WaqtType.fajr:
+          return entity.startFajr;
+        case WaqtType.dhuhr:
+          return entity.startDhuhr;
+        case WaqtType.asr:
+          return entity.startAsr;
+        case WaqtType.maghrib:
+          return entity.startMaghrib;
+        case WaqtType.isha:
+          return entity.startIsha;
+        default:
+          return null;
+      }
+    });
   }
 
   /// Notification body তৈরি adjustment অনুযায়ী
   static String _buildNotificationBody(WaqtType type, int adjustmentMinutes) {
-    if (adjustmentMinutes == 0) {
-      return 'It is time for ${type.displayName} prayer.';
-    } else if (adjustmentMinutes > 0) {
-      return '${type.displayName} prayer was $adjustmentMinutes minutes ago.';
-    } else {
-      return '${type.displayName} prayer is in ${adjustmentMinutes.abs()} minutes.';
-    }
+    return catchAndReturn<String>(() {
+      if (adjustmentMinutes == 0) {
+        return 'It is time for ${type.displayName} prayer.';
+      } else if (adjustmentMinutes > 0) {
+        return '${type.displayName} prayer was $adjustmentMinutes minutes ago.';
+      } else {
+        return '${type.displayName} prayer is in ${adjustmentMinutes.abs()} minutes.';
+      }
+    }) ?? '';
   }
 }
