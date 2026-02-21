@@ -1,14 +1,20 @@
 import 'dart:convert';
 
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
+
 import 'package:prayer_times/core/config/prayer_time_app_color.dart';
 import 'package:prayer_times/core/utility/logger_utility.dart';
 import 'package:prayer_times/core/utility/trial_utility.dart';
+import 'package:prayer_times/data/models/location_model.dart';
 import 'package:prayer_times/data/services/local_cache_service.dart';
 import 'package:prayer_times/data/services/notification/notification_service_information.dart';
+import 'package:prayer_times/domain/entities/calculation_method_entity.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
 import 'package:prayer_times/domain/service/prayer_notification_service.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
@@ -119,14 +125,13 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     });
   }
 
-  /// Cache থেকে prayer time ও adjustment settings লোড করে সব notification reschedule করে।
+  /// adhan_dart দিয়ে আজকের prayer times fresh calculate করে সব notification reschedule করে।
   /// App foreground/background উভয় ক্ষেত্রে কাজ করে।
   static Future<void> _rescheduleFromCache() async {
     await catchFutureOrVoid(() async {
       LocalCacheService cacheService;
 
       if (GetIt.instance.isRegistered<LocalCacheService>()) {
-        // App চালু আছে — service locator থেকে সরাসরি নাও
         cacheService = GetIt.instance.get<LocalCacheService>();
       } else {
         // Background isolate — Hive manually initialize করো
@@ -138,30 +143,52 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
         cacheService = LocalCacheService();
       }
 
+      // Adjustment settings লোড
       final String? enabledJson = cacheService.getData<String>(
         key: CacheKeys.adjustmentEnabled,
       );
       final String? minutesJson = cacheService.getData<String>(
         key: CacheKeys.adjustmentMinutes,
       );
-      final String? prayerJson = cacheService.getData<String>(
-        key: CacheKeys.prayerTimeJson,
+
+      // Location লোড — ছাড়া calculation সম্ভব না
+      final String? locationJson = cacheService.getData<String>(
+        key: CacheKeys.location,
       );
 
-      if (enabledJson == null || prayerJson == null) {
+      if (enabledJson == null || locationJson == null) {
         logDebugStatic('Midnight reset: cache-এ data নেই, skip', 'MidnightReset');
         return;
       }
 
+      final LocationModel? location = _parseLocation(locationJson);
+      if (location == null) {
+        logDebugStatic('Midnight reset: location parse হয়নি, skip', 'MidnightReset');
+        return;
+      }
+
+      // Calculation/juristic method — cache থেকে, default fallback সহ
+      final String calculationMethodId = cacheService.getData<String>(
+            key: CacheKeys.calculationMethodId,
+          ) ??
+          'karachi';
+      final String juristicMethod = cacheService.getData<String>(
+            key: CacheKeys.juristicMethod,
+          ) ??
+          'Shafi';
+
+      // adhan_dart দিয়ে আজকের prayer times calculate
+      final PrayerTimeEntity entity = _calculatePrayerTimes(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timezone: location.timezone,
+        calculationMethodId: calculationMethodId,
+        juristicMethod: juristicMethod,
+      );
+
       final Map<WaqtType, bool> enabledMap = _parseEnabledMap(enabledJson);
       final Map<WaqtType, int> minutesMap =
           minutesJson != null ? _parseMinutesMap(minutesJson) : {};
-      final PrayerTimeEntity? entity = _parsePrayerEntity(prayerJson);
-
-      if (entity == null) {
-        logDebugStatic('Midnight reset: prayer entity parse হয়নি, skip', 'MidnightReset');
-        return;
-      }
 
       final service = PrayerNotificationServiceImpl();
       await service.rescheduleAll(
@@ -172,6 +199,75 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
 
       logDebugStatic('Midnight reset: সব prayer notification reschedule হয়েছে', 'MidnightReset');
     });
+  }
+
+  /// Cached location JSON parse
+  static LocationModel? _parseLocation(String json) {
+    return catchAndReturn<LocationModel>(() {
+      final Map<String, dynamic> m = jsonDecode(json);
+      return LocationModel.fromJson(m);
+    });
+  }
+
+  /// adhan_dart দিয়ে সরাসরি prayer times calculate — কোনো API call নেই
+  static PrayerTimeEntity _calculatePrayerTimes({
+    required double latitude,
+    required double longitude,
+    required String? timezone,
+    required String calculationMethodId,
+    required String juristicMethod,
+  }) {
+    tz_data.initializeTimeZones();
+
+    final coordinates = Coordinates(latitude, longitude);
+    final method = CalculationMethodEntity.getById(calculationMethodId);
+    final params = method.getParams()
+      ..madhab = juristicMethod == 'Hanafi' ? Madhab.hanafi : Madhab.shafi;
+
+    // আজকের date — timezone অনুযায়ী
+    DateTime now = DateTime.now();
+    if (timezone != null && timezone.isNotEmpty) {
+      try {
+        now = tz.TZDateTime.now(tz.getLocation(timezone));
+      } catch (_) {
+        // fallback to local time
+      }
+    }
+
+    final prayerTimes = PrayerTimes(
+      coordinates: coordinates,
+      date: now,
+      calculationParameters: params,
+      precision: true,
+    );
+
+    // UTC → location timezone convert helper
+    DateTime toLocal(DateTime utc) {
+      if (timezone != null && timezone.isNotEmpty) {
+        try {
+          return tz.TZDateTime.from(utc, tz.getLocation(timezone));
+        } catch (_) {
+          return utc.toLocal();
+        }
+      }
+      return utc.toLocal();
+    }
+
+    return PrayerTimeEntity(
+      startFajr: toLocal(prayerTimes.fajr),
+      fajrEnd: toLocal(prayerTimes.sunrise),
+      sunrise: toLocal(prayerTimes.sunrise),
+      duhaStart: toLocal(prayerTimes.sunrise).add(const Duration(minutes: 15)),
+      duhaEnd: toLocal(prayerTimes.dhuhr),
+      startDhuhr: toLocal(prayerTimes.dhuhr),
+      dhuhrEnd: toLocal(prayerTimes.asr),
+      startAsr: toLocal(prayerTimes.asr),
+      asrEnd: toLocal(prayerTimes.maghrib),
+      startMaghrib: toLocal(prayerTimes.maghrib),
+      maghribEnd: toLocal(prayerTimes.isha),
+      startIsha: toLocal(prayerTimes.isha),
+      ishaEnd: toLocal(prayerTimes.fajr).add(const Duration(days: 1)),
+    );
   }
 
   static Map<WaqtType, bool> _parseEnabledMap(String json) {
@@ -200,26 +296,6 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     }) ?? {};
   }
 
-  static PrayerTimeEntity? _parsePrayerEntity(String json) {
-    return catchAndReturn<PrayerTimeEntity>(() {
-      final Map<String, dynamic> m = jsonDecode(json);
-      return PrayerTimeEntity(
-        startFajr: DateTime.parse(m['startFajr']),
-        fajrEnd: DateTime.parse(m['fajrEnd']),
-        sunrise: DateTime.parse(m['sunrise']),
-        duhaStart: DateTime.parse(m['duhaStart']),
-        duhaEnd: DateTime.parse(m['duhaEnd']),
-        startDhuhr: DateTime.parse(m['startDhuhr']),
-        dhuhrEnd: DateTime.parse(m['dhuhrEnd']),
-        startAsr: DateTime.parse(m['startAsr']),
-        asrEnd: DateTime.parse(m['asrEnd']),
-        startMaghrib: DateTime.parse(m['startMaghrib']),
-        maghribEnd: DateTime.parse(m['maghribEnd']),
-        startIsha: DateTime.parse(m['startIsha']),
-        ishaEnd: DateTime.parse(m['ishaEnd']),
-      );
-    });
-  }
 
   @override
   Future<void> scheduleForPrayer({

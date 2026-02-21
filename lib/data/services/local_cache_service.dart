@@ -129,5 +129,6 @@ class CacheKeys {
   static const String hijriDayAdjustment = "hijri_day_adjustment_key";
   static const String adjustmentEnabled = "adjustment_enabled_key";
   static const String adjustmentMinutes = "adjustment_minutes_key";
-  static const String prayerTimeJson = "prayer_time_json_key";
+  static const String calculationMethodId = "calculation_method_id_key";
+  static const String juristicMethod = "juristic_method_key";
 }

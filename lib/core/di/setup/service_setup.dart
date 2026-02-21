@@ -70,6 +70,23 @@ class ServiceSetup implements SetupModule {
 
     await LocalCacheService.setUp();
 
+    // DB থেকে calculation/juristic method Hive cache-এ sync —
+    // background isolate (midnight reset) এ Drift DB নেই, তাই Hive-এ রাখা দরকার
+    await catchFutureOrVoid(() async {
+      final db = _serviceLocator<PrayerDatabase>();
+      final cache = _serviceLocator<LocalCacheService>();
+      final calcMethod = await db.getCalculationMethod();
+      final juristicMethod = await db.getJuristicMethod();
+      await cache.saveData<String>(
+        key: CacheKeys.calculationMethodId,
+        value: calcMethod,
+      );
+      await cache.saveData<String>(
+        key: CacheKeys.juristicMethod,
+        value: juristicMethod,
+      );
+    });
+
     await _serviceLocator<PrayerNotificationService>().initialize();
 
     await _setUpAudioService();

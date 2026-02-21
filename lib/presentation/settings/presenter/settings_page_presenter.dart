@@ -6,6 +6,7 @@ import 'package:prayer_times/core/external_libs/flutter_toast/debouncer.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/data/datasources/local/location_local_data_source.dart';
 import 'package:prayer_times/data/services/hijri_date_service.dart';
+import 'package:prayer_times/data/services/local_cache_service.dart';
 import 'package:prayer_times/domain/entities/country_entity.dart';
 import 'package:prayer_times/domain/entities/location_entity.dart';
 import 'package:prayer_times/domain/usecases/get_countries_usecase.dart';
@@ -95,6 +96,11 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
           uiState.value = currentUiState.copyWith(
             selectedJuristicMethod: method,
           );
+          // Background midnight reset-এর জন্য Hive cache-এও save
+          locate<LocalCacheService>().saveData<String>(
+            key: CacheKeys.juristicMethod,
+            value: method,
+          );
           onPrayerTimeUpdateRequired?.call();
           showMessage(message: 'Juristic method saved successfully');
         },
@@ -127,6 +133,11 @@ class SettingsPagePresenter extends BasePresenter<SettingsPageUiState> {
         onDataLoaded: (_) async {
           uiState.value = currentUiState.copyWith(
             selectedCalculationMethod: method,
+          );
+          // Background midnight reset-এর জন্য Hive cache-এও save
+          locate<LocalCacheService>().saveData<String>(
+            key: CacheKeys.calculationMethodId,
+            value: method,
           );
           onPrayerTimeUpdateRequired?.call();
           showMessage(message: 'Calculation method saved successfully');
