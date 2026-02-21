@@ -91,6 +91,18 @@ class NotificationRepositoryImpl extends NotificationRepository {
     }
   }
 
+  @override
+  Future<Either<String, void>> deleteNotifications(List<String> ids) async {
+    try {
+      final List<NotificationModel> notifications = _loadNotifications();
+      notifications.removeWhere((n) => ids.contains(n.id));
+      await _saveNotifications(notifications);
+      return right(null);
+    } catch (e) {
+      return left('নোটিফিকেশন মুছে ফেলতে সমস্যা হয়েছে');
+    }
+  }
+
   /// Hive cache থেকে notification list লোড
   List<NotificationModel> _loadNotifications() {
     return catchAndReturn<List<NotificationModel>>(() {

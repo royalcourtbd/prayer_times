@@ -27,13 +27,21 @@ class NotificationPage extends StatelessWidget {
       onInit: () {},
       builder: () {
         final NotificationUiState currentUiState = _presenter.currentUiState;
+        final bool isSelectionMode = currentUiState.isSelectionMode;
+        final int selectedCount = currentUiState.selectedIds.length;
 
         return Scaffold(
-          appBar: CustomAppBar(title: 'Notifications', theme: theme),
+          appBar: CustomAppBar(
+            title: isSelectionMode
+                ? '$selectedCount Selected'
+                : 'Notifications',
+            theme: theme,
+            actions: _buildActions(context, currentUiState, theme),
+          ),
           body: currentUiState.notifications.isEmpty
               ? _buildEmptyState(theme, context)
               : _buildNotificationList(
-                  currentUiState.notifications,
+                  currentUiState,
                   theme,
                   context,
                 ),
@@ -42,70 +50,165 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
+  /// AppBar actions — selection mode অনুযায়ী পরিবর্তন হবে
+  List<Widget> _buildActions(
+    BuildContext context,
+    NotificationUiState state,
+    ThemeData theme,
+  ) {
+    if (state.notifications.isEmpty) return [];
+
+    if (state.isSelectionMode) {
+      return [
+        // সব select করা
+        IconButton(
+          onPressed: () => _presenter.selectAll(),
+          icon: Icon(
+            Icons.select_all_rounded,
+            color: context.color.titleColor,
+          ),
+          tooltip: 'Select All',
+        ),
+        // Delete selected
+        IconButton(
+          onPressed: state.selectedIds.isEmpty
+              ? null
+              : () => _presenter.deleteSelected(),
+          icon: Icon(
+            Icons.delete_outline_rounded,
+            color: state.selectedIds.isEmpty
+                ? context.color.captionColor
+                : context.color.errorColor500,
+          ),
+          tooltip: 'Delete',
+        ),
+        // Cancel selection
+        IconButton(
+          onPressed: () => _presenter.toggleSelectionMode(),
+          icon: Icon(
+            Icons.close_rounded,
+            color: context.color.titleColor,
+          ),
+          tooltip: 'Cancel',
+        ),
+      ];
+    }
+
+    return [
+      // Selection mode চালু করার button
+      IconButton(
+        onPressed: () => _presenter.toggleSelectionMode(),
+        icon: Icon(
+          Icons.checklist_rounded,
+          color: context.color.titleColor,
+        ),
+        tooltip: 'Select',
+      ),
+    ];
+  }
+
   Widget _buildEmptyState(ThemeData theme, BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SvgImage(SvgPath.icNotificationOutline),
-          gapH16,
-          Text(
-            'No Notifications Yet',
-            style: theme.textTheme.titleMedium!.copyWith(
-              color: context.color.titleColor,
+      child: Padding(
+        padding: paddingH20,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SvgImage(SvgPath.icNotificationOutline),
+            gapH16,
+            Text(
+              'No Notifications Yet',
+              style: theme.textTheme.titleMedium!.copyWith(
+                color: context.color.titleColor,
+              ),
             ),
-          ),
-          gapH8,
-          Text(
-            'You\'ll receive notifications about prayer times and updates here',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: context.color.subTitleColor,
+            gapH8,
+            Text(
+              'You\'ll receive notifications about prayer times and updates here',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium!.copyWith(
+                color: context.color.subTitleColor,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildNotificationList(
-    List<NotificationEntity> notifications,
+    NotificationUiState state,
     ThemeData theme,
     BuildContext context,
   ) {
+    final List<NotificationEntity> notifications = state.notifications;
+
     return ListView.separated(
       padding: padding15,
       itemCount: notifications.length,
       separatorBuilder: (_, _) => gapH16,
       itemBuilder: (context, index) {
         final NotificationEntity notification = notifications[index];
+        final bool isSelected = state.selectedIds.contains(notification.id);
+
         return InkWell(
           borderRadius: radius15,
           onTap: () {
-            _presenter.markAsRead(notification.id);
-            context.navigatorPush(
-              NotificationDetailsPage(notification: notification),
-            );
+            if (state.isSelectionMode) {
+              _presenter.toggleSelection(notification.id);
+            } else {
+              _presenter.markAsRead(notification.id);
+              context.navigatorPush(
+                NotificationDetailsPage(notification: notification),
+              );
+            }
+          },
+          onLongPress: () {
+            if (!state.isSelectionMode) {
+              _presenter.toggleSelectionMode();
+              _presenter.toggleSelection(notification.id);
+            }
           },
           child: Container(
             padding: padding15,
             decoration: BoxDecoration(
-              color: notification.isRead
-                  ? context.color.scaffoldBachgroundColor
-                  : context.color.primaryColor25,
+              color: isSelected
+                  ? context.color.primaryColor25
+                  : notification.isRead
+                      ? context.color.scaffoldBachgroundColor
+                      : context.color.primaryColor25,
               borderRadius: radius10,
+              border: isSelected
+                  ? Border.all(
+                      color: context.color.primaryColor,
+                      width: 1.5,
+                    )
+                  : null,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: twentyTwoPx,
-                  backgroundColor: generateAvatarColor(index: index),
-                  child: SvgImage(
-                    notification.imageUrl ?? '',
-                    color: context.color.whiteColor,
+                // Selection mode-এ checkbox, না হলে avatar
+                if (state.isSelectionMode) ...[
+                  Checkbox(
+                    value: isSelected,
+                    onChanged: (_) =>
+                        _presenter.toggleSelection(notification.id),
+                    activeColor: context.color.primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(fourPx),
+                    ),
                   ),
-                ),
+                ] else ...[
+                  CircleAvatar(
+                    radius: twentyTwoPx,
+                    backgroundColor: generateAvatarColor(index: index),
+                    child: SvgImage(
+                      notification.imageUrl ?? '',
+                      color: context.color.whiteColor,
+                    ),
+                  ),
+                ],
                 gapW14,
                 Expanded(
                   child: Column(
@@ -130,7 +233,8 @@ class NotificationPage extends StatelessWidget {
                         ),
                       ),
                       gapH8,
-                      if (notification.actionUrl != null) ...[
+                      if (notification.actionUrl != null &&
+                          !state.isSelectionMode) ...[
                         gapH8,
                         Align(
                           alignment: Alignment.centerLeft,

@@ -57,6 +57,51 @@ class NotificationPresenter extends BasePresenter<NotificationUiState> {
     );
   }
 
+  /// Selection mode toggle
+  void toggleSelectionMode() {
+    final bool newMode = !currentUiState.isSelectionMode;
+    uiState.value = currentUiState.copyWith(
+      isSelectionMode: newMode,
+      selectedIds: newMode ? currentUiState.selectedIds : {},
+    );
+  }
+
+  /// একটি notification select/deselect toggle
+  void toggleSelection(String id) {
+    final Set<String> updated = Set<String>.from(currentUiState.selectedIds);
+    if (updated.contains(id)) {
+      updated.remove(id);
+    } else {
+      updated.add(id);
+    }
+    uiState.value = currentUiState.copyWith(selectedIds: updated);
+  }
+
+  /// সব notification select করা
+  void selectAll() {
+    final Set<String> allIds =
+        currentUiState.notifications.map((n) => n.id).toSet();
+    uiState.value = currentUiState.copyWith(selectedIds: allIds);
+  }
+
+  /// Selected notification গুলো delete করা
+  Future<void> deleteSelected() async {
+    final List<String> ids = currentUiState.selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    await parseDataFromEitherWithUserMessage(
+      task: () => _getNotificationsUseCase.deleteNotifications(ids),
+      onDataLoaded: (data) {
+        uiState.value = currentUiState.copyWith(
+          isSelectionMode: false,
+          selectedIds: {},
+        );
+        loadNotifications();
+      },
+      showLoading: true,
+    );
+  }
+
   @override
   void onInit() {
     loadNotifications();

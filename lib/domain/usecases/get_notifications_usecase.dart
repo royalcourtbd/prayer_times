@@ -25,4 +25,8 @@ class GetNotificationsUseCase extends BaseUseCase<List<NotificationEntity>> {
   ) async {
     return _repository.addNotification(notification);
   }
+
+  Future<Either<String, void>> deleteNotifications(List<String> ids) async {
+    return _repository.deleteNotifications(ids);
+  }
 }
