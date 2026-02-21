@@ -1,0 +1,1176 @@
+[
+  {
+    "name": "Brunei",
+    "timezone": "Asia/Brunei",
+    "code": "BN",
+    "latitude": 4.8903,
+    "longitude": 114.9422,
+    "cities": [
+      {
+        "name": "Bandar Seri Begawan",
+        "timezone": "Asia/Brunei",
+        "latitude": 4.8903,
+        "longitude": 114.9422
+      },
+      {
+        "name": "Seria",
+        "timezone": "Asia/Brunei",
+        "latitude": 4.6141,
+        "longitude": 114.3302
+      },
+      {
+        "name": "Kuala Belait",
+        "timezone": "Asia/Brunei",
+        "latitude": 4.5828,
+        "longitude": 114.1918
+      }
+    ]
+  },
+  {
+    "name": "Congo (Brazzaville)",
+    "timezone": "Africa/Brazzaville",
+    "code": "CG",
+    "latitude": -4.2694,
+    "longitude": 15.2711,
+    "cities": [
+      {
+        "name": "Brazzaville",
+        "timezone": "Africa/Brazzaville",
+        "latitude": -4.2694,
+        "longitude": 15.2711
+      },
+      {
+        "name": "Pointe-Noire",
+        "timezone": "Africa/Brazzaville",
+        "latitude": -4.7975,
+        "longitude": 11.8503
+      },
+      {
+        "name": "Dolisie",
+        "timezone": "Africa/Brazzaville",
+        "latitude": -4.2006,
+        "longitude": 12.6792
+      }
+    ]
+  },
+  {
+    "name": "Congo (Kinshasa)",
+    "timezone": "Africa/Kinshasa",
+    "code": "CD",
+    "latitude": -4.3219,
+    "longitude": 15.3119,
+    "cities": [
+      {
+        "name": "Kinshasa",
+        "timezone": "Africa/Kinshasa",
+        "latitude": -4.3219,
+        "longitude": 15.3119
+      },
+      {
+        "name": "Mbuji-Mayi",
+        "timezone": "Africa/Kinshasa",
+        "latitude": -6.15,
+        "longitude": 23.6
+      },
+      {
+        "name": "Kananga",
+        "timezone": "Africa/Kinshasa",
+        "latitude": -5.897,
+        "longitude": 22.4488
+      },
+      {
+        "name": "Lubumbashi",
+        "timezone": "Africa/Kinshasa",
+        "latitude": -11.6647,
+        "longitude": 27.4794
+      },
+      {
+        "name": "Kisangani",
+        "timezone": "Africa/Kinshasa",
+        "latitude": 0.5167,
+        "longitude": 25.2
+      }
+    ]
+  },
+  {
+    "name": "Cote d’Ivoire",
+    "timezone": "Africa/Abidjan",
+    "code": "CI",
+    "latitude": 5.3167,
+    "longitude": -4.0333,
+    "cities": [
+      {
+        "name": "Abidjan",
+        "timezone": "Africa/Abidjan",
+        "latitude": 5.3167,
+        "longitude": -4.0333
+      },
+      {
+        "name": "Bouake",
+        "timezone": "Africa/Abidjan",
+        "latitude": 7.6833,
+        "longitude": -5.0167
+      },
+      {
+        "name": "Daloa",
+        "timezone": "Africa/Abidjan",
+        "latitude": 6.8833,
+        "longitude": -6.45
+      },
+      {
+        "name": "Yamoussoukro",
+        "timezone": "Africa/Abidjan",
+        "latitude": 6.8161,
+        "longitude": -5.2742
+      }
+    ]
+  },
+  {
+    "name": "Czechia",
+    "timezone": "Europe/Prague",
+    "code": "CZ",
+    "latitude": 50.0875,
+    "longitude": 14.4214,
+    "cities": [
+      {
+        "name": "Prague",
+        "timezone": "Europe/Prague",
+        "latitude": 50.0875,
+        "longitude": 14.4214
+      },
+      {
+        "name": "Brno",
+        "timezone": "Europe/Prague",
+        "latitude": 49.1925,
+        "longitude": 16.6083
+      },
+      {
+        "name": "Ostrava",
+        "timezone": "Europe/Prague",
+        "latitude": 49.8356,
+        "longitude": 18.2925
+      },
+      {
+        "name": "Plzen",
+        "timezone": "Europe/Prague",
+        "latitude": 49.7475,
+        "longitude": 13.3775
+      }
+    ]
+  },
+  {
+    "name": "Gambia, The",
+    "timezone": "Africa/Banjul",
+    "code": "GM",
+    "latitude": 13.4531,
+    "longitude": -16.5775,
+    "cities": [
+      {
+        "name": "Banjul",
+        "timezone": "Africa/Banjul",
+        "latitude": 13.4531,
+        "longitude": -16.5775
+      },
+      {
+        "name": "Serekunda",
+        "timezone": "Africa/Banjul",
+        "latitude": 13.4333,
+        "longitude": -16.6667
+      },
+      {
+        "name": "Brikama",
+        "timezone": "Africa/Banjul",
+        "latitude": 13.2667,
+        "longitude": -16.65
+      }
+    ]
+  },
+  {
+    "name": "Vatican City",
+    "timezone": "Europe/Vatican",
+    "code": "VA",
+    "latitude": 41.904,
+    "longitude": 12.453,
+    "cities": [
+      {
+        "name": "Vatican City",
+        "timezone": "Europe/Vatican",
+        "latitude": 41.904,
+        "longitude": 12.453
+      }
+    ]
+  },
+  {
+    "name": "Iran",
+    "timezone": "Asia/Tehran",
+    "code": "IR",
+    "latitude": 35.6892,
+    "longitude": 51.3889,
+    "cities": [
+      {
+        "name": "Tehran",
+        "timezone": "Asia/Tehran",
+        "latitude": 35.6892,
+        "longitude": 51.3889
+      },
+      {
+        "name": "Mashhad",
+        "timezone": "Asia/Tehran",
+        "latitude": 36.3264,
+        "longitude": 59.5433
+      },
+      {
+        "name": "Esfahan",
+        "timezone": "Asia/Tehran",
+        "latitude": 32.6447,
+        "longitude": 51.6675
+      },
+      {
+        "name": "Karaj",
+        "timezone": "Asia/Tehran",
+        "latitude": 35.8272,
+        "longitude": 50.9489
+      },
+      {
+        "name": "Shiraz",
+        "timezone": "Asia/Tehran",
+        "latitude": 29.61,
+        "longitude": 52.5425
+      },
+      {
+        "name": "Tabriz",
+        "timezone": "Asia/Tehran",
+        "latitude": 38.0814,
+        "longitude": 46.3006
+      }
+    ]
+  },
+  {
+    "name": "Korea, North",
+    "timezone": "Asia/Pyongyang",
+    "code": "KP",
+    "latitude": 39.0167,
+    "longitude": 125.7475,
+    "cities": [
+      {
+        "name": "Pyongyang",
+        "timezone": "Asia/Pyongyang",
+        "latitude": 39.0167,
+        "longitude": 125.7475
+      },
+      {
+        "name": "Hamhung",
+        "timezone": "Asia/Pyongyang",
+        "latitude": 39.9167,
+        "longitude": 127.5333
+      },
+      {
+        "name": "Nampo",
+        "timezone": "Asia/Pyongyang",
+        "latitude": 38.7333,
+        "longitude": 125.4
+      },
+      {
+        "name": "Ch’ongjin",
+        "timezone": "Asia/Pyongyang",
+        "latitude": 41.7833,
+        "longitude": 129.7667
+      }
+    ]
+  },
+  {
+    "name": "Korea, South",
+    "timezone": "Asia/Seoul",
+    "code": "KR",
+    "latitude": 37.56,
+    "longitude": 126.99,
+    "cities": [
+      {
+        "name": "Seoul",
+        "timezone": "Asia/Seoul",
+        "latitude": 37.56,
+        "longitude": 126.99
+      },
+      {
+        "name": "Busan",
+        "timezone": "Asia/Seoul",
+        "latitude": 35.18,
+        "longitude": 129.075
+      },
+      {
+        "name": "Incheon",
+        "timezone": "Asia/Seoul",
+        "latitude": 37.4833,
+        "longitude": 126.6333
+      },
+      {
+        "name": "Daegu",
+        "timezone": "Asia/Seoul",
+        "latitude": 35.8717,
+        "longitude": 128.6017
+      },
+      {
+        "name": "Gwangju",
+        "timezone": "Asia/Seoul",
+        "latitude": 35.1653,
+        "longitude": 126.8486
+      },
+      {
+        "name": "Daejeon",
+        "timezone": "Asia/Seoul",
+        "latitude": 36.35,
+        "longitude": 127.385
+      }
+    ]
+  },
+  {
+    "name": "Laos",
+    "timezone": "Asia/Vientiane",
+    "code": "LA",
+    "latitude": 17.98,
+    "longitude": 102.63,
+    "cities": [
+      {
+        "name": "Vientiane",
+        "timezone": "Asia/Vientiane",
+        "latitude": 17.98,
+        "longitude": 102.63
+      },
+      {
+        "name": "Savannakhet",
+        "timezone": "Asia/Vientiane",
+        "latitude": 16.55,
+        "longitude": 104.75
+      },
+      {
+        "name": "Pakxe",
+        "timezone": "Asia/Vientiane",
+        "latitude": 15.1167,
+        "longitude": 105.7833
+      }
+    ]
+  },
+  {
+    "name": "Macau",
+    "timezone": "Asia/Macau",
+    "code": "MO",
+    "latitude": 22.2006,
+    "longitude": 113.5461,
+    "cities": [
+      {
+        "name": "Macau",
+        "timezone": "Asia/Macau",
+        "latitude": 22.2006,
+        "longitude": 113.5461
+      }
+    ]
+  },
+  {
+    "name": "North Macedonia",
+    "timezone": "Europe/Skopje",
+    "code": "MK",
+    "latitude": 41.9961,
+    "longitude": 21.4317,
+    "cities": [
+      {
+        "name": "Skopje",
+        "timezone": "Europe/Skopje",
+        "latitude": 41.9961,
+        "longitude": 21.4317
+      },
+      {
+        "name": "Kumanovo",
+        "timezone": "Europe/Skopje",
+        "latitude": 42.1322,
+        "longitude": 21.7144
+      },
+      {
+        "name": "Bitola",
+        "timezone": "Europe/Skopje",
+        "latitude": 41.0319,
+        "longitude": 21.3347
+      },
+      {
+        "name": "Prilep",
+        "timezone": "Europe/Skopje",
+        "latitude": 41.3464,
+        "longitude": 21.5542
+      }
+    ]
+  },
+
+  {
+    "name": "Burma",
+    "timezone": "Asia/Yangon",
+    "code": "MM",
+    "latitude": 16.795,
+    "longitude": 96.16,
+    "cities": [
+      {
+        "name": "Rangoon",
+        "timezone": "Asia/Yangon",
+        "latitude": 16.795,
+        "longitude": 96.16
+      },
+      {
+        "name": "Mandalay",
+        "timezone": "Asia/Yangon",
+        "latitude": 21.9831,
+        "longitude": 96.0844
+      },
+      {
+        "name": "Nay Pyi Taw",
+        "timezone": "Asia/Yangon",
+        "latitude": 19.7475,
+        "longitude": 96.115
+      }
+    ]
+  },
+  {
+    "name": "Nauru",
+    "timezone": "Pacific/Nauru",
+    "code": "NR",
+    "latitude": -0.5477,
+    "longitude": 166.9209,
+    "cities": [
+      {
+        "name": "Yaren",
+        "timezone": "Pacific/Nauru",
+        "latitude": -0.5477,
+        "longitude": 166.9209
+      }
+    ]
+  },
+  {
+    "name": "West Bank",
+    "timezone": "Asia/Hebron",
+    "code": "XW",
+    "latitude": 31.5286,
+    "longitude": 35.0969,
+    "cities": [
+      {
+        "name": "Hebron",
+        "timezone": "Asia/Hebron",
+        "latitude": 31.5286,
+        "longitude": 35.0969
+      },
+      {
+        "name": "Nablus",
+        "timezone": "Asia/Hebron",
+        "latitude": 32.2222,
+        "longitude": 35.2611
+      },
+      {
+        "name": "Ramallah",
+        "timezone": "Asia/Hebron",
+        "latitude": 31.9,
+        "longitude": 35.2
+      }
+    ]
+  },
+  {
+    "name": "Gaza Strip",
+    "timezone": "Asia/Gaza",
+    "code": "XG",
+    "latitude": 31.5069,
+    "longitude": 34.456,
+    "cities": [
+      {
+        "name": "Gaza",
+        "timezone": "Asia/Gaza",
+        "latitude": 31.5069,
+        "longitude": 34.456
+      },
+      {
+        "name": "Khan Yunis",
+        "timezone": "Asia/Gaza",
+        "latitude": 31.3444,
+        "longitude": 34.3031
+      }
+    ]
+  },
+  {
+    "name": "Pitcairn Islands",
+    "timezone": "Pacific/Pitcairn",
+    "code": "PN",
+    "latitude": -25.0667,
+    "longitude": -130.1,
+    "cities": [
+      {
+        "name": "Adamstown",
+        "timezone": "Pacific/Pitcairn",
+        "latitude": -25.0667,
+        "longitude": -130.1
+      }
+    ]
+  },
+  {
+    "name": "Puerto Rico",
+    "timezone": "America/Puerto_Rico",
+    "code": "PR",
+    "latitude": 18.3985,
+    "longitude": -66.061,
+    "cities": [
+      {
+        "name": "San Juan",
+        "timezone": "America/Puerto_Rico",
+        "latitude": 18.3985,
+        "longitude": -66.061
+      },
+      {
+        "name": "Bayamon",
+        "timezone": "America/Puerto_Rico",
+        "latitude": 18.3794,
+        "longitude": -66.1635
+      },
+      {
+        "name": "Carolina",
+        "timezone": "America/Puerto_Rico",
+        "latitude": 18.4054,
+        "longitude": -65.9792
+      },
+      {
+        "name": "Ponce",
+        "timezone": "America/Puerto_Rico",
+        "latitude": 18.0127,
+        "longitude": -66.6212
+      }
+    ]
+  },
+  {
+    "name": "Kosovo",
+    "timezone": "Europe/Belgrade",
+    "code": "XK",
+    "latitude": 42.6633,
+    "longitude": 21.1622,
+    "cities": [
+      {
+        "name": "Pristina",
+        "timezone": "Europe/Belgrade",
+        "latitude": 42.6633,
+        "longitude": 21.1622
+      },
+      {
+        "name": "Prizren",
+        "timezone": "Europe/Belgrade",
+        "latitude": 42.2128,
+        "longitude": 20.7392
+      },
+      {
+        "name": "Ferizaj",
+        "timezone": "Europe/Belgrade",
+        "latitude": 42.3667,
+        "longitude": 21.1667
+      }
+    ]
+  },
+  {
+    "name": "Reunion",
+    "timezone": "Indian/Reunion",
+    "code": "RE",
+    "latitude": -20.8789,
+    "longitude": 55.4481,
+    "cities": [
+      {
+        "name": "Saint-Denis",
+        "timezone": "Indian/Reunion",
+        "latitude": -20.8789,
+        "longitude": 55.4481
+      },
+      {
+        "name": "Saint-Benoit",
+        "timezone": "Indian/Reunion",
+        "latitude": -21.0339,
+        "longitude": 55.7128
+      }
+    ]
+  },
+  {
+    "name": "Russia",
+    "timezone": "Europe/Moscow",
+    "code": "RU",
+    "latitude": 55.7558,
+    "longitude": 37.6172,
+    "cities": [
+      {
+        "name": "Moscow",
+        "timezone": "Europe/Moscow",
+        "latitude": 55.7558,
+        "longitude": 37.6172
+      },
+      {
+        "name": "Saint Petersburg",
+        "timezone": "Europe/Moscow",
+        "latitude": 59.9375,
+        "longitude": 30.3086
+      },
+      {
+        "name": "Novosibirsk",
+        "timezone": "Asia/Novosibirsk",
+        "latitude": 55.05,
+        "longitude": 82.95
+      },
+      {
+        "name": "Yekaterinburg",
+        "timezone": "Asia/Yekaterinburg",
+        "latitude": 56.8356,
+        "longitude": 60.6128
+      },
+      {
+        "name": "Kazan",
+        "timezone": "Europe/Moscow",
+        "latitude": 55.7964,
+        "longitude": 49.1089
+      },
+      {
+        "name": "Nizhniy Novgorod",
+        "timezone": "Europe/Moscow",
+        "latitude": 56.3269,
+        "longitude": 44.0075
+      }
+    ]
+  },
+  {
+    "name": "Saint Barthelemy",
+    "timezone": "America/St_Barthelemy",
+    "code": "BL",
+    "latitude": 17.8979,
+    "longitude": -62.8506,
+    "cities": [
+      {
+        "name": "Gustavia",
+        "timezone": "America/St_Barthelemy",
+        "latitude": 17.8979,
+        "longitude": -62.8506
+      }
+    ]
+  },
+  {
+    "name": "Saint Helena, Ascension, and Tristan da Cunha",
+    "timezone": "Atlantic/St_Helena",
+    "code": "SH",
+    "latitude": -15.9251,
+    "longitude": -5.7179,
+    "cities": [
+      {
+        "name": "Jamestown",
+        "timezone": "Atlantic/St_Helena",
+        "latitude": -15.9251,
+        "longitude": -5.7179
+      },
+      {
+        "name": "Georgetown",
+        "timezone": "Atlantic/St_Helena",
+        "latitude": -7.9286,
+        "longitude": -14.4119
+      }
+    ]
+  },
+  {
+    "name": "Saint Kitts and Nevis",
+    "timezone": "America/St_Kitts",
+    "code": "KN",
+    "latitude": 17.3,
+    "longitude": -62.7333,
+    "cities": [
+      {
+        "name": "Basseterre",
+        "timezone": "America/St_Kitts",
+        "latitude": 17.3,
+        "longitude": -62.7333
+      }
+    ]
+  },
+  {
+    "name": "Saint Martin",
+    "timezone": "America/Marigot",
+    "code": "MF",
+    "latitude": 18.0706,
+    "longitude": -63.0847,
+    "cities": [
+      {
+        "name": "Marigot",
+        "timezone": "America/Marigot",
+        "latitude": 18.0706,
+        "longitude": -63.0847
+      }
+    ]
+  },
+  {
+    "name": "Saint Pierre and Miquelon",
+    "timezone": "America/Miquelon",
+    "code": "PM",
+    "latitude": 46.7778,
+    "longitude": -56.1778,
+    "cities": [
+      {
+        "name": "Saint-Pierre",
+        "timezone": "America/Miquelon",
+        "latitude": 46.7778,
+        "longitude": -56.1778
+      }
+    ]
+  },
+  {
+    "name": "Saint Vincent and the Grenadines",
+    "timezone": "America/St_Vincent",
+    "code": "VC",
+    "latitude": 13.1578,
+    "longitude": -61.225,
+    "cities": [
+      {
+        "name": "Kingstown",
+        "timezone": "America/St_Vincent",
+        "latitude": 13.1578,
+        "longitude": -61.225
+      }
+    ]
+  },
+  {
+    "name": "Sao Tome and Principe",
+    "timezone": "Africa/Sao_Tome",
+    "code": "ST",
+    "latitude": 0.3361,
+    "longitude": 6.7306,
+    "cities": [
+      {
+        "name": "Sao Tome",
+        "timezone": "Africa/Sao_Tome",
+        "latitude": 0.3361,
+        "longitude": 6.7306
+      }
+    ]
+  },
+  {
+    "name": "Sint Maarten",
+    "timezone": "America/Lower_Princes",
+    "code": "SX",
+    "latitude": 18.0237,
+    "longitude": -63.0458,
+    "cities": [
+      {
+        "name": "Philipsburg",
+        "timezone": "America/Lower_Princes",
+        "latitude": 18.0237,
+        "longitude": -63.0458
+      }
+    ]
+  },
+  {
+    "name": "Svalbard",
+    "timezone": "Arctic/Longyearbyen",
+    "code": "XR",
+    "latitude": 78.22,
+    "longitude": 15.65,
+    "cities": [
+      {
+        "name": "Longyearbyen",
+        "timezone": "Arctic/Longyearbyen",
+        "latitude": 78.22,
+        "longitude": 15.65
+      }
+    ]
+  },
+  {
+    "name": "Syria",
+    "timezone": "Asia/Damascus",
+    "code": "SY",
+    "latitude": 33.5131,
+    "longitude": 36.2919,
+    "cities": [
+      {
+        "name": "Damascus",
+        "timezone": "Asia/Damascus",
+        "latitude": 33.5131,
+        "longitude": 36.2919
+      },
+      {
+        "name": "Aleppo",
+        "timezone": "Asia/Damascus",
+        "latitude": 36.2,
+        "longitude": 37.16
+      },
+      {
+        "name": "Homs",
+        "timezone": "Asia/Damascus",
+        "latitude": 34.7308,
+        "longitude": 36.7094
+      },
+      {
+        "name": "Latakia",
+        "timezone": "Asia/Damascus",
+        "latitude": 35.5167,
+        "longitude": 35.7833
+      },
+      {
+        "name": "Hamah",
+        "timezone": "Asia/Damascus",
+        "latitude": 35.1333,
+        "longitude": 36.75
+      }
+    ]
+  },
+  {
+    "name": "Taiwan",
+    "timezone": "Asia/Taipei",
+    "code": "TW",
+    "latitude": 25.0375,
+    "longitude": 121.5625,
+    "cities": [
+      {
+        "name": "Taipei",
+        "timezone": "Asia/Taipei",
+        "latitude": 25.0375,
+        "longitude": 121.5625
+      },
+      {
+        "name": "Kaohsiung",
+        "timezone": "Asia/Taipei",
+        "latitude": 22.615,
+        "longitude": 120.2975
+      },
+      {
+        "name": "Taichung",
+        "timezone": "Asia/Taipei",
+        "latitude": 24.1439,
+        "longitude": 120.6794
+      },
+      {
+        "name": "Tainan",
+        "timezone": "Asia/Taipei",
+        "latitude": 22.9833,
+        "longitude": 120.1833
+      }
+    ]
+  },
+  {
+    "name": "Tanzania",
+    "timezone": "Africa/Dar_es_Salaam",
+    "code": "TZ",
+    "latitude": -6.1731,
+    "longitude": 35.7419,
+    "cities": [
+      {
+        "name": "Dar es Salaam",
+        "timezone": "Africa/Dar_es_Salaam",
+        "latitude": -6.8161,
+        "longitude": 39.2803
+      },
+      {
+        "name": "Mwanza",
+        "timezone": "Africa/Dar_es_Salaam",
+        "latitude": -2.5167,
+        "longitude": 32.9
+      },
+      {
+        "name": "Dodoma",
+        "timezone": "Africa/Dar_es_Salaam",
+        "latitude": -6.1731,
+        "longitude": 35.7419
+      },
+      {
+        "name": "Arusha",
+        "timezone": "Africa/Dar_es_Salaam",
+        "latitude": -3.3667,
+        "longitude": 36.6833
+      },
+      {
+        "name": "Mbeya",
+        "timezone": "Africa/Dar_es_Salaam",
+        "latitude": -8.9,
+        "longitude": 33.45
+      }
+    ]
+  },
+  {
+    "name": "Trinidad and Tobago",
+    "timezone": "America/Port_of_Spain",
+    "code": "TT",
+    "latitude": 10.6667,
+    "longitude": -61.5167,
+    "cities": [
+      {
+        "name": "Port of Spain",
+        "timezone": "America/Port_of_Spain",
+        "latitude": 10.6667,
+        "longitude": -61.5167
+      },
+      {
+        "name": "Chaguanas",
+        "timezone": "America/Port_of_Spain",
+        "latitude": 10.5167,
+        "longitude": -61.4
+      },
+      {
+        "name": "San Fernando",
+        "timezone": "America/Port_of_Spain",
+        "latitude": 10.2833,
+        "longitude": -61.4667
+      }
+    ]
+  },
+  {
+    "name": "Turks and Caicos Islands",
+    "timezone": "America/Grand_Turk",
+    "code": "TC",
+    "latitude": 21.459,
+    "longitude": -71.139,
+    "cities": [
+      {
+        "name": "Grand Turk",
+        "timezone": "America/Grand_Turk",
+        "latitude": 21.459,
+        "longitude": -71.139
+      }
+    ]
+  },
+  {
+    "name": "United Kingdom",
+    "timezone": "Europe/London",
+    "code": "GB",
+    "latitude": 51.5072,
+    "longitude": -0.1275,
+    "cities": [
+      {
+        "name": "London",
+        "timezone": "Europe/London",
+        "latitude": 51.5072,
+        "longitude": -0.1275
+      },
+      {
+        "name": "Birmingham",
+        "timezone": "Europe/London",
+        "latitude": 52.48,
+        "longitude": -1.9025
+      },
+      {
+        "name": "Manchester",
+        "timezone": "Europe/London",
+        "latitude": 53.479,
+        "longitude": -2.2452
+      },
+      {
+        "name": "Glasgow",
+        "timezone": "Europe/London",
+        "latitude": 55.8611,
+        "longitude": -4.25
+      },
+      {
+        "name": "Newcastle",
+        "timezone": "Europe/London",
+        "latitude": 54.978,
+        "longitude": -1.6102
+      },
+      {
+        "name": "Sheffield",
+        "timezone": "Europe/London",
+        "latitude": 53.3833,
+        "longitude": -1.4667
+      },
+      {
+        "name": "Liverpool",
+        "timezone": "Europe/London",
+        "latitude": 53.4075,
+        "longitude": -2.9916
+      },
+      {
+        "name": "Leeds",
+        "timezone": "Europe/London",
+        "latitude": 53.7975,
+        "longitude": -1.5436
+      },
+      {
+        "name": "Bristol",
+        "timezone": "Europe/London",
+        "latitude": 51.4536,
+        "longitude": -2.5975
+      },
+      {
+        "name": "Belfast",
+        "timezone": "Europe/London",
+        "latitude": 54.5964,
+        "longitude": -5.93
+      }
+    ]
+  },
+  {
+    "name": "United States",
+    "timezone": "America/New_York",
+    "code": "US",
+    "latitude": 38.9047,
+    "longitude": -77.0163,
+    "cities": [
+      {
+        "name": "Washington",
+        "timezone": "America/New_York",
+        "latitude": 38.9047,
+        "longitude": -77.0163
+      },
+      {
+        "name": "New York",
+        "timezone": "America/New_York",
+        "latitude": 40.6943,
+        "longitude": -73.9249
+      },
+      {
+        "name": "Los Angeles",
+        "timezone": "America/Los_Angeles",
+        "latitude": 34.1141,
+        "longitude": -118.4068
+      },
+      {
+        "name": "Chicago",
+        "timezone": "America/Chicago",
+        "latitude": 41.8375,
+        "longitude": -87.6866
+      },
+      {
+        "name": "Houston",
+        "timezone": "America/Chicago",
+        "latitude": 29.786,
+        "longitude": -95.3885
+      },
+      {
+        "name": "Phoenix",
+        "timezone": "America/Phoenix",
+        "latitude": 33.5722,
+        "longitude": -112.0892
+      }
+    ]
+  },
+  {
+    "name": "Venezuela",
+    "timezone": "America/Caracas",
+    "code": "VE",
+    "latitude": 10.4806,
+    "longitude": -66.9036,
+    "cities": [
+      {
+        "name": "Caracas",
+        "timezone": "America/Caracas",
+        "latitude": 10.4806,
+        "longitude": -66.9036
+      },
+      {
+        "name": "Maracaibo",
+        "timezone": "America/Caracas",
+        "latitude": 10.6333,
+        "longitude": -71.6333
+      },
+      {
+        "name": "Valencia",
+        "timezone": "America/Caracas",
+        "latitude": 10.1833,
+        "longitude": -68
+      },
+      {
+        "name": "Barquisimeto",
+        "timezone": "America/Caracas",
+        "latitude": 10.0636,
+        "longitude": -69.3347
+      },
+      {
+        "name": "Ciudad Guayana",
+        "timezone": "America/Caracas",
+        "latitude": 8.3667,
+        "longitude": -62.65
+      }
+    ]
+  },
+  {
+    "name": "Vietnam",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "code": "VN",
+    "latitude": 21,
+    "longitude": 105.85,
+    "cities": [
+      {
+        "name": "Hanoi",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "latitude": 21,
+        "longitude": 105.85
+      },
+      {
+        "name": "Ho Chi Minh City",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "latitude": 10.7756,
+        "longitude": 106.7019
+      },
+      {
+        "name": "Da Nang",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "latitude": 16.0748,
+        "longitude": 108.224
+      },
+      {
+        "name": "Haiphong",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "latitude": 20.8651,
+        "longitude": 106.6838
+      },
+      {
+        "name": "Can Tho",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "latitude": 10.0333,
+        "longitude": 105.7833
+      },
+      {
+        "name": "Bien Hoa",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "latitude": 10.95,
+        "longitude": 106.8167
+      }
+    ]
+  },
+  {
+    "name": "Virgin Islands, British",
+    "timezone": "America/Tortola",
+    "code": "VG",
+    "latitude": 18.4167,
+    "longitude": -64.6167,
+    "cities": [
+      {
+        "name": "Road Town",
+        "timezone": "America/Tortola",
+        "latitude": 18.4167,
+        "longitude": -64.6167
+      }
+    ]
+  },
+  {
+    "name": "U.S. Virgin Islands",
+    "timezone": "America/St_Thomas",
+    "code": "VI",
+    "latitude": 18.342,
+    "longitude": -64.9331,
+    "cities": [
+      {
+        "name": "Charlotte Amalie",
+        "timezone": "America/St_Thomas",
+        "latitude": 18.342,
+        "longitude": -64.9331
+      }
+    ]
+  },
+  {
+    "name": "Wallis and Futuna",
+    "timezone": "Pacific/Wallis",
+    "code": "WF",
+    "latitude": -13.2833,
+    "longitude": -176.1833,
+    "cities": [
+      {
+        "name": "Mata-Utu",
+        "timezone": "Pacific/Wallis",
+        "latitude": -13.2833,
+        "longitude": -176.1833
+      },
+      {
+        "name": "Leava",
+        "timezone": "Pacific/Wallis",
+        "latitude": -14.2961,
+        "longitude": -178.1585
+      }
+    ]
+  }
+]

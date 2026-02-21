@@ -1186,7 +1186,14 @@
     "code": "AG",
     "latitude": 17.05,
     "longitude": -61.8,
-    "cities": []
+    "cities": [
+      {
+        "name": "Saint John’s",
+        "timezone": "America/Antigua",
+        "latitude": 17.05,
+        "longitude": -61.8
+      }
+    ]
   },
   {
     "name": "Argentina",
@@ -4655,7 +4662,62 @@
     "code": "BO",
     "latitude": -17,
     "longitude": -65,
-    "cities": []
+    "cities": [
+      {
+        "name": "Santa Cruz de la Sierra",
+        "timezone": "America/La_Paz",
+        "latitude": -17.7892,
+        "longitude": -63.1975
+      },
+      {
+        "name": "La Paz",
+        "timezone": "America/La_Paz",
+        "latitude": -16.4958,
+        "longitude": -68.1333
+      },
+      {
+        "name": "Santa Cruz",
+        "timezone": "America/La_Paz",
+        "latitude": -17.8,
+        "longitude": -63.1833
+      },
+      {
+        "name": "El Alto",
+        "timezone": "America/La_Paz",
+        "latitude": -16.5047,
+        "longitude": -68.1633
+      },
+      {
+        "name": "Cochabamba",
+        "timezone": "America/La_Paz",
+        "latitude": -17.3883,
+        "longitude": -66.1597
+      },
+      {
+        "name": "Oruro",
+        "timezone": "America/La_Paz",
+        "latitude": -17.9667,
+        "longitude": -67.1167
+      },
+      {
+        "name": "Sucre",
+        "timezone": "America/La_Paz",
+        "latitude": -19.0475,
+        "longitude": -65.26
+      },
+      {
+        "name": "Tarija",
+        "timezone": "America/La_Paz",
+        "latitude": -21.5333,
+        "longitude": -64.7333
+      },
+      {
+        "name": "Potosi",
+        "timezone": "America/La_Paz",
+        "latitude": -19.5892,
+        "longitude": -65.7533
+      }
+    ]
   },
   {
     "name": "Bonaire, Sint Eustatius and Saba",
@@ -4663,7 +4725,26 @@
     "code": "BQ",
     "latitude": 12.15,
     "longitude": -68.266667,
-    "cities": []
+    "cities": [
+      {
+        "name": "Kralendijk",
+        "timezone": "America/Kralendijk",
+        "latitude": 12.1444,
+        "longitude": -68.2656
+      },
+      {
+        "name": "Oranjestad",
+        "timezone": "America/Kralendijk",
+        "latitude": 17.4833,
+        "longitude": -62.9833
+      },
+      {
+        "name": "The Bottom",
+        "timezone": "America/Kralendijk",
+        "latitude": 17.6261,
+        "longitude": -63.2492
+      }
+    ]
   },
   {
     "name": "Bosnia and Herzegovina",
@@ -4671,7 +4752,44 @@
     "code": "BA",
     "latitude": 44,
     "longitude": 18,
-    "cities": []
+    "cities": [
+      {
+        "name": "Sarajevo",
+        "timezone": "Europe/Sarajevo",
+        "latitude": 43.8564,
+        "longitude": 18.4131
+      },
+      {
+        "name": "Banja Luka",
+        "timezone": "Europe/Sarajevo",
+        "latitude": 44.7725,
+        "longitude": 17.1925
+      },
+      {
+        "name": "Bijeljina",
+        "timezone": "Europe/Sarajevo",
+        "latitude": 44.7569,
+        "longitude": 19.2161
+      },
+      {
+        "name": "Mostar",
+        "timezone": "Europe/Sarajevo",
+        "latitude": 43.3436,
+        "longitude": 17.8075
+      },
+      {
+        "name": "Tuzla",
+        "timezone": "Europe/Sarajevo",
+        "latitude": 44.5381,
+        "longitude": 18.6761
+      },
+      {
+        "name": "Zenica",
+        "timezone": "Europe/Sarajevo",
+        "latitude": 44.2039,
+        "longitude": 17.9078
+      }
+    ]
   },
   {
     "name": "Botswana",
@@ -27036,7 +27154,26 @@
     "code": "FM",
     "latitude": 6.91666666,
     "longitude": 158.25,
-    "cities": []
+    "cities": [
+      {
+        "name": "Weno",
+        "timezone": "Pacific/Chuuk",
+        "latitude": 7.4417,
+        "longitude": 151.8583
+      },
+      {
+        "name": "Palikir",
+        "timezone": "Pacific/Pohnpei",
+        "latitude": 6.9172,
+        "longitude": 158.1589
+      },
+      {
+        "name": "Kolonia",
+        "timezone": "Pacific/Pohnpei",
+        "latitude": 6.9639,
+        "longitude": 158.2081
+      }
+    ]
   },
   {
     "name": "Moldova (Republic of)",
@@ -27044,7 +27181,32 @@
     "code": "MD",
     "latitude": 47,
     "longitude": 29,
-    "cities": []
+    "cities": [
+      {
+        "name": "Chisinau",
+        "timezone": "Europe/Chisinau",
+        "latitude": 47.0228,
+        "longitude": 28.8353
+      },
+      {
+        "name": "Tiraspol",
+        "timezone": "Europe/Chisinau",
+        "latitude": 46.8403,
+        "longitude": 29.6433
+      },
+      {
+        "name": "Balti",
+        "timezone": "Europe/Chisinau",
+        "latitude": 47.7667,
+        "longitude": 27.9167
+      },
+      {
+        "name": "Bender",
+        "timezone": "Europe/Chisinau",
+        "latitude": 46.8333,
+        "longitude": 29.4833
+      }
+    ]
   },
   {
     "name": "Monaco",
