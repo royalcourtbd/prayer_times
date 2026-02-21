@@ -53,7 +53,7 @@ class RepositorySetup implements SetupModule {
         () => UserDataRepositoryImpl(locate(), locate()),
       )
       ..registerLazySingleton<NotificationRepository>(
-        () => NotificationRepositoryImpl(),
+        () => NotificationRepositoryImpl(locate()),
       )
       ..registerLazySingleton<PaymentRepository>(
         () => PaymentRepositoryImpl(locate(), locate()),

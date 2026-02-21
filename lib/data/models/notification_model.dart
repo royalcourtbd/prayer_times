@@ -14,14 +14,14 @@ class NotificationModel extends NotificationEntity {
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      timestamp: json['timestamp'],
-      type: json['type'],
-      isRead: json['isRead'],
-      actionUrl: json['actionUrl'],
-      imageUrl: json['imageUrl'],
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      type: json['type'] as String,
+      isRead: json['isRead'] as bool,
+      actionUrl: json['actionUrl'] as String?,
+      imageUrl: json['imageUrl'] as String?,
     );
   }
 
@@ -30,7 +30,7 @@ class NotificationModel extends NotificationEntity {
       'id': id,
       'title': title,
       'description': description,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toIso8601String(),
       'type': type,
       'isRead': isRead,
       'actionUrl': actionUrl,

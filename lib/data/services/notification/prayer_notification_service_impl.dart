@@ -16,8 +16,11 @@ import 'package:prayer_times/data/services/local_cache_service.dart';
 import 'package:prayer_times/data/services/notification/notification_service_information.dart';
 import 'package:prayer_times/domain/entities/calculation_method_entity.dart';
 import 'package:prayer_times/domain/entities/prayer_time_entity.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:prayer_times/domain/service/prayer_notification_service.dart';
 import 'package:prayer_times/presentation/home/models/waqt.dart';
+import 'package:prayer_times/presentation/notification/ui/notification_page.dart';
+import 'package:prayer_times/presentation/prayer_times.dart' as app;
 
 // Prayer notification channel (Adhan sound, high importance)
 const String _channelKey = 'prayer_time_channel';
@@ -89,6 +92,17 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
           enableLights: false,
           defaultPrivacy: NotificationPrivacy.Private,
         ),
+        // Push notification channel — FCM foreground push
+        NotificationChannel(
+          channelKey: pushNotificationChannelKey,
+          channelName: pushNotificationChannelName,
+          channelDescription: pushNotificationChannelDescription,
+          importance: NotificationImportance.High,
+          defaultPrivacy: NotificationPrivacy.Public,
+          playSound: true,
+          enableVibration: true,
+          defaultColor: PrayerTimeAppColor.primaryColor500,
+        ),
       ], debug: false);
 
       // Listeners সেট করা — static methods দরকার
@@ -101,27 +115,40 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     });
   }
 
-  /// Notification tap action handler
+  /// Notification tap action handler — NotificationPage-এ navigate
   @pragma('vm:entry-point')
   static Future<void> _onActionReceived(ReceivedAction action) async {
     await catchFutureOrVoid(() async {
-      // Notification এ tap করলে app open হবে (default behavior)
+      final NavigatorState? navigatorState =
+          app.PrayerTimes.navigatorKey.currentState;
+      if (navigatorState == null) return;
+
+      // UI thread-এ navigate করতে হবে — slight delay দিয়ে ensure
+      Future.delayed(const Duration(milliseconds: 300), () {
+        navigatorState.push(
+          CupertinoPageRoute(builder: (_) => NotificationPage()),
+        );
+      });
     });
   }
 
-  /// Notification display handler — midnight reset এ prayer notifications reschedule
+  /// Notification display handler — midnight reset এ reschedule + prayer notification store
   @pragma('vm:entry-point')
   static Future<void> _onNotificationDisplayed(
     ReceivedNotification notification,
   ) async {
     await catchFutureOrVoid(() async {
-      if (notification.id != _midnightResetId) return;
+      if (notification.id == _midnightResetId) {
+        // Silent notification তাৎক্ষণিক dismiss — user notification drawer-এ দেখবে না
+        await AwesomeNotifications().dismiss(_midnightResetId);
 
-      // Silent notification তাৎক্ষণিক dismiss — user notification drawer-এ দেখবে না
-      await AwesomeNotifications().dismiss(_midnightResetId);
+        // Cache থেকে prayer times ও settings লোড করে reschedule
+        await _rescheduleFromCache();
+        return;
+      }
 
-      // Cache থেকে prayer times ও settings লোড করে reschedule
-      await _rescheduleFromCache();
+      // Prayer notification displayed — Hive-তে save করো
+      await _storePrayerNotification(notification);
     });
   }
 
@@ -198,6 +225,67 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       );
 
       logDebugStatic('Midnight reset: সব prayer notification reschedule হয়েছে', 'MidnightReset');
+    });
+  }
+
+  /// Prayer notification display হলে Hive-তে save — background isolate safe
+  static Future<void> _storePrayerNotification(
+    ReceivedNotification notification,
+  ) async {
+    await catchFutureOrVoid(() async {
+      LocalCacheService cacheService;
+
+      if (GetIt.instance.isRegistered<LocalCacheService>()) {
+        cacheService = GetIt.instance.get<LocalCacheService>();
+      } else {
+        // Background isolate — Hive manually initialize
+        final dir = await getApplicationDocumentsDirectory();
+        Hive.init(dir.path);
+        if (!Hive.isBoxOpen(LocalCacheService.boxName)) {
+          await Hive.openBox<dynamic>(LocalCacheService.boxName);
+        }
+        cacheService = LocalCacheService();
+      }
+
+      // Existing notifications load
+      final String? existingJson = cacheService.getData<String>(
+        key: CacheKeys.notifications,
+      );
+
+      List<Map<String, dynamic>> notificationsList = [];
+      if (existingJson != null) {
+        final decoded = jsonDecode(existingJson) as List<dynamic>;
+        notificationsList =
+            decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+
+      // New notification add
+      final Map<String, dynamic> newNotification = {
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'title': notification.title ?? '',
+        'description': notification.body ?? '',
+        'timestamp': DateTime.now().toIso8601String(),
+        'type': 'prayer_time',
+        'isRead': false,
+        'imageUrl': null,
+        'actionUrl': null,
+      };
+
+      notificationsList.insert(0, newNotification);
+
+      // 7 দিনের পুরনো notification মুছে ফেলো
+      final DateTime cutoff = DateTime.now().subtract(const Duration(days: 7));
+      notificationsList.removeWhere((n) {
+        final timestamp = DateTime.tryParse(n['timestamp'] ?? '');
+        return timestamp != null && timestamp.isBefore(cutoff);
+      });
+
+      await cacheService.saveData<String>(
+        key: CacheKeys.notifications,
+        value: jsonEncode(notificationsList),
+      );
+
+      logDebugStatic('Prayer notification stored', 'NotificationStore');
     });
   }
 

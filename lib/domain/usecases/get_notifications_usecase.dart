@@ -19,4 +19,10 @@ class GetNotificationsUseCase extends BaseUseCase<List<NotificationEntity>> {
   Future<Either<String, void>> clearAll() async {
     return _repository.clearAll();
   }
+
+  Future<Either<String, void>> addNotification(
+    NotificationEntity notification,
+  ) async {
+    return _repository.addNotification(notification);
+  }
 }

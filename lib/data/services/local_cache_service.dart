@@ -131,4 +131,5 @@ class CacheKeys {
   static const String adjustmentMinutes = "adjustment_minutes_key";
   static const String calculationMethodId = "calculation_method_id_key";
   static const String juristicMethod = "juristic_method_key";
+  static const String notifications = "notifications_key";
 }

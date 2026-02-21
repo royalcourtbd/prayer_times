@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:prayer_times/core/utility/trial_utility.dart';
 import 'package:get/get.dart';
 import 'package:prayer_times/core/base/base_presenter.dart';
 import 'package:prayer_times/data/services/hijri_date_service.dart';
@@ -34,6 +35,9 @@ import 'package:prayer_times/domain/entities/app_update_entity.dart';
 import 'package:prayer_times/domain/usecases/get_app_update_info_usecase.dart';
 import 'package:prayer_times/presentation/home/widgets/app_update_bottom_sheet.dart';
 import 'package:prayer_times/presentation/settings/widgets/select_location_bottomsheet.dart';
+import 'package:prayer_times/domain/service/notification_service.dart';
+import 'package:prayer_times/domain/usecases/get_notifications_usecase.dart';
+import 'package:prayer_times/data/models/notification_model.dart';
 
 class HomePresenter extends BasePresenter<HomeUiState> {
   final GetLocationUseCase _getLocationUseCase;
@@ -50,6 +54,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
   final LocalCacheService _cacheService;
   final HijriDateService _hijriDateService;
   final PrayerNotificationService _prayerNotificationService;
+  final NotificationService _notificationService;
+  final GetNotificationsUseCase _getNotificationsUseCase;
   StreamSubscription<DateTime>? _timeSubscription;
 
   final ScrollController prayerTimesScrollController = ScrollController();
@@ -70,6 +76,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     this._cacheService,
     this._hijriDateService,
     this._prayerNotificationService,
+    this._notificationService,
+    this._getNotificationsUseCase,
   );
 
   final Obs<HomeUiState> uiState = Obs<HomeUiState>(HomeUiState.empty());
@@ -91,6 +99,8 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     _trackLaunchAndRequestReview();
     _checkForAppUpdate();
     _prayerNotificationService.scheduleMidnightReset();
+    _setupFCMListeners();
+    _checkInitialNotification();
 
     prayerTimesScrollController.addListener(_onUserScroll);
   }
@@ -446,6 +456,46 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     );
   }
 
+  /// FCM foreground/background listener সেটআপ
+  Future<void> _setupFCMListeners() async {
+    await catchFutureOrVoid(() async {
+      await _notificationService.setupFCMListeners(
+        onMessageReceived: (data, title, body) async {
+          // FCM push notification received — locally store করো
+          if (title == null && body == null) return;
+          final notification = NotificationModel(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            title: title ?? '',
+            description: body ?? '',
+            timestamp: DateTime.now(),
+            type: data['type'] as String? ?? 'push',
+            isRead: false,
+            imageUrl: data['imageUrl'] as String?,
+            actionUrl: data['actionUrl'] as String?,
+          );
+          await _getNotificationsUseCase.addNotification(notification);
+        },
+        onNotificationTapped: (data) async {
+          // FCM notification tap — NotificationPage-এ navigate
+          await _notificationService.onOpenedFromNotification();
+        },
+      );
+    });
+  }
+
+  /// App terminated অবস্থায় notification tap থেকে open হলে চেক
+  Future<void> _checkInitialNotification() async {
+    await catchFutureOrVoid(() async {
+      final data = await _notificationService.getInitialMessage();
+      if (data != null) {
+        // App terminated ছিল, user notification tap করে open করেছে
+        // Navigation stack ready হওয়ার জন্য delay
+        Future.delayed(const Duration(seconds: 2), () {
+          _notificationService.onOpenedFromNotification();
+        });
+      }
+    });
+  }
 
   void _updateAllStates() {
     _updateActiveWaqt();
