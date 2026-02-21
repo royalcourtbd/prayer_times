@@ -147,6 +147,10 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
         return;
       }
 
+      // শুধু prayer time channel-এর notification store করো
+      // Push notification channel-এর গুলো HomePresenter-এ onMessageReceived-এ store হয়
+      if (notification.channelKey != _channelKey) return;
+
       // Prayer notification displayed — Hive-তে save করো
       await _storePrayerNotification(notification);
     });

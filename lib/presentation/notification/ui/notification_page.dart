@@ -40,11 +40,7 @@ class NotificationPage extends StatelessWidget {
           ),
           body: currentUiState.notifications.isEmpty
               ? _buildEmptyState(theme, context)
-              : _buildNotificationList(
-                  currentUiState,
-                  theme,
-                  context,
-                ),
+              : _buildNotificationList(currentUiState, theme, context),
         );
       },
     );
@@ -63,10 +59,7 @@ class NotificationPage extends StatelessWidget {
         // সব select করা
         IconButton(
           onPressed: () => _presenter.selectAll(),
-          icon: Icon(
-            Icons.select_all_rounded,
-            color: context.color.titleColor,
-          ),
+          icon: Icon(Icons.select_all_rounded, color: context.color.titleColor),
           tooltip: 'Select All',
         ),
         // Delete selected
@@ -85,10 +78,7 @@ class NotificationPage extends StatelessWidget {
         // Cancel selection
         IconButton(
           onPressed: () => _presenter.toggleSelectionMode(),
-          icon: Icon(
-            Icons.close_rounded,
-            color: context.color.titleColor,
-          ),
+          icon: Icon(Icons.close_rounded, color: context.color.titleColor),
           tooltip: 'Cancel',
         ),
       ];
@@ -98,10 +88,7 @@ class NotificationPage extends StatelessWidget {
       // Selection mode চালু করার button
       IconButton(
         onPressed: () => _presenter.toggleSelectionMode(),
-        icon: Icon(
-          Icons.checklist_rounded,
-          color: context.color.titleColor,
-        ),
+        icon: Icon(Icons.checklist_rounded, color: context.color.titleColor),
         tooltip: 'Select',
       ),
     ];
@@ -175,14 +162,11 @@ class NotificationPage extends StatelessWidget {
               color: isSelected
                   ? context.color.primaryColor25
                   : notification.isRead
-                      ? context.color.scaffoldBachgroundColor
-                      : context.color.primaryColor25,
+                  ? context.color.scaffoldBachgroundColor
+                  : context.color.primaryColor25,
               borderRadius: radius10,
               border: isSelected
-                  ? Border.all(
-                      color: context.color.primaryColor,
-                      width: 1.5,
-                    )
+                  ? Border.all(color: context.color.primaryColor, width: 1.5)
                   : null,
             ),
             child: Row(
@@ -204,7 +188,7 @@ class NotificationPage extends StatelessWidget {
                     radius: twentyTwoPx,
                     backgroundColor: generateAvatarColor(index: index),
                     child: SvgImage(
-                      notification.imageUrl ?? '',
+                      SvgPath.icNotificationOutline,
                       color: context.color.whiteColor,
                     ),
                   ),
@@ -244,8 +228,9 @@ class NotificationPage extends StatelessWidget {
                             child: CustomButton(
                               key: UniqueKey(),
                               horizontalPadding: 0,
-                              title: 'Support Now',
-                              onPressed: () {},
+                              title: 'View',
+                              onPressed: () =>
+                                  openUrl(url: notification.actionUrl!),
                               liftIconPath: SvgPath.icLovelyOutline,
                             ),
                           ),

@@ -145,8 +145,11 @@ class NotificationServiceImpl implements NotificationService {
       String? title,
       String? body,
     ) onMessageReceived,
-    required Future<void> Function(Map<String, dynamic> data)
-        onNotificationTapped,
+    required Future<void> Function(
+      Map<String, dynamic> data,
+      String? title,
+      String? body,
+    ) onNotificationTapped,
   }) async {
     await catchFutureOrVoid(() async {
       // 1. Foreground messages — app open অবস্থায় push আসলে
@@ -180,7 +183,11 @@ class NotificationServiceImpl implements NotificationService {
       FirebaseMessaging.onMessageOpenedApp.listen(
         (RemoteMessage message) async {
           await catchFutureOrVoid(() async {
-            await onNotificationTapped(message.data);
+            await onNotificationTapped(
+              message.data,
+              message.notification?.title,
+              message.notification?.body,
+            );
           });
         },
       );
@@ -194,7 +201,14 @@ class NotificationServiceImpl implements NotificationService {
     try {
       final RemoteMessage? initialMessage =
           await _firebaseMessaging.getInitialMessage();
-      return initialMessage?.data;
+      if (initialMessage == null) return null;
+
+      // data-র সাথে title/body ও return করো — notification store করতে লাগবে
+      return {
+        ...initialMessage.data,
+        '_title': initialMessage.notification?.title,
+        '_body': initialMessage.notification?.body,
+      };
     } catch (e) {
       logDebug('Error getting initial message: $e');
       return null;

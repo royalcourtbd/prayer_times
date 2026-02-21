@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:prayer_times/core/config/prayer_time_app_screen.dart';
+import 'package:prayer_times/core/static/svg_path.dart';
 import 'package:prayer_times/core/static/ui_const.dart';
 import 'package:prayer_times/core/utility/utility.dart';
 import 'package:prayer_times/domain/entities/notification_entity.dart';
 import 'package:prayer_times/presentation/common/custom_app_bar.dart';
+import 'package:prayer_times/presentation/common/custom_button.dart';
 
 class NotificationDetailsPage extends StatelessWidget {
   const NotificationDetailsPage({super.key, required this.notification});
@@ -44,6 +47,24 @@ class NotificationDetailsPage extends StatelessWidget {
                 height: 1.5,
               ),
             ),
+            if (notification.actionUrl != null) ...[
+              gapH16,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  height: fortyTwoPx,
+                  width: 42.percentWidth,
+                  child: CustomButton(
+                    key: UniqueKey(),
+                    horizontalPadding: 0,
+                    title: 'Support Now',
+                    onPressed: () =>
+                        openUrl(url: notification.actionUrl!),
+                    liftIconPath: SvgPath.icLovelyOutline,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

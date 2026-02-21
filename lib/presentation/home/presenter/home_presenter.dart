@@ -475,9 +475,9 @@ class HomePresenter extends BasePresenter<HomeUiState> {
           );
           await _getNotificationsUseCase.addNotification(notification);
         },
-        onNotificationTapped: (data) async {
-          // FCM notification tap — NotificationPage-এ navigate
-          await _notificationService.onOpenedFromNotification();
+        onNotificationTapped: (data, title, body) async {
+          // FCM notification tap — আগে store করো, তারপর navigate
+          await _storeAndNavigateFromNotification(data, title, body);
         },
       );
     });
@@ -489,11 +489,42 @@ class HomePresenter extends BasePresenter<HomeUiState> {
       final data = await _notificationService.getInitialMessage();
       if (data != null) {
         // App terminated ছিল, user notification tap করে open করেছে
+        // _title ও _body extract করো — getInitialMessage() এ inject করা হয়েছে
+        final String? title = data.remove('_title') as String?;
+        final String? body = data.remove('_body') as String?;
+
         // Navigation stack ready হওয়ার জন্য delay
         Future.delayed(const Duration(seconds: 2), () {
-          _notificationService.onOpenedFromNotification();
+          _storeAndNavigateFromNotification(data, title, body);
         });
       }
+    });
+  }
+
+  /// FCM notification tap (background/terminated) — store করো এবং navigate করো
+  Future<void> _storeAndNavigateFromNotification(
+    Map<String, dynamic> data,
+    String? title,
+    String? body,
+  ) async {
+    await catchFutureOrVoid(() async {
+      // Notification locally store করো — যাতে NotificationPage-এ দেখা যায়
+      if (title != null || body != null) {
+        final notification = NotificationModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: title ?? '',
+          description: body ?? '',
+          timestamp: DateTime.now(),
+          type: data['type'] as String? ?? 'push',
+          isRead: false,
+          imageUrl: data['imageUrl'] as String?,
+          actionUrl: data['actionUrl'] as String?,
+        );
+        await _getNotificationsUseCase.addNotification(notification);
+      }
+
+      // NotificationPage-এ navigate
+      await _notificationService.onOpenedFromNotification();
     });
   }
 
