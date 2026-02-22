@@ -27,6 +27,24 @@ abstract class PrayerNotificationService {
     required Map<WaqtType, int> minutesMap,
   });
 
+  /// Schedule notifications for multiple days ahead (7 days).
+  /// এটি location, calculation method সহ সব তথ্য নিয়ে 7 দিনের
+  /// notifications একসাথে schedule করে।
+  /// App open না করলেও notifications আসবে।
+  Future<void> scheduleForMultipleDays({
+    required double latitude,
+    required double longitude,
+    required String? timezone,
+    required Map<WaqtType, bool> enabledMap,
+    required Map<WaqtType, int> minutesMap,
+    required String calculationMethodId,
+    required String juristicMethod,
+  });
+
+  /// Check if notifications need to be rescheduled.
+  /// Returns true if less than 3 days of notifications are scheduled.
+  Future<bool> shouldReschedule();
+
   /// Schedule a daily midnight reset trigger.
   Future<void> scheduleMidnightReset();
 

@@ -31,9 +31,13 @@ const String _soundSource = 'resource://raw/hayya_ala_salah';
 // Silent channel — midnight reset trigger (user দেখবে না/শুনবে না)
 const String _silentChannelKey = 'midnight_reset_channel';
 const String _silentChannelName = 'Background Updates';
-const String _silentChannelDescription = 'Silent background task — no user visibility';
+const String _silentChannelDescription =
+    'Silent background task — no user visibility';
 
 const int _midnightResetId = 1000;
+
+/// Multi-day scheduling: 7 দিন আগে থেকে notifications schedule করা হবে
+const int _daysToScheduleAhead = 7;
 
 /// Schedulable prayer types (excludes sunrise and duha).
 const List<WaqtType> _schedulableTypes = [
@@ -45,7 +49,7 @@ const List<WaqtType> _schedulableTypes = [
 ];
 
 class PrayerNotificationServiceImpl implements PrayerNotificationService {
-  /// Deterministic notification ID for each prayer.
+  /// Deterministic notification ID for each prayer (legacy - single day).
   static int _notificationId(WaqtType type, {int dayOffset = 0}) {
     final int baseId;
     switch (type) {
@@ -63,6 +67,29 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
         return 0;
     }
     return baseId + (dayOffset * 10);
+  }
+
+  /// Date-based unique notification ID - প্রতিটি দিনের প্রতিটি prayer-এর জন্য আলাদা ID
+  /// Format: YYYYMMDD * 10 + prayerBaseId
+  /// Example: 20260222 * 10 + 1 = 202602221 (Fajr on Feb 22, 2026)
+  static int _notificationIdForDate(WaqtType type, DateTime date) {
+    final int baseId;
+    switch (type) {
+      case WaqtType.fajr:
+        baseId = 1;
+      case WaqtType.dhuhr:
+        baseId = 2;
+      case WaqtType.asr:
+        baseId = 3;
+      case WaqtType.maghrib:
+        baseId = 4;
+      case WaqtType.isha:
+        baseId = 5;
+      default:
+        return 0;
+    }
+    final dateComponent = date.year * 10000 + date.month * 100 + date.day;
+    return dateComponent * 10 + baseId;
   }
 
   @override
@@ -188,24 +215,28 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       );
 
       if (enabledJson == null || locationJson == null) {
-        logDebugStatic('Midnight reset: cache-এ data নেই, skip', 'MidnightReset');
+        logDebugStatic(
+          'Midnight reset: cache-এ data নেই, skip',
+          'MidnightReset',
+        );
         return;
       }
 
       final LocationModel? location = _parseLocation(locationJson);
       if (location == null) {
-        logDebugStatic('Midnight reset: location parse হয়নি, skip', 'MidnightReset');
+        logDebugStatic(
+          'Midnight reset: location parse হয়নি, skip',
+          'MidnightReset',
+        );
         return;
       }
 
       // Calculation/juristic method — cache থেকে, default fallback সহ
-      final String calculationMethodId = cacheService.getData<String>(
-            key: CacheKeys.calculationMethodId,
-          ) ??
+      final String calculationMethodId =
+          cacheService.getData<String>(key: CacheKeys.calculationMethodId) ??
           'karachi';
-      final String juristicMethod = cacheService.getData<String>(
-            key: CacheKeys.juristicMethod,
-          ) ??
+      final String juristicMethod =
+          cacheService.getData<String>(key: CacheKeys.juristicMethod) ??
           'Shafi';
 
       // adhan_dart দিয়ে আজকের prayer times calculate
@@ -218,8 +249,9 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       );
 
       final Map<WaqtType, bool> enabledMap = _parseEnabledMap(enabledJson);
-      final Map<WaqtType, int> minutesMap =
-          minutesJson != null ? _parseMinutesMap(minutesJson) : {};
+      final Map<WaqtType, int> minutesMap = minutesJson != null
+          ? _parseMinutesMap(minutesJson)
+          : {};
 
       final service = PrayerNotificationServiceImpl();
       await service.rescheduleAll(
@@ -228,7 +260,10 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
         minutesMap: minutesMap,
       );
 
-      logDebugStatic('Midnight reset: সব prayer notification reschedule হয়েছে', 'MidnightReset');
+      logDebugStatic(
+        'Midnight reset: সব prayer notification reschedule হয়েছে',
+        'MidnightReset',
+      );
     });
   }
 
@@ -259,8 +294,9 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
       List<Map<String, dynamic>> notificationsList = [];
       if (existingJson != null) {
         final decoded = jsonDecode(existingJson) as List<dynamic>;
-        notificationsList =
-            decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        notificationsList = decoded
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
       }
 
       // New notification add
@@ -301,13 +337,15 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     });
   }
 
-  /// adhan_dart দিয়ে সরাসরি prayer times calculate — কোনো API call নেই
+  /// adhan_dart দিয়ে prayer times calculate — কোনো API call নেই
+  /// [date] parameter দিলে সেই নির্দিষ্ট দিনের prayer times calculate হবে
   static PrayerTimeEntity _calculatePrayerTimes({
     required double latitude,
     required double longitude,
     required String? timezone,
     required String calculationMethodId,
     required String juristicMethod,
+    DateTime? date,
   }) {
     tz_data.initializeTimeZones();
 
@@ -316,11 +354,22 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
     final params = method.getParams()
       ..madhab = juristicMethod == 'Hanafi' ? Madhab.hanafi : Madhab.shafi;
 
-    // আজকের date — timezone অনুযায়ী
-    DateTime now = DateTime.now();
+    // Target date — timezone অনুযায়ী
+    DateTime targetDate = date ?? DateTime.now();
     if (timezone != null && timezone.isNotEmpty) {
       try {
-        now = tz.TZDateTime.now(tz.getLocation(timezone));
+        if (date != null) {
+          // নির্দিষ্ট date-এর জন্য timezone adjust
+          targetDate = tz.TZDateTime(
+            tz.getLocation(timezone),
+            date.year,
+            date.month,
+            date.day,
+            12, // midday to avoid DST issues
+          );
+        } else {
+          targetDate = tz.TZDateTime.now(tz.getLocation(timezone));
+        }
       } catch (_) {
         // fallback to local time
       }
@@ -328,7 +377,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
 
     final prayerTimes = PrayerTimes(
       coordinates: coordinates,
-      date: now,
+      date: targetDate,
       calculationParameters: params,
       precision: true,
     );
@@ -364,30 +413,31 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
 
   static Map<WaqtType, bool> _parseEnabledMap(String json) {
     return catchAndReturn<Map<WaqtType, bool>>(() {
-      final Map<String, dynamic> decoded = jsonDecode(json);
-      final Map<WaqtType, bool> map = {};
-      for (final entry in decoded.entries) {
-        final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
-        if (idx == -1) continue;
-        map[WaqtType.values[idx]] = entry.value as bool;
-      }
-      return map;
-    }) ?? {};
+          final Map<String, dynamic> decoded = jsonDecode(json);
+          final Map<WaqtType, bool> map = {};
+          for (final entry in decoded.entries) {
+            final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
+            if (idx == -1) continue;
+            map[WaqtType.values[idx]] = entry.value as bool;
+          }
+          return map;
+        }) ??
+        {};
   }
 
   static Map<WaqtType, int> _parseMinutesMap(String json) {
     return catchAndReturn<Map<WaqtType, int>>(() {
-      final Map<String, dynamic> decoded = jsonDecode(json);
-      final Map<WaqtType, int> map = {};
-      for (final entry in decoded.entries) {
-        final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
-        if (idx == -1) continue;
-        map[WaqtType.values[idx]] = entry.value as int;
-      }
-      return map;
-    }) ?? {};
+          final Map<String, dynamic> decoded = jsonDecode(json);
+          final Map<WaqtType, int> map = {};
+          for (final entry in decoded.entries) {
+            final idx = WaqtType.values.indexWhere((e) => e.name == entry.key);
+            if (idx == -1) continue;
+            map[WaqtType.values[idx]] = entry.value as int;
+          }
+          return map;
+        }) ??
+        {};
   }
-
 
   @override
   Future<void> scheduleForPrayer({
@@ -421,7 +471,7 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
           date: scheduledTime,
           allowWhileIdle: true,
           preciseAlarm: true,
-          repeats: false,
+          repeats: true,
         ),
       );
 
@@ -486,6 +536,129 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
 
       logDebug('Rescheduled all prayer notifications');
     });
+  }
+
+  @override
+  Future<void> scheduleForMultipleDays({
+    required double latitude,
+    required double longitude,
+    required String? timezone,
+    required Map<WaqtType, bool> enabledMap,
+    required Map<WaqtType, int> minutesMap,
+    required String calculationMethodId,
+    required String juristicMethod,
+  }) async {
+    await catchFutureOrVoid(() async {
+      // সব existing scheduled notifications cancel (midnight reset বাদে)
+      for (final type in _schedulableTypes) {
+        await _cancelMultipleDaysForPrayer(type);
+      }
+
+      final DateTime now = DateTime.now();
+
+      // 7 দিনের জন্য notifications schedule
+      for (int dayOffset = 0; dayOffset < _daysToScheduleAhead; dayOffset++) {
+        final DateTime targetDate = now.add(Duration(days: dayOffset));
+
+        // এই দিনের prayer times calculate
+        final PrayerTimeEntity prayerTimeEntity = _calculatePrayerTimes(
+          latitude: latitude,
+          longitude: longitude,
+          timezone: timezone,
+          calculationMethodId: calculationMethodId,
+          juristicMethod: juristicMethod,
+          date: targetDate,
+        );
+
+        // প্রতিটি enabled prayer-এর জন্য notification schedule
+        for (final type in _schedulableTypes) {
+          final bool isEnabled = enabledMap[type] ?? false;
+          if (!isEnabled) continue;
+
+          final DateTime? prayerTime = _getTimeForType(type, prayerTimeEntity);
+          if (prayerTime == null) continue;
+
+          final int adjustmentMinutes = minutesMap[type] ?? 0;
+          final DateTime scheduledTime = prayerTime.add(
+            Duration(minutes: adjustmentMinutes),
+          );
+
+          // অতীতের time skip
+          if (scheduledTime.isBefore(DateTime.now())) continue;
+
+          // Date-based unique ID দিয়ে schedule
+          await _scheduleNotificationWithId(
+            notificationId: _notificationIdForDate(type, targetDate),
+            waqtType: type,
+            scheduledTime: scheduledTime,
+            adjustmentMinutes: adjustmentMinutes,
+          );
+        }
+      }
+
+      logDebug(
+        'Scheduled notifications for $_daysToScheduleAhead days ahead',
+      );
+    });
+  }
+
+  /// Multi-day scheduling-এর জন্য notification schedule করা
+  Future<void> _scheduleNotificationWithId({
+    required int notificationId,
+    required WaqtType waqtType,
+    required DateTime scheduledTime,
+    required int adjustmentMinutes,
+  }) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: notificationId,
+        channelKey: _channelKey,
+        title: '${waqtType.displayName} Prayer Time',
+        body: _buildNotificationBody(waqtType, adjustmentMinutes),
+        notificationLayout: NotificationLayout.Default,
+        category: NotificationCategory.Reminder,
+        wakeUpScreen: true,
+        payload: {'waqtType': waqtType.name},
+        autoDismissible: true,
+        color: PrayerTimeAppColor.primaryColor500,
+        largeIcon: notificationIconSource,
+      ),
+      schedule: NotificationCalendar.fromDate(
+        date: scheduledTime,
+        allowWhileIdle: true,
+        preciseAlarm: true,
+        repeats: false, // One-time per day, multi-day scheduled
+      ),
+    );
+  }
+
+  /// Multi-day notifications cancel করা
+  Future<void> _cancelMultipleDaysForPrayer(WaqtType waqtType) async {
+    final DateTime now = DateTime.now();
+    // 14 দিনের notifications cancel (safety margin)
+    for (int dayOffset = 0; dayOffset < 14; dayOffset++) {
+      final DateTime targetDate = now.add(Duration(days: dayOffset));
+      await AwesomeNotifications().cancel(
+        _notificationIdForDate(waqtType, targetDate),
+      );
+    }
+  }
+
+  @override
+  Future<bool> shouldReschedule() async {
+    // Check if we have less than 3 days of notifications scheduled
+    // এই method app resume-এ call হবে
+    final List<NotificationModel> scheduled =
+        await AwesomeNotifications().listScheduledNotifications();
+
+    // Prayer notifications count করো (midnight reset বাদে)
+    final int prayerNotificationCount = scheduled
+        .where((n) => n.content?.channelKey == _channelKey)
+        .length;
+
+    // যদি 10 টার কম notification থাকে, reschedule দরকার
+    // (5 prayers * 2 days = 10 minimum)
+    return prayerNotificationCount < 10;
   }
 
   @override
@@ -562,13 +735,14 @@ class PrayerNotificationServiceImpl implements PrayerNotificationService {
   /// Notification body তৈরি adjustment অনুযায়ী
   static String _buildNotificationBody(WaqtType type, int adjustmentMinutes) {
     return catchAndReturn<String>(() {
-      if (adjustmentMinutes == 0) {
-        return 'It is time for ${type.displayName} prayer.';
-      } else if (adjustmentMinutes > 0) {
-        return '${type.displayName} prayer was $adjustmentMinutes minutes ago.';
-      } else {
-        return '${type.displayName} prayer is in ${adjustmentMinutes.abs()} minutes.';
-      }
-    }) ?? '';
+          if (adjustmentMinutes == 0) {
+            return 'It is time for ${type.displayName} prayer.';
+          } else if (adjustmentMinutes > 0) {
+            return '${type.displayName} prayer was $adjustmentMinutes minutes ago.';
+          } else {
+            return '${type.displayName} prayer is in ${adjustmentMinutes.abs()} minutes.';
+          }
+        }) ??
+        '';
   }
 }

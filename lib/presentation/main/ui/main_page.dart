@@ -3,6 +3,7 @@ import 'package:prayer_times/core/di/service_locator.dart';
 import 'package:prayer_times/core/external_libs/presentable_widget_builder.dart';
 import 'package:prayer_times/presentation/audio/ui/audio_page.dart';
 import 'package:prayer_times/presentation/event/ui/event_page.dart';
+import 'package:prayer_times/presentation/home/presenter/home_presenter.dart';
 import 'package:prayer_times/presentation/main/presenter/main_presenter.dart';
 import 'package:prayer_times/presentation/main/presenter/main_ui_state.dart';
 import 'package:prayer_times/presentation/main/widgets/double_tap_back_to_exit_app.dart';
@@ -11,18 +12,45 @@ import 'package:prayer_times/presentation/home/ui/home_page.dart';
 import 'package:prayer_times/presentation/prayer_tracker/ui/prayer_tracker_page.dart';
 import 'package:prayer_times/presentation/settings/ui/settings_page.dart';
 
-class MainPage extends StatelessWidget {
-  MainPage({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final MainPresenter _mainPresenter = locate<MainPresenter>();
+  final HomePresenter _homePresenter = locate<HomePresenter>();
 
   final List<Widget> _pages = <Widget>[
-    // PrayerTimePage(),
     HomePage(),
     PrayerTrackerPage(),
     EventPage(),
     const AudioPage(),
     SettingsPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // App foreground-এ এসেছে - notifications refresh করো যদি দরকার হয়
+      _homePresenter.ensureNotificationsScheduled();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

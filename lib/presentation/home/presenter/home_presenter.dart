@@ -448,12 +448,70 @@ class HomePresenter extends BasePresenter<HomeUiState> {
     );
   }
 
-  void _rescheduleAllNotifications(PrayerTimeEntity prayerTime) {
-    _prayerNotificationService.rescheduleAll(
-      prayerTimeEntity: prayerTime,
+  /// সব notifications reschedule করা - 7 দিনের জন্য আগে থেকে schedule
+  Future<void> _rescheduleAllNotifications(PrayerTimeEntity prayerTime) async {
+    final location = currentUiState.location;
+    if (location == null) {
+      // Fallback to single-day reschedule if location not available
+      _prayerNotificationService.rescheduleAll(
+        prayerTimeEntity: prayerTime,
+        enabledMap: currentUiState.adjustmentEnabledMap,
+        minutesMap: currentUiState.adjustmentMinutesMap,
+      );
+      return;
+    }
+
+    // Cache থেকে calculation settings নিয়ে আসা
+    final String calculationMethodId =
+        _cacheService.getData<String>(key: CacheKeys.calculationMethodId) ??
+            'karachi';
+    final String juristicMethod =
+        _cacheService.getData<String>(key: CacheKeys.juristicMethod) ?? 'Shafi';
+
+    // 7 দিনের জন্য notifications schedule
+    await _prayerNotificationService.scheduleForMultipleDays(
+      latitude: location.latitude,
+      longitude: location.longitude,
+      timezone: location.timezone,
       enabledMap: currentUiState.adjustmentEnabledMap,
       minutesMap: currentUiState.adjustmentMinutesMap,
+      calculationMethodId: calculationMethodId,
+      juristicMethod: juristicMethod,
     );
+  }
+
+  /// App resume হলে check করে notifications ঠিক আছে কিনা
+  /// যদি কম থাকে, 7 দিনের জন্য আবার schedule করে
+  Future<void> ensureNotificationsScheduled() async {
+    await catchFutureOrVoid(() async {
+      final bool needsReschedule =
+          await _prayerNotificationService.shouldReschedule();
+
+      if (!needsReschedule) return;
+
+      final location = currentUiState.location;
+      if (location == null) return;
+
+      // Cache থেকে calculation settings নিয়ে আসা
+      final String calculationMethodId =
+          _cacheService.getData<String>(key: CacheKeys.calculationMethodId) ??
+              'karachi';
+      final String juristicMethod =
+          _cacheService.getData<String>(key: CacheKeys.juristicMethod) ??
+              'Shafi';
+
+      await _prayerNotificationService.scheduleForMultipleDays(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timezone: location.timezone,
+        enabledMap: currentUiState.adjustmentEnabledMap,
+        minutesMap: currentUiState.adjustmentMinutesMap,
+        calculationMethodId: calculationMethodId,
+        juristicMethod: juristicMethod,
+      );
+
+      log('Notifications rescheduled for 7 days on app resume');
+    });
   }
 
   /// FCM foreground/background listener সেটআপ
